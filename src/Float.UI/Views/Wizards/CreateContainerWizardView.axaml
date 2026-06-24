@@ -1,0 +1,598 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels.Wizards"
+             x:Class="Float.UI.Views.Wizards.CreateContainerWizardView"
+             x:DataType="vm:CreateContainerWizardViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- ── Header ───────────────────────────────────────────────────── -->
+        <Border Grid.Row="0" Padding="32,52,32,16">
+            <StackPanel Spacing="10">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="{Binding StepTitle}"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                    <!-- Step counter — hidden on the creating screen (step 6) -->
+                    <TextBlock Grid.Column="1"
+                               FontSize="12"
+                               Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                               VerticalAlignment="Center"
+                               IsVisible="{Binding IsWizardStep}">
+                        <Run Text="Step "/>
+                        <Run Text="{Binding CurrentStep}"/>
+                        <Run Text=" of "/>
+                        <Run Text="{Binding TotalSteps}"/>
+                    </TextBlock>
+                </Grid>
+                <!-- Progress bar — wizard steps only -->
+                <ProgressBar Value="{Binding CurrentStep}"
+                             Maximum="{Binding TotalSteps}"
+                             Height="3"
+                             CornerRadius="2"
+                             Foreground="{DynamicResource FloatAccentBrush}"
+                             Background="{DynamicResource SidebarBorderBrush}"
+                             IsVisible="{Binding IsWizardStep}"/>
+            </StackPanel>
+        </Border>
+
+        <!-- ── Content ──────────────────────────────────────────────────── -->
+        <ScrollViewer Grid.Row="1" Padding="32,0,32,16">
+            <Grid>
+
+                <!-- ── Step 1: Image ──────────────────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep1}" Spacing="20" MaxWidth="720">
+                    <Grid ColumnDefinitions="*,24,*"
+                          RowDefinitions="Auto,20,Auto,20,Auto"
+                          HorizontalAlignment="Stretch">
+                        <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
+                            <TextBlock Text="REGISTRY"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <ComboBox ItemsSource="{Binding RegistryOptions}"
+                                      SelectedItem="{Binding Registry, Mode=TwoWay}"
+                                      FontSize="13"
+                                      HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="0" Grid.Column="2" Spacing="6">
+                            <TextBlock Text="IMAGE NAME"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <TextBox Text="{Binding ImageName, Mode=TwoWay}"
+                                     PlaceholderText="e.g. ubuntu, org/image, library/node"
+                                     FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
+                            <TextBlock Text="TAG"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <TextBox Text="{Binding Tag, Mode=TwoWay}"
+                                     PlaceholderText="e.g. latest, 22.04, 1.0.0"
+                                     FontSize="13"/>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="2" Grid.Column="2" Spacing="6">
+                            <TextBlock Text="CONTAINER NAME"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <TextBox Text="{Binding ContainerName, Mode=TwoWay}"
+                                     PlaceholderText="Optional — auto-generated if left blank"
+                                     FontSize="13"/>
+                        </StackPanel>
+
+                        <Border Grid.Row="4"
+                                Grid.ColumnSpan="3"
+                                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                CornerRadius="10"
+                                Padding="14,12">
+                            <StackPanel Spacing="4">
+                                <TextBlock Text="IMAGE PREVIEW"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           LetterSpacing="1"/>
+                                <TextBlock Text="{Binding ImageReference}"
+                                           FontSize="13"
+                                           FontWeight="Medium"
+                                           TextWrapping="Wrap"/>
+                            </StackPanel>
+                        </Border>
+                    </Grid>
+                </StackPanel>
+
+                <!-- ── Step 2: Platform ───────────────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep2}" Spacing="20" MaxWidth="520">
+
+                    <!-- Rosetta toggle card -->
+                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                            CornerRadius="10"
+                            Padding="16,14">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Enable Rosetta (AMD64 Emulation)"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Required for x86_64/amd64-only images. Uses Apple Rosetta 2 to translate instructions at near-native speed."
+                                           FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="360"/>
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding EnableRosetta}"
+                                         VerticalAlignment="Center"
+                                         Margin="16,0,0,0"
+                                         OnContent=""
+                                         OffContent=""/>
+                        </Grid>
+                    </Border>
+
+                    <!-- Architecture -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="ARCHITECTURE"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
+                        <ComboBox ItemsSource="{Binding ArchitectureOptions}"
+                                  SelectedItem="{Binding Architecture}"
+                                  FontSize="13"
+                                  HorizontalAlignment="Stretch"/>
+                        <TextBlock Text="Set automatically when toggling Rosetta above."
+                                   FontSize="11"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                    </StackPanel>
+
+                    <!-- Resources -->
+                    <Grid ColumnDefinitions="*,16,*">
+                        <StackPanel Grid.Column="0" Spacing="6">
+                            <TextBlock Text="CPU CORES"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <TextBox Text="{Binding CpuCount}"
+                                     PlaceholderText="e.g. 2  (optional)"
+                                     FontSize="13"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="6">
+                            <TextBlock Text="MEMORY"
+                                       FontSize="11"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       LetterSpacing="1"/>
+                            <TextBox Text="{Binding Memory}"
+                                     PlaceholderText="e.g. 512m, 2g  (optional)"
+                                     FontSize="13"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                            CornerRadius="10"
+                            Padding="16,14">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="4">
+                                <TextBlock Text="Keep container alive"
+                                           FontSize="14"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="Appends a persistent command for cases where the image exits immediately, such as test containers or minimal base images."
+                                           FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="360"/>
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                         IsChecked="{Binding KeepAlive}"
+                                         VerticalAlignment="Center"
+                                         Margin="16,0,0,0"
+                                         OnContent=""
+                                         OffContent=""/>
+                        </Grid>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── Step 3: Ports & Volumes ────────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep3}" Spacing="24" MaxWidth="600">
+
+                    <!-- Ports -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="PORT MAPPINGS"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
+
+                        <ItemsControl ItemsSource="{Binding PortMappings}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:PortMappingItem">
+                                    <Grid ColumnDefinitions="*,24,*,8,72,8,Auto"
+                                          Margin="0,0,0,6">
+                                        <TextBox Grid.Column="0"
+                                                 Text="{Binding HostPort}"
+                                                 PlaceholderText="Host port"
+                                                 FontSize="12"/>
+                                        <TextBlock Grid.Column="1"
+                                                   Text="→"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                        <TextBox Grid.Column="2"
+                                                 Text="{Binding ContainerPort}"
+                                                 PlaceholderText="Container port"
+                                                 FontSize="12"/>
+                                        <ComboBox Grid.Column="4"
+                                                  ItemsSource="{x:Static vm:PortMappingItem.Protocols}"
+                                                  SelectedItem="{Binding Protocol}"
+                                                  FontSize="12"
+                                                  HorizontalAlignment="Stretch"/>
+                                        <Button Grid.Column="6"
+                                                Theme="{StaticResource ActionButtonTheme}"
+                                                Command="{Binding $parent[UserControl].DataContext.RemovePortCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Remove">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconClose}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding AddPortCommand}"
+                                HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconNewContainer}"
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="Add Port" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <!-- Volumes -->
+                    <StackPanel Spacing="10">
+                        <TextBlock Text="VOLUME MOUNTS"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
+
+                        <ItemsControl ItemsSource="{Binding Volumes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:VolumeItem">
+                                    <Grid ColumnDefinitions="*,4,28,16,*,8,44,8,Auto"
+                                          Margin="0,0,0,6">
+                                        <TextBox Grid.Column="0"
+                                                 Text="{Binding HostPath}"
+                                                 PlaceholderText="~/projects/myapp"
+                                                 FontSize="12"/>
+                                        <!-- native folder picker -->
+                                        <Button Grid.Column="2"
+                                                Theme="{StaticResource ActionButtonTheme}"
+                                                Command="{Binding $parent[UserControl].DataContext.PickFolderCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Browse…"
+                                                Padding="4">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconVolumes}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
+                                        <TextBlock Grid.Column="3"
+                                                   Text="→"
+                                                   VerticalAlignment="Center"
+                                                   HorizontalAlignment="Center"
+                                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                        <TextBox Grid.Column="4"
+                                                 Text="{Binding ContainerPath}"
+                                                 PlaceholderText="/app"
+                                                 FontSize="12"/>
+                                        <CheckBox Grid.Column="6"
+                                                  IsChecked="{Binding ReadOnly}"
+                                                  Content="R/O"
+                                                  FontSize="11"
+                                                  VerticalAlignment="Center"/>
+                                        <Button Grid.Column="8"
+                                                Theme="{StaticResource ActionButtonTheme}"
+                                                Command="{Binding $parent[UserControl].DataContext.RemoveVolumeCommand}"
+                                                CommandParameter="{Binding}"
+                                                ToolTip.Tip="Remove">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconClose}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
+                                    </Grid>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding AddVolumeCommand}"
+                                HorizontalAlignment="Left">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconNewContainer}"
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="Add Volume" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </StackPanel>
+
+                <!-- ── Step 4: Environment ────────────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep4}" Spacing="10" MaxWidth="520">
+                    <TextBlock Text="ENVIRONMENT VARIABLES"
+                               FontSize="11"
+                               FontWeight="SemiBold"
+                               Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                               LetterSpacing="1"/>
+
+                    <ItemsControl ItemsSource="{Binding EnvironmentVariables}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:EnvVarItem">
+                                <Grid ColumnDefinitions="*,16,*,8,Auto"
+                                      Margin="0,0,0,6">
+                                    <TextBox Grid.Column="0"
+                                             Text="{Binding Name}"
+                                             PlaceholderText="KEY"
+                                             FontFamily="Courier New, Courier, monospace"
+                                             FontSize="12"/>
+                                    <TextBlock Grid.Column="1"
+                                               Text="="
+                                               VerticalAlignment="Center"
+                                               HorizontalAlignment="Center"
+                                               FontFamily="Courier New, Courier, monospace"
+                                               Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                    <TextBox Grid.Column="2"
+                                             Text="{Binding Value}"
+                                             PlaceholderText="value"
+                                             FontFamily="Courier New, Courier, monospace"
+                                             FontSize="12"/>
+                                    <Button Grid.Column="4"
+                                            Theme="{StaticResource ActionButtonTheme}"
+                                            Command="{Binding $parent[UserControl].DataContext.RemoveEnvVarCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip.Tip="Remove">
+                                        <Path Classes="icon icon-sm"
+                                              Data="{StaticResource IconClose}"
+                                              Stroke="{Binding $parent[Button].Foreground}"/>
+                                    </Button>
+                                </Grid>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                    <Button Theme="{StaticResource ActionButtonTheme}"
+                            Command="{Binding AddEnvVarCommand}"
+                            HorizontalAlignment="Left">
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon icon-sm"
+                                  Data="{StaticResource IconNewContainer}"
+                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                            <TextBlock Text="Add Variable" FontSize="12"/>
+                        </StackPanel>
+                    </Button>
+                </StackPanel>
+
+                <!-- ── Step 5: Review & Create ────────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep5}" Spacing="16" MaxWidth="520">
+                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                            CornerRadius="10"
+                            Padding="16">
+                        <StackPanel Spacing="10">
+                            <Grid ColumnDefinitions="120,*">
+                                <TextBlock Text="Image" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ImageReference}"
+                                           FontSize="13" FontWeight="Medium" TextWrapping="Wrap"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*">
+                                <TextBlock Text="Name" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding ContainerName}"
+                                           FontSize="13"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*">
+                                <TextBlock Text="Architecture" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Architecture}"
+                                           FontSize="13"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*" IsVisible="{Binding EnableRosetta}">
+                                <TextBlock Text="Rosetta" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="Enabled"
+                                           FontSize="13"
+                                           Foreground="{DynamicResource FloatAccentBrush}"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*"
+                                  IsVisible="{Binding CpuCount, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="CPU Cores" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding CpuCount}" FontSize="13"/>
+                            </Grid>
+                            <Grid ColumnDefinitions="120,*"
+                                  IsVisible="{Binding Memory, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
+                                <TextBlock Text="Memory" FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                <TextBlock Grid.Column="1" Text="{Binding Memory}" FontSize="13"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+
+                <!-- ── Step 6: Creating (console) ─────────────────────── -->
+                <StackPanel IsVisible="{Binding IsStep6}"
+                            Spacing="16"
+                            MaxWidth="620"
+                            HorizontalAlignment="Stretch">
+
+                    <!-- Console output -->
+                    <Border Background="#1C1C1E"
+                            CornerRadius="8"
+                            ClipToBounds="True"
+                            MinHeight="240"
+                            MaxHeight="440">
+                        <ScrollViewer x:Name="ConsoleScroller"
+                                      HorizontalScrollBarVisibility="Disabled"
+                                      VerticalScrollBarVisibility="Auto">
+                            <SelectableTextBlock Text="{Binding Output}"
+                                                 Padding="14"
+                                                 FontFamily="Courier New, Courier, monospace"
+                                                 FontSize="11"
+                                                 Foreground="#E5E5EA"
+                                                 TextWrapping="Wrap"/>
+                        </ScrollViewer>
+                    </Border>
+
+                    <!-- Error banner -->
+                    <Border IsVisible="{Binding HasError}"
+                            Background="#18FF453A"
+                            CornerRadius="8"
+                            Padding="14,12">
+                        <StackPanel Spacing="4">
+                            <TextBlock Text="Creation failed"
+                                       FontWeight="SemiBold"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource StatusErrorBrush}"/>
+                            <TextBlock Text="{Binding ErrorMessage}"
+                                       Foreground="{DynamicResource StatusErrorBrush}"
+                                       FontSize="12"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+                    </Border>
+
+                    <!-- Success banner -->
+                    <Border IsVisible="{Binding IsComplete}"
+                            Background="#1830D158"
+                            CornerRadius="8"
+                            Padding="14,12">
+                        <StackPanel Orientation="Horizontal" Spacing="10">
+                            <TextBlock Text="✓"
+                                       FontSize="16"
+                                       FontWeight="SemiBold"
+                                       Foreground="{DynamicResource StatusRunningBrush}"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="Container created successfully."
+                                       FontSize="13"
+                                       Foreground="{DynamicResource StatusRunningBrush}"
+                                       VerticalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                </StackPanel>
+
+            </Grid>
+        </ScrollViewer>
+
+        <!-- ── Footer ───────────────────────────────────────────────────── -->
+        <Border Grid.Row="2"
+                Padding="32,16"
+                Background="{DynamicResource FloatFooterBackgroundBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto,8,Auto">
+
+                <!-- ── Wizard footer (steps 1-5) ── -->
+
+                <!-- Cancel (step 1) -->
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsVisible="{Binding IsStep1}"/>
+
+                <!-- Back (steps 2-5) -->
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="← Back"
+                        Command="{Binding BackCommand}"
+                        IsVisible="{Binding IsStep1, Converter={x:Static BoolConverters.Not}}">
+                    <!-- hidden on step 6 too -->
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="IsStep1" Converter="{x:Static BoolConverters.Not}"/>
+                            <Binding Path="IsStep6" Converter="{x:Static BoolConverters.Not}"/>
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
+
+                <!-- Continue (steps 1-4) -->
+                <Button Grid.Column="4"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Content="Continue →"
+                        Command="{Binding NextCommand}"
+                        IsEnabled="{Binding CanGoNext}"
+                        IsVisible="{Binding IsStep5, Converter={x:Static BoolConverters.Not}}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="IsStep5" Converter="{x:Static BoolConverters.Not}"/>
+                            <Binding Path="IsStep6" Converter="{x:Static BoolConverters.Not}"/>
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
+
+                <!-- Create Container (step 5) -->
+                <Button Grid.Column="4"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Command="{Binding CreateContainerCommand}"
+                        IsVisible="{Binding IsStep5}">
+                    <TextBlock Text="Create Container"/>
+                </Button>
+
+                <!-- ── Creating screen footer (step 6) ── -->
+
+                <!-- Cancel while in progress -->
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsVisible="{Binding IsCreating}"/>
+
+                <!-- After error: retry -->
+                <Button Grid.Column="2"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Retry"
+                        Command="{Binding CreateContainerCommand}"
+                        IsVisible="{Binding HasError}"/>
+
+                <!-- After success: Create Another -->
+                <Button Grid.Column="2"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Create Another"
+                        Command="{Binding CreateAnotherCommand}"
+                        IsVisible="{Binding IsComplete}"/>
+
+                <!-- After success or error: Done → back to dashboard -->
+                <Button Grid.Column="4"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Content="Done"
+                        Command="{Binding DoneCommand}"
+                        IsVisible="{Binding IsStep6}">
+                    <Button.IsVisible>
+                        <MultiBinding Converter="{x:Static BoolConverters.And}">
+                            <Binding Path="IsStep6"/>
+                            <Binding Path="IsCreating" Converter="{x:Static BoolConverters.Not}"/>
+                        </MultiBinding>
+                    </Button.IsVisible>
+                </Button>
+
+            </Grid>
+        </Border>
+    </Grid>
+
+</UserControl>
