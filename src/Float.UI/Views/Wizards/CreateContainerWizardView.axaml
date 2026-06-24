@@ -275,7 +275,7 @@
                         <ItemsControl ItemsSource="{Binding Volumes}">
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate x:DataType="vm:VolumeItem">
-                                    <Grid ColumnDefinitions="*,4,28,16,*,8,44,8,Auto"
+                                    <Grid ColumnDefinitions="*,4,28,16,*,8,Auto,8,Auto"
                                           Margin="0,0,0,6">
                                         <TextBox Grid.Column="0"
                                                  Text="{Binding HostPath}"
@@ -303,8 +303,9 @@
                                                  FontSize="12"/>
                                         <CheckBox Grid.Column="6"
                                                   IsChecked="{Binding ReadOnly}"
-                                                  Content="R/O"
+                                                  Content="Read only"
                                                   FontSize="11"
+                                                  ToolTip.Tip="Mount this volume without write access"
                                                   VerticalAlignment="Center"/>
                                         <Button Grid.Column="8"
                                                 Theme="{StaticResource ActionButtonTheme}"
