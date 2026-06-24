@@ -4,5 +4,8 @@ namespace Float.Core.Abstractions.Services;
 
 public interface IContainerCreator : IContainerEngineAware
 {
-    Task CreateAsync(Container container, CancellationToken cancellationToken = default);
+    Task<string> CreateAsync(
+        ContainerCreateRequest request,
+        IProgress<string>? progress = null,
+        CancellationToken cancellationToken = default);
 }

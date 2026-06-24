@@ -4,5 +4,5 @@ namespace Float.Core.Abstractions.Services;
 
 public interface IContainerReader : IContainerEngineAware
 {
-    Task<IReadOnlyList<Container>> ListAsync(CancellationToken cancellationToken = default);
+    Task<IReadOnlyList<Container>> ListAsync(bool includeAll = true, CancellationToken cancellationToken = default);
 }
