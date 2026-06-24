@@ -1,4 +1,3 @@
-using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Text.Json;
@@ -7,6 +6,7 @@ using System.Threading.Tasks;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
 
@@ -17,46 +17,51 @@ public class AppleContainerReader : IContainerReader
     private readonly IEngineProvisioner _engineProvisioner;
     private readonly IProcessHost _processHost;
 
-    public AppleContainerReader(IEngineProvisioner engineProvisioner, IProcessHost processHost)
+    public AppleContainerReader(
+        [FromKeyedServices(ContainerEngine.AppleContainers)] IEngineProvisioner engineProvisioner,
+        IProcessHost processHost)
     {
         _engineProvisioner = engineProvisioner;
         _processHost = processHost;
     }
 
-    public async Task<IReadOnlyList<Container>> ListAsync(CancellationToken cancellationToken = default)
+    public async Task<IReadOnlyList<Container>> ListAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
         if (!_engineProvisioner.IsEngineInstalled())
             throw new InvalidOperationException("Apple Container is not available.");
 
         var output = new StringBuilder();
+        var args = new List<string> { "ls", "--format", "json" };
+
+        if (includeAll)
+        {
+            args.Insert(1, "--all");
+        }
 
         await _processHost.RunWithResultAsync(
             "/usr/local/bin/container",
-            ["ls", "--all", "--format", "json"],
+            args,
             workingDirectory: null,
             onOutput: line => output.AppendLine(line),
             onError:  _ => { },
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return ParseJson(output.ToString());
-    }
-
-    private static IReadOnlyList<Container> ParseJson(string output)
-    {
-        if (string.IsNullOrWhiteSpace(output))
+        var outputStr = output.ToString();
+        if (string.IsNullOrWhiteSpace(outputStr))
             return [];
 
-        // Try JSON array first; fall back to NDJSON (one object per line)
         try
         {
-            var items = JsonSerializer.Deserialize<AppleManagedContainer[]>(output, JsonOptions);
+            var items = JsonSerializer.Deserialize(
+                outputStr,
+                AppleContainerJsonContext.Default.AppleManagedContainerArray);
             return items?.Select(Map).ToArray() ?? [];
         }
         catch (JsonException)
         {
-            return output
+            return outputStr
                 .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(line => JsonSerializer.Deserialize<AppleManagedContainer>(line, JsonOptions))
+                .Select(line => JsonSerializer.Deserialize(line, AppleContainerJsonContext.Default.AppleManagedContainer))
                 .Where(c => c is not null)
                 .Select(c => Map(c!))
                 .ToArray();
@@ -93,7 +98,7 @@ public class AppleContainerReader : IContainerReader
             m.ReadOnly
         )).ToArray() ?? [];
 
-        DateTimeOffset.TryParse(config?.CreationDate, out var createdAt);
+        DateTimeOffset.TryParse(config?.CreationDate ?? status?.StartedDate, out var createdAt);
 
         var containerStatus = status?.State?.ToLowerInvariant() switch
         {
@@ -120,8 +125,4 @@ public class AppleContainerReader : IContainerReader
         };
     }
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
-    {
-        PropertyNameCaseInsensitive = true
-    };
 }
