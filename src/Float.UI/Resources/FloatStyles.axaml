@@ -1,0 +1,244 @@
+<Styles xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+
+    <Styles.Resources>
+        <ResourceDictionary>
+
+            <!-- Adaptive surface brushes (light / dark) -->
+            <ResourceDictionary.ThemeDictionaries>
+                <ResourceDictionary x:Key="Light">
+                    <!-- Window / content area -->
+                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#F5F5F7"/>
+                    <SolidColorBrush x:Key="FloatCardBackgroundBrush"    Color="#FFFFFF"/>
+                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#EFEFEF"/>
+                    <!-- Sidebar -->
+                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#EBEBEB"/>
+                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#D1D1D6"/>
+                    <!-- Muted text -->
+                    <SolidColorBrush x:Key="FloatSecondaryTextBrush"     Color="#6C6C70"/>
+                </ResourceDictionary>
+                <ResourceDictionary x:Key="Dark">
+                    <!-- Window / content area — macOS dark grays, not black -->
+                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#1C1C1E"/>
+                    <SolidColorBrush x:Key="FloatCardBackgroundBrush"    Color="#2C2C2E"/>
+                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#232325"/>
+                    <!-- Sidebar -->
+                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#2C2C2E"/>
+                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#3A3A3C"/>
+                    <!-- Muted text -->
+                    <SolidColorBrush x:Key="FloatSecondaryTextBrush"     Color="#8E8E93"/>
+                </ResourceDictionary>
+            </ResourceDictionary.ThemeDictionaries>
+
+            <!-- Status colors (same in both themes) -->
+            <SolidColorBrush x:Key="StatusRunningBrush"  Color="#30D158"/>
+            <SolidColorBrush x:Key="StatusStoppedBrush"  Color="#8E8E93"/>
+            <SolidColorBrush x:Key="StatusErrorBrush"    Color="#FF453A"/>
+            <SolidColorBrush x:Key="StatusWarningBrush"  Color="#FF9F0A"/>
+
+            <!-- Brand accent (macOS system blue) -->
+            <SolidColorBrush x:Key="FloatAccentBrush"    Color="#0A84FF"/>
+
+        <!-- ─── ControlTheme: sidebar navigation button ──────────────── -->
+        <ControlTheme x:Key="NavItemTheme" TargetType="Button">
+            <Setter Property="Background"              Value="Transparent"/>
+            <Setter Property="BorderThickness"         Value="0"/>
+            <Setter Property="Padding"                 Value="10,8"/>
+            <Setter Property="CornerRadius"            Value="6"/>
+            <Setter Property="HorizontalAlignment"     Value="Stretch"/>
+            <Setter Property="HorizontalContentAlignment" Value="Left"/>
+            <Setter Property="FontSize"                Value="13"/>
+            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Foreground"              Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+            <Setter Property="Template">
+                <ControlTemplate TargetType="Button">
+                    <Border Name="PART_Root"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}"
+                                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}"
+                                          Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ Border#PART_Root">
+                <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_Root">
+                <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListMediumBrush}"/>
+            </Style>
+            <Style Selector="^.active /template/ Border#PART_Root">
+                <Setter Property="Background" Value="{DynamicResource FloatAccentBrush}"/>
+            </Style>
+            <Style Selector="^.active">
+                <Setter Property="Foreground" Value="White"/>
+            </Style>
+            <Style Selector="^.active:pointerover /template/ Border#PART_Root">
+                <Setter Property="Background" Value="{DynamicResource FloatAccentBrush}"/>
+            </Style>
+            <Style Selector="^:disabled">
+                <Setter Property="Opacity" Value="0.45"/>
+            </Style>
+        </ControlTheme>
+
+        <!-- ─── ControlTheme: primary action button (accent fill) ────── -->
+        <ControlTheme x:Key="PrimaryButtonTheme" TargetType="Button">
+            <Setter Property="Background"              Value="{DynamicResource FloatAccentBrush}"/>
+            <Setter Property="Foreground"              Value="White"/>
+            <Setter Property="BorderThickness"         Value="0"/>
+            <Setter Property="Padding"                 Value="12,6"/>
+            <Setter Property="CornerRadius"            Value="6"/>
+            <Setter Property="FontSize"                Value="13"/>
+            <Setter Property="FontWeight"              Value="Medium"/>
+            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Template">
+                <ControlTemplate TargetType="Button">
+                    <Border Name="PART_Root"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ Border#PART_Root">
+                <Setter Property="Opacity" Value="0.88"/>
+            </Style>
+            <Style Selector="^:pressed /template/ Border#PART_Root">
+                <Setter Property="Opacity" Value="0.75"/>
+            </Style>
+        </ControlTheme>
+
+        <!-- ─── ControlTheme: ghost row action button ────────────────── -->
+        <ControlTheme x:Key="ActionButtonTheme" TargetType="Button">
+            <Setter Property="Background"              Value="Transparent"/>
+            <Setter Property="BorderThickness"         Value="0"/>
+            <Setter Property="Padding"                 Value="5,3"/>
+            <Setter Property="CornerRadius"            Value="4"/>
+            <Setter Property="FontSize"                Value="12"/>
+            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Foreground"              Value="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
+            <Setter Property="Template">
+                <ControlTemplate TargetType="Button">
+                    <Border Name="PART_Root"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ Border#PART_Root">
+                <Setter Property="Background" Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+            </Style>
+        </ControlTheme>
+
+        <!-- ─── ControlTheme: danger/destructive action ──────────────── -->
+        <ControlTheme x:Key="DangerButtonTheme" TargetType="Button">
+            <Setter Property="Background"              Value="Transparent"/>
+            <Setter Property="BorderThickness"         Value="0"/>
+            <Setter Property="Padding"                 Value="5,3"/>
+            <Setter Property="CornerRadius"            Value="4"/>
+            <Setter Property="FontSize"                Value="12"/>
+            <Setter Property="Cursor"                  Value="Hand"/>
+            <Setter Property="Foreground"              Value="{DynamicResource StatusErrorBrush}"/>
+            <Setter Property="Template">
+                <ControlTemplate TargetType="Button">
+                    <Border Name="PART_Root"
+                            Background="{TemplateBinding Background}"
+                            Padding="{TemplateBinding Padding}"
+                            CornerRadius="{TemplateBinding CornerRadius}">
+                        <ContentPresenter Content="{TemplateBinding Content}"
+                                          HorizontalAlignment="Center"
+                                          VerticalAlignment="Center"
+                                          Foreground="{TemplateBinding Foreground}"/>
+                    </Border>
+                </ControlTemplate>
+            </Setter>
+
+            <Style Selector="^:pointerover /template/ Border#PART_Root">
+                <Setter Property="Background" Value="#18FF453A"/>
+            </Style>
+        </ControlTheme>
+
+        </ResourceDictionary>
+    </Styles.Resources>
+
+    <!-- ─── Console (read-only terminal output) ──────────────────────── -->
+    <Style Selector="TextBox.console">
+        <Setter Property="Background"       Value="#1C1C1E"/>
+        <Setter Property="Foreground"       Value="#E5E5EA"/>
+        <Setter Property="FontFamily"       Value="Courier New, Courier, monospace"/>
+        <Setter Property="FontSize"         Value="11"/>
+        <Setter Property="BorderThickness"  Value="0"/>
+        <Setter Property="CornerRadius"     Value="8"/>
+        <Setter Property="Padding"          Value="12"/>
+        <Setter Property="CaretBrush"       Value="Transparent"/>
+    </Style>
+
+    <Style Selector="TextBox.console /template/ ScrollViewer">
+        <Setter Property="VerticalScrollBarVisibility"   Value="Auto"/>
+        <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <!-- ─── Status dot ────────────────────────────────────────────────── -->
+    <Style Selector="Ellipse.status-dot">
+        <Setter Property="Width"               Value="8"/>
+        <Setter Property="Height"              Value="8"/>
+        <Setter Property="Fill"                Value="{DynamicResource StatusStoppedBrush}"/>
+        <Setter Property="VerticalAlignment"   Value="Center"/>
+    </Style>
+
+    <Style Selector="Ellipse.status-dot.running">
+        <Setter Property="Fill" Value="{DynamicResource StatusRunningBrush}"/>
+        <Style.Animations>
+            <Animation Duration="0:0:2"
+                       IterationCount="INFINITE"
+                       PlaybackDirection="Alternate"
+                       Easing="SineEaseInOut">
+                <KeyFrame Cue="0%">
+                    <Setter Property="Opacity" Value="0.5"/>
+                </KeyFrame>
+                <KeyFrame Cue="100%">
+                    <Setter Property="Opacity" Value="1.0"/>
+                </KeyFrame>
+            </Animation>
+        </Style.Animations>
+    </Style>
+
+    <!-- ─── Container list ────────────────────────────────────────────── -->
+    <Style Selector="ListBox.container-list">
+        <Setter Property="Background"                              Value="Transparent"/>
+        <Setter Property="Padding"                                 Value="0"/>
+        <Setter Property="BorderThickness"                         Value="0"/>
+        <Setter Property="ScrollViewer.HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <Style Selector="ListBox.container-list > ListBoxItem">
+        <Setter Property="Padding"         Value="0"/>
+        <Setter Property="Margin"          Value="0,0,0,4"/>
+        <Setter Property="Background"      Value="Transparent"/>
+        <Setter Property="CornerRadius"    Value="8"/>
+        <Setter Property="Cursor"          Value="Hand"/>
+    </Style>
+
+    <Style Selector="ListBox.container-list > ListBoxItem:selected /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+    <Style Selector="ListBox.container-list > ListBoxItem:pointerover /template/ ContentPresenter">
+        <Setter Property="Background" Value="Transparent"/>
+    </Style>
+
+</Styles>

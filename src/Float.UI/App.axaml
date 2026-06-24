@@ -1,0 +1,58 @@
+<Application xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Float.UI.App"
+             xmlns:local="using:Float.UI"
+             RequestedThemeVariant="Default">
+
+    <Application.DataTemplates>
+        <local:ViewLocator/>
+    </Application.DataTemplates>
+
+    <Application.Styles>
+        <FluentTheme />
+        <StyleInclude Source="avares://Float.UI/Resources/FloatStyles.axaml"/>
+    </Application.Styles>
+
+    <!-- macOS application menu bar -->
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="Float">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="About Float"    Click="OnAboutClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Quit Float"     Click="OnQuitClick" Gesture="Ctrl+Q"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Containers">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="New Container…"        Click="OnNewContainerClick" Gesture="Ctrl+N"/>
+                        <NativeMenuItem Header="Migrate from Docker…"  Click="OnMigrateClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Refresh"               Click="OnRefreshClick"     Gesture="Ctrl+R"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
+    <!-- System tray icon -->
+    <TrayIcon.Icons>
+        <TrayIcons>
+            <TrayIcon Icon="/Assets/avalonia-logo.ico"
+                      ToolTipText="Float"
+                      Clicked="OnTrayIconClicked">
+                <TrayIcon.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Show Float" Click="OnShowFloatClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Quit Float" Click="OnQuitClick"/>
+                    </NativeMenu>
+                </TrayIcon.Menu>
+            </TrayIcon>
+        </TrayIcons>
+    </TrayIcon.Icons>
+
+</Application>
