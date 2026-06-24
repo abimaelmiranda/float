@@ -1,0 +1,72 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels.Wizards"
+             x:Class="Float.UI.Views.Wizards.MigrationWizardView"
+             x:DataType="vm:MigrationWizardViewModel">
+
+    <Grid RowDefinitions="Auto,*,Auto">
+
+        <!-- Header -->
+        <Border Grid.Row="0" Padding="24,52,24,16">
+            <StackPanel Spacing="4">
+                <TextBlock Text="Migrate from Docker"
+                           FontSize="20"
+                           FontWeight="SemiBold"/>
+                <TextBlock FontSize="13"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
+                    <Run Text="Step "/>
+                    <Run Text="{Binding CurrentStep}"/>
+                    <Run Text=" of "/>
+                    <Run Text="{Binding TotalSteps}"/>
+                </TextBlock>
+            </StackPanel>
+        </Border>
+
+        <!-- Step content placeholder -->
+        <Border Grid.Row="1"
+                Margin="24,0"
+                CornerRadius="10"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="24">
+            <StackPanel VerticalAlignment="Center"
+                        HorizontalAlignment="Center"
+                        Spacing="12">
+                <TextBlock Text="🚧"
+                           FontSize="40"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="Migration Wizard"
+                           FontSize="17"
+                           FontWeight="SemiBold"
+                           HorizontalAlignment="Center"/>
+                <TextBlock Text="This flow will guide you through importing Docker containers into Float."
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           TextWrapping="Wrap"
+                           MaxWidth="320"
+                           TextAlignment="Center"
+                           HorizontalAlignment="Center"/>
+            </StackPanel>
+        </Border>
+
+        <!-- Step footer -->
+        <Border Grid.Row="2" Padding="24,16">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="← Back"
+                        Command="{Binding BackCommand}"
+                        IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+
+                <Button Grid.Column="2"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Command="{Binding NextCommand}">
+                    <TextBlock>
+                        <Run Text="{Binding CurrentStep, StringFormat='Step {0}: Continue →'}"/>
+                    </TextBlock>
+                </Button>
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</UserControl>
