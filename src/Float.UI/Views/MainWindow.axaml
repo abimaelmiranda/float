@@ -57,19 +57,6 @@
                     </StackPanel>
                 </Button>
 
-                <!-- Engine status indicator -->
-                <Border Margin="16,6,16,4">
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Ellipse Classes="status-dot"
-                                 Classes.running="{Binding IsEngineRunning}"
-                                 Width="7" Height="7"/>
-                        <TextBlock Text="{Binding EngineStatusLabel}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   VerticalAlignment="Center"/>
-                    </StackPanel>
-                </Border>
-
                 <Button Theme="{StaticResource NavItemTheme}"
                         Margin="8,0,8,12"
                         IsEnabled="False">
@@ -134,9 +121,28 @@
                 Background="{DynamicResource SidebarBorderBrush}"/>
 
         <!-- ── Content area (fills remaining space) ──────────────────── -->
-        <Border Background="{DynamicResource FloatWindowBackgroundBrush}">
+        <DockPanel Background="{DynamicResource FloatWindowBackgroundBrush}">
+
+            <!-- Engine status is scoped to content, not the fixed sidebar. -->
+            <Border DockPanel.Dock="Bottom"
+                    Classes="engine-bottom-bar"
+                    IsHitTestVisible="False">
+                <Grid ColumnDefinitions="*,Auto,*">
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="7"
+                                VerticalAlignment="Center">
+                        <Ellipse Classes="status-dot bottom-bar-status-dot"
+                                 Classes.running="{Binding IsEngineRunning}"
+                                 Classes.starting="{Binding IsEngineStarting}"/>
+                        <TextBlock Text="{Binding EngineStatusLabel}"
+                                   Classes="bottom-bar-status-text"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
             <ContentControl Content="{Binding CurrentPageViewModel}"/>
-        </Border>
+        </DockPanel>
 
     </DockPanel>
 
