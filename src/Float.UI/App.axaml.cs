@@ -1,12 +1,17 @@
 using System;
+using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Float.Infrastructure.Common;
-using Float.Infrastructure.Engines.AppleContainers;
+using Avalonia.Platform;
+using Avalonia.Styling;
+using Float.Infrastructure;
 using Float.UI.ViewModels;
+using Float.UI.ViewModels.Setup;
+using Float.UI.ViewModels.Wizards;
 using Float.UI.Views;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI;
 
@@ -14,6 +19,7 @@ public partial class App : Application
 {
     private MainWindow? _mainWindow;
     private MainWindowViewModel? _mainWindowVm;
+    private TrayIcon? _trayIcon;
 
     public override void Initialize()
     {
@@ -24,11 +30,18 @@ public partial class App : Application
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
         {
-            var processHost  = new ProcessHost();
-            var fileSystem   = new FileSystemService();
-            var provisioner  = new AppleContainersEngineProvisioner(fileSystem, processHost);
+            var services = new ServiceCollection();
+            services.AddFloatInfrastructure();
+            services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<MigrationWizardViewModel>();
+            services.AddSingleton<EngineSetupViewModel>();
+            services.AddSingleton<CreateContainerWizardViewModel>();
+            services.AddSingleton<MainWindowViewModel>();
 
-            _mainWindowVm = new MainWindowViewModel(provisioner);
+            var provider = services.BuildServiceProvider();
+            ViewLocator.Services = provider;
+
+            _mainWindowVm = provider.GetRequiredService<MainWindowViewModel>();
             _mainWindow = new MainWindow { DataContext = _mainWindowVm };
             desktop.MainWindow = _mainWindow;
 
@@ -36,6 +49,20 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
+
+        _trayIcon = TrayIcon.GetIcons(this)?.FirstOrDefault();
+        ActualThemeVariantChanged += (_, _) => UpdateTrayIcon();
+        UpdateTrayIcon();
+    }
+
+    private void UpdateTrayIcon()
+    {
+        if (_trayIcon is null) return;
+        var asset = ActualThemeVariant == ThemeVariant.Dark
+            ? "avares://Float.UI/Assets/float_tray_dark.png"
+            : "avares://Float.UI/Assets/float_tray_light.png";
+        using var stream = AssetLoader.Open(new Uri(asset));
+        _trayIcon.Icon = new WindowIcon(stream);
     }
 
     private void ShowMainWindow()
@@ -52,6 +79,7 @@ public partial class App : Application
 
     // ── Native menu ──────────────────────────────────────────────────────
     private void OnAboutClick(object? sender, EventArgs e) { }
+    private void OnSettingsClick(object? sender, EventArgs e) { }
 
     private void OnQuitClick(object? sender, EventArgs e)
     {

@@ -2,7 +2,16 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Float.UI.App"
              xmlns:local="using:Float.UI"
-             RequestedThemeVariant="Default">
+             RequestedThemeVariant="Default"
+             Name="Float">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Float.UI/Resources/Icons.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -19,19 +28,22 @@
             <NativeMenuItem Header="Float">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="About Float"    Click="OnAboutClick"/>
+                        <NativeMenuItem Header="About Float"  Click="OnAboutClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Quit Float"     Click="OnQuitClick" Gesture="Ctrl+Q"/>
+                        <NativeMenuItem Header="Settings…"    Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Quit Float"   Click="OnQuitClick"     Gesture="Ctrl+Q"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
             <NativeMenuItem Header="Containers">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="New Container…"        Click="OnNewContainerClick" Gesture="Ctrl+N"/>
-                        <NativeMenuItem Header="Migrate from Docker…"  Click="OnMigrateClick"/>
+                        <NativeMenuItem Header="New Container…"       Click="OnNewContainerClick" Gesture="Ctrl+N"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Refresh"               Click="OnRefreshClick"     Gesture="Ctrl+R"/>
+                        <NativeMenuItem Header="Migrate from Docker…" Click="OnMigrateClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Refresh"              Click="OnRefreshClick"     Gesture="Ctrl+R"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -41,7 +53,7 @@
     <!-- System tray icon -->
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico"
+            <TrayIcon Icon="/Assets/float_tray_dark.png"
                       ToolTipText="Float"
                       Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>
