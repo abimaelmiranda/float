@@ -1,0 +1,137 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels.Setup"
+             x:Class="Float.UI.Views.Setup.EngineSetupView"
+             x:DataType="vm:EngineSetupViewModel">
+
+    <Grid RowDefinitions="*,Auto">
+
+        <!-- Center content -->
+        <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+            <StackPanel MaxWidth="560"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Margin="40,80,40,32"
+                        Spacing="24">
+
+                <!-- Icon + title -->
+                <StackPanel HorizontalAlignment="Center" Spacing="12">
+                    <TextBlock Text="⬡"
+                               FontSize="48"
+                               Foreground="{DynamicResource FloatAccentBrush}"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Setting Up Float"
+                               FontSize="22"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="Float needs apple/container to run containers natively on Apple Silicon. This installs the engine from GitHub — it only takes a moment."
+                               FontSize="13"
+                               Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                               TextWrapping="Wrap"
+                               TextAlignment="Center"
+                               MaxWidth="400"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Console output -->
+                <Border IsVisible="{Binding ShowConsole}"
+                        Background="#1C1C1E"
+                        CornerRadius="8"
+                        ClipToBounds="True"
+                        MinHeight="180"
+                        MaxHeight="320">
+                    <ScrollViewer x:Name="ConsoleScroller"
+                                  HorizontalScrollBarVisibility="Disabled"
+                                  VerticalScrollBarVisibility="Auto">
+                        <SelectableTextBlock Text="{Binding Output}"
+                                             Padding="12"
+                                             FontFamily="Courier New, Courier, monospace"
+                                             FontSize="11"
+                                             Foreground="#E5E5EA"
+                                             TextWrapping="Wrap"/>
+                    </ScrollViewer>
+                </Border>
+
+                <!-- Error message -->
+                <Border IsVisible="{Binding HasError}"
+                        Background="#18FF453A"
+                        CornerRadius="8"
+                        Padding="12,10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="✕"
+                                   Foreground="{DynamicResource StatusErrorBrush}"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   Foreground="{DynamicResource StatusErrorBrush}"
+                                   FontSize="13"
+                                   TextWrapping="Wrap"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- Success message -->
+                <Border IsVisible="{Binding IsComplete}"
+                        Background="#1830D158"
+                        CornerRadius="8"
+                        Padding="12,10">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="✓"
+                                   Foreground="{DynamicResource StatusRunningBrush}"
+                                   VerticalAlignment="Center"
+                                   FontWeight="SemiBold"
+                                   FontSize="15"/>
+                        <TextBlock Text="apple/container installed successfully. Launching Float…"
+                                   Foreground="{DynamicResource StatusRunningBrush}"
+                                   FontSize="13"
+                                   VerticalAlignment="Center"/>
+                    </StackPanel>
+                </Border>
+
+            </StackPanel>
+        </ScrollViewer>
+
+        <!-- Footer -->
+        <Border Grid.Row="1"
+                Padding="40,16"
+                Background="{DynamicResource FloatFooterBackgroundBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="Auto,*,Auto">
+
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Cancel"
+                        Command="{Binding CancelCommand}"
+                        IsVisible="{Binding IsRunning}"/>
+
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Content="Retry"
+                        Command="{Binding RetryCommand}"
+                        IsVisible="{Binding HasError}"/>
+
+                <!-- Install / Installing -->
+                <Button Grid.Column="2"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Command="{Binding InstallCommand}"
+                        IsVisible="{Binding !IsComplete}">
+                    <StackPanel Orientation="Horizontal" Spacing="8">
+                        <TextBlock Text="Install Engine" IsVisible="{Binding !IsRunning}"/>
+                        <TextBlock Text="Installing…"    IsVisible="{Binding IsRunning}"/>
+                    </StackPanel>
+                </Button>
+
+                <!-- Continue (shown only after successful install) -->
+                <Button Grid.Column="2"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Content="Continue →"
+                        Command="{Binding ContinueCommand}"
+                        IsVisible="{Binding IsComplete}"/>
+
+            </Grid>
+        </Border>
+
+    </Grid>
+
+</UserControl>
