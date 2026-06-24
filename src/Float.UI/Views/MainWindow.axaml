@@ -7,6 +7,7 @@
         x:Class="Float.UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Float"
+        Icon="/Assets/float_icon.png"
         Width="1100" Height="700"
         MinWidth="900" MinHeight="600"
         ExtendClientAreaToDecorationsHint="True"
@@ -40,6 +41,22 @@
                         Background="{DynamicResource SidebarBorderBrush}"
                         Margin="8,4"/>
 
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Margin="8,0,8,4"
+                        Command="{Binding ToggleThemeCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconSun}"
+                              IsVisible="{Binding IsDarkTheme}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconMoon}"
+                              IsVisible="{Binding !IsDarkTheme}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{Binding ThemeToggleLabel}" FontSize="13"/>
+                    </StackPanel>
+                </Button>
+
                 <!-- Engine status indicator -->
                 <Border Margin="16,6,16,4">
                     <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
@@ -57,7 +74,9 @@
                         Margin="8,0,8,12"
                         IsEnabled="False">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⚙" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconSettings}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
                         <TextBlock Text="Settings" FontSize="13"/>
                     </StackPanel>
                 </Button>
@@ -69,7 +88,9 @@
                         Classes.active="{Binding ShowingContainers}"
                         Command="{Binding ShowContainersCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="▦" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconContainers}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
                         <TextBlock Text="Containers" FontSize="13"/>
                     </StackPanel>
                 </Button>
@@ -78,21 +99,27 @@
                         Classes.active="{Binding ShowingMigration}"
                         Command="{Binding ShowMigrationCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⇒" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconMigration}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
                         <TextBlock Text="Migrate" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
                 <Button Theme="{StaticResource NavItemTheme}" IsEnabled="False">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⬚" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconImages}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
                         <TextBlock Text="Images" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
                 <Button Theme="{StaticResource NavItemTheme}" IsEnabled="False">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="◫" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconVolumes}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
                         <TextBlock Text="Volumes" FontSize="13"/>
                     </StackPanel>
                 </Button>

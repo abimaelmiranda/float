@@ -20,7 +20,12 @@
                     <Button Grid.Column="1"
                             Theme="{StaticResource PrimaryButtonTheme}"
                             Command="{Binding NewContainerCommand}">
-                        + New Container
+                        <StackPanel Orientation="Horizontal" Spacing="6">
+                            <Path Classes="icon icon-sm"
+                                  Data="{StaticResource IconNewContainer}"
+                                  Stroke="White"/>
+                            <TextBlock Text="New Container" VerticalAlignment="Center"/>
+                        </StackPanel>
                     </Button>
                 </Grid>
             </Border>
@@ -87,26 +92,42 @@
                                                 VerticalAlignment="Center">
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="▶"
-                                                Command="{Binding StartCommand}"
+                                                Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
+                                                CommandParameter="{Binding Source}"
                                                 IsVisible="{Binding !IsRunning}"
-                                                ToolTip.Tip="Start"/>
+                                                ToolTip.Tip="Start">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconPlay}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="⏹"
-                                                Command="{Binding StopCommand}"
+                                                Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
+                                                CommandParameter="{Binding Source}"
                                                 IsVisible="{Binding IsRunning}"
-                                                ToolTip.Tip="Stop"/>
+                                                ToolTip.Tip="Stop">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconStop}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="↺"
-                                                Command="{Binding RestartCommand}"
-                                                ToolTip.Tip="Restart"/>
+                                                Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                ToolTip.Tip="Restart">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconRestart}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
-                                                Content="✕"
-                                                Command="{Binding DeleteCommand}"
-                                                ToolTip.Tip="Delete"/>
+                                                Command="{Binding $parent[UserControl].DataContext.DeleteContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                ToolTip.Tip="Delete">
+                                            <Path Classes="icon icon-sm"
+                                                  Data="{StaticResource IconDelete}"
+                                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                                        </Button>
 
                                     </StackPanel>
 
@@ -127,103 +148,115 @@
                 Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
                 BorderBrush="{DynamicResource SidebarBorderBrush}"
                 BorderThickness="1,0,0,0">
+            <ContentControl Content="{Binding SelectedContainer}">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate x:DataType="vm:ContainerItemViewModel">
+                        <DockPanel>
 
-            <DockPanel>
+                            <!-- Detail header -->
+                            <Border DockPanel.Dock="Top" Padding="16,52,16,12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Theme="{StaticResource ActionButtonTheme}"
+                                            Command="{Binding $parent[UserControl].DataContext.CloseDetailCommand}"
+                                            ToolTip.Tip="Close">
+                                        <Path Classes="icon icon-sm"
+                                              Data="{StaticResource IconClose}"
+                                              Stroke="{Binding $parent[Button].Foreground}"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
 
-                <!-- Detail header -->
-                <Border DockPanel.Dock="Top" Padding="16,52,16,12">
-                    <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="{Binding SelectedContainer.Name}"
-                                   FontSize="16"
-                                   FontWeight="SemiBold"
-                                   VerticalAlignment="Center"/>
-                        <Button Grid.Column="1"
-                                Theme="{StaticResource ActionButtonTheme}"
-                                Content="✕"
-                                Command="{Binding CloseDetailCommand}"
-                                ToolTip.Tip="Close"/>
-                    </Grid>
-                </Border>
+                            <!-- Detail body -->
+                            <ScrollViewer Padding="16,0,16,16">
+                                <StackPanel Spacing="20">
 
-                <!-- Detail body -->
-                <ScrollViewer Padding="16,0,16,16">
-                    <StackPanel Spacing="20">
+                                    <!-- Status -->
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="STATUS"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <StackPanel Orientation="Horizontal" Spacing="6">
+                                            <Ellipse Classes="status-dot"
+                                                     Classes.running="{Binding IsRunning}"/>
+                                            <TextBlock Text="{Binding StatusLabel}"
+                                                       FontSize="13"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
+                                    </StackPanel>
 
-                        <!-- Status -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="STATUS"
-                                       FontSize="10"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                       LetterSpacing="1"/>
-                            <StackPanel Orientation="Horizontal" Spacing="6">
-                                <Ellipse Classes="status-dot"
-                                         Classes.running="{Binding SelectedContainer.IsRunning}"/>
-                                <TextBlock Text="{Binding SelectedContainer.StatusLabel}"
-                                           FontSize="13"
-                                           VerticalAlignment="Center"/>
-                            </StackPanel>
-                        </StackPanel>
+                                    <!-- Image -->
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="IMAGE"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding ImageTag}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
 
-                        <!-- Image -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="IMAGE"
-                                       FontSize="10"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                       LetterSpacing="1"/>
-                            <TextBlock Text="{Binding SelectedContainer.ImageTag}"
-                                       FontSize="13"
-                                       TextWrapping="Wrap"/>
-                        </StackPanel>
+                                    <!-- Ports -->
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="PORTS"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding PortSummary}"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
+                                    </StackPanel>
 
-                        <!-- Ports -->
-                        <StackPanel Spacing="4">
-                            <TextBlock Text="PORTS"
-                                       FontSize="10"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                       LetterSpacing="1"/>
-                            <TextBlock Text="{Binding SelectedContainer.PortSummary}"
-                                       FontSize="13"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
-                        </StackPanel>
+                                    <!-- Actions -->
+                                    <StackPanel Spacing="6">
+                                        <TextBlock Text="ACTIONS"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
 
-                        <!-- Actions -->
-                        <StackPanel Spacing="6">
-                            <TextBlock Text="ACTIONS"
-                                       FontSize="10"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                       LetterSpacing="1"/>
+                                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                                Content="Stop Container"
+                                                Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                IsVisible="{Binding IsRunning}"
+                                                HorizontalAlignment="Left"/>
 
-                            <Button Theme="{StaticResource ActionButtonTheme}"
-                                    Content="Stop Container"
-                                    Command="{Binding SelectedContainer.StopCommand}"
-                                    IsVisible="{Binding SelectedContainer.IsRunning}"
-                                    HorizontalAlignment="Left"/>
+                                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                                Content="Start Container"
+                                                Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                IsVisible="{Binding !IsRunning}"
+                                                HorizontalAlignment="Left"/>
 
-                            <Button Theme="{StaticResource ActionButtonTheme}"
-                                    Content="Start Container"
-                                    Command="{Binding SelectedContainer.StartCommand}"
-                                    IsVisible="{Binding !SelectedContainer.IsRunning}"
-                                    HorizontalAlignment="Left"/>
+                                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                                Content="Restart"
+                                                Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                HorizontalAlignment="Left"/>
 
-                            <Button Theme="{StaticResource ActionButtonTheme}"
-                                    Content="Restart"
-                                    Command="{Binding SelectedContainer.RestartCommand}"
-                                    HorizontalAlignment="Left"/>
+                                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                                Content="Delete Container"
+                                                Command="{Binding $parent[UserControl].DataContext.DeleteContainerCommand}"
+                                                CommandParameter="{Binding Source}"
+                                                HorizontalAlignment="Left"/>
+                                    </StackPanel>
 
-                            <Button Theme="{StaticResource DangerButtonTheme}"
-                                    Content="Delete Container"
-                                    Command="{Binding SelectedContainer.DeleteCommand}"
-                                    HorizontalAlignment="Left"/>
-                        </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
 
-                    </StackPanel>
-                </ScrollViewer>
-
-            </DockPanel>
+                        </DockPanel>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
         </Border>
 
     </Grid>
