@@ -31,9 +31,10 @@
             <StackPanel VerticalAlignment="Center"
                         HorizontalAlignment="Center"
                         Spacing="12">
-                <TextBlock Text="🚧"
-                           FontSize="40"
-                           HorizontalAlignment="Center"/>
+                <Path Classes="icon icon-lg"
+                      Data="{StaticResource IconMigration}"
+                      Stroke="{DynamicResource FloatAccentBrush}"
+                      HorizontalAlignment="Center"/>
                 <TextBlock Text="Migration Wizard"
                            FontSize="17"
                            FontWeight="SemiBold"

@@ -16,10 +16,10 @@
 
                 <!-- Icon + title -->
                 <StackPanel HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="⬡"
-                               FontSize="48"
-                               Foreground="{DynamicResource FloatAccentBrush}"
-                               HorizontalAlignment="Center"/>
+                    <Path Classes="icon icon-lg"
+                          Data="{StaticResource IconEngine}"
+                          Stroke="{DynamicResource FloatAccentBrush}"
+                          HorizontalAlignment="Center"/>
                     <TextBlock Text="Setting Up Float"
                                FontSize="22"
                                FontWeight="SemiBold"
