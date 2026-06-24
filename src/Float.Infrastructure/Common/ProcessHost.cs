@@ -77,7 +77,7 @@ public sealed class ProcessHost : IProcessHost
             environment,
             captureResult: true);
 
-    private static async Task<ProcessResult> RunCoreAsync(
+    private static Task<ProcessResult> RunCoreAsync(
         string executable,
         string? arguments,
         string? workingDirectory,
@@ -96,37 +96,11 @@ public sealed class ProcessHost : IProcessHost
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
-
-        if (environment is not null)
-        {
-            foreach (var pair in environment)
-            {
-                startInfo.Environment[pair.Key] = pair.Value;
-            }
-        }
-
-        using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
-
-        if (!process.Start())
-        {
-            throw new InvalidOperationException($"Unable to start process '{executable}'.");
-        }
-
-        var stdoutTask = PumpAsync(process.StandardOutput, onOutput, cancellationToken);
-        var stderrTask = PumpAsync(process.StandardError, onError, cancellationToken);
-        await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
-        await Task.WhenAll(stdoutTask, stderrTask).ConfigureAwait(false);
-
-        var result = new ProcessResult(process.ExitCode);
-        if (!captureResult && !result.Succeeded)
-        {
-            throw new InvalidOperationException($"Process '{executable}' failed with exit code {process.ExitCode}.");
-        }
-
-        return result;
+        ApplyEnvironment(startInfo, environment);
+        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, captureResult);
     }
 
-    private static async Task<ProcessResult> RunCoreAsync(
+    private static Task<ProcessResult> RunCoreAsync(
         string executable,
         IReadOnlyList<string> arguments,
         string? workingDirectory,
@@ -144,36 +118,46 @@ public sealed class ProcessHost : IProcessHost
             RedirectStandardOutput = true,
             RedirectStandardError = true,
         };
-
         foreach (var argument in arguments)
-        {
             startInfo.ArgumentList.Add(argument);
-        }
+        ApplyEnvironment(startInfo, environment);
+        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, captureResult);
+    }
 
-        if (environment is not null)
-        {
-            foreach (var pair in environment)
-            {
-                startInfo.Environment[pair.Key] = pair.Value;
-            }
-        }
+    private static void ApplyEnvironment(ProcessStartInfo startInfo, IReadOnlyDictionary<string, string>? environment)
+    {
+        if (environment is null) return;
+        foreach (var pair in environment)
+            startInfo.Environment[pair.Key] = pair.Value;
+    }
 
+    private static async Task<ProcessResult> RunCoreAsync(
+        ProcessStartInfo startInfo,
+        Action<string> onOutput,
+        Action<string> onError,
+        CancellationToken cancellationToken,
+        bool captureResult)
+    {
         using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
         if (!process.Start())
-        {
-            throw new InvalidOperationException($"Unable to start process '{executable}'.");
-        }
+            throw new InvalidOperationException($"Unable to start process '{startInfo.FileName}'.");
+
+        var stderrBuffer = new System.Text.StringBuilder();
+        Action<string> stderrHandler = line => { stderrBuffer.AppendLine(line); onError(line); };
 
         var stdoutTask = PumpAsync(process.StandardOutput, onOutput, cancellationToken);
-        var stderrTask = PumpAsync(process.StandardError, onError, cancellationToken);
+        var stderrTask = PumpAsync(process.StandardError, stderrHandler, cancellationToken);
         await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
         await Task.WhenAll(stdoutTask, stderrTask).ConfigureAwait(false);
 
         var result = new ProcessResult(process.ExitCode);
         if (!captureResult && !result.Succeeded)
         {
-            throw new InvalidOperationException($"Process '{executable}' failed with exit code {process.ExitCode}.");
+            var stderr = stderrBuffer.ToString().Trim();
+            var detail = string.IsNullOrEmpty(stderr) ? "" : $"\n{stderr}";
+            throw new InvalidOperationException(
+                $"Process '{startInfo.FileName}' failed with exit code {process.ExitCode}.{detail}");
         }
 
         return result;
@@ -184,13 +168,10 @@ public sealed class ProcessHost : IProcessHost
         Action<string> onLine,
         CancellationToken cancellationToken)
     {
-        while (!reader.EndOfStream && !cancellationToken.IsCancellationRequested)
+        string? line;
+        while ((line = await reader.ReadLineAsync(cancellationToken).ConfigureAwait(false)) is not null)
         {
-            var line = await reader.ReadLineAsync().ConfigureAwait(false);
-            if (line is not null)
-            {
-                onLine(line);
-            }
+            onLine(line);
         }
     }
 
