@@ -32,6 +32,9 @@ public partial class MigrationWizardViewModel : ViewModelBase
     [ObservableProperty] public partial string CleanupSummary { get; set; } = "";
     [ObservableProperty] public partial MigrationContainerItemViewModel? PendingArchitectureItem { get; set; }
 
+    public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
+    [ObservableProperty] public partial string? SelectedArchitecture { get; set; }
+
     public int TotalSteps => 3;
     public int SelectedCount => Containers.Count(container => container.IsSelected);
     public int MigratedCount => Containers.Count(container => container.MigrationSucceeded);
@@ -42,7 +45,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
     public bool IsEmpty => !IsLoading && !HasError && !HasContainers;
     public bool ShowContainerList => !IsLoading && !HasError && HasContainers;
     public bool HasSelectedContainers => SelectedCount > 0;
-    public bool CanGoBack => CurrentStep > 1 && !IsMigrating && !IsCleaningUp;
+    public bool CanGoBack => CurrentStep > 1 && CurrentStep < 3 && !IsMigrating && !IsCleaningUp;
     public bool HasCleanupCandidates => CleanupCandidates.Count > 0;
     public bool HasCleanupSelection => CleanupSelectedCount > 0;
     public bool CanFinishCleanup => IsCleanupStep && !IsCleaningUp;
@@ -103,6 +106,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
             MigrationSummary = "";
             CleanupSummary = "";
             PendingArchitectureItem = null;
+            SelectedArchitecture = null;
             Containers.Clear();
             CleanupCandidates.Clear();
             NotifyListStateChanged();
@@ -139,19 +143,29 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 .Select(container => container.Name)
                 .ToHashSet(StringComparer.Ordinal);
 
-            var containers = await _dockerReader.ListAsync(includeAll: true).ConfigureAwait(false);
-            var items = containers
-                .OrderBy(container => container.Name, StringComparer.OrdinalIgnoreCase)
-                .Select(container => CreateItem(container, selectedNames.Contains(container.Name)))
-                .ToArray();
+            var result = await _dockerReader.ListAsync(includeAll: true).ConfigureAwait(false);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Containers.Clear();
-                foreach (var item in items)
-                {
-                    Containers.Add(item);
-                }
+                result.Match(
+                    onSuccess: containers =>
+                    {
+                        var items = containers
+                            .OrderBy(container => container.Name, StringComparer.OrdinalIgnoreCase)
+                            .Select(container => CreateItem(container, selectedNames.Contains(container.Name)))
+                            .ToArray();
+
+                        foreach (var item in items)
+                        {
+                            Containers.Add(item);
+                        }
+                    },
+                    onFailure: error =>
+                    {
+                        HasError = true;
+                        ErrorMessage = error.Message ?? "Failed to list Docker containers";
+                    });
 
                 IsLoading = false;
                 NotifyListStateChanged();
@@ -159,7 +173,6 @@ public partial class MigrationWizardViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
-            // TODO: replace flow-control exception with result pattern.
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Containers.Clear();
@@ -231,6 +244,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
         item.AppendLogLine("Docker image architecture could not be detected automatically.");
         item.AppendLogLine($"Architecture provided manually: {item.ManualArchitecture}.");
         PendingArchitectureItem = null;
+        SelectedArchitecture = null;
 
         var nextPending = Containers.FirstOrDefault(container => container.NeedsArchitectureSelection);
         if (nextPending is not null)
@@ -267,9 +281,9 @@ public partial class MigrationWizardViewModel : ViewModelBase
         foreach (var item in selected)
         {
             var progress = CreateItemProgress(item);
-            try
+            var result = await _dockerLifecycle.DeleteAsync(item.Source, progress: progress).ConfigureAwait(false);
+            if (result.IsSuccess)
             {
-                await _dockerLifecycle.DeleteAsync(item.Source, progress: progress).ConfigureAwait(false);
                 removed++;
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
@@ -279,15 +293,16 @@ public partial class MigrationWizardViewModel : ViewModelBase
                     item.MigrationStatus = "Docker original removed";
                 });
             }
-            catch (Exception ex)
+            else
             {
-                item.AppendLogLine($"Cleanup failed: {ex.Message}");
+                var errorMessage = result.Failure.Message ?? "Unknown error";
+                item.AppendLogLine($"Cleanup failed: {errorMessage}");
                 failed++;
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     item.CleanupSucceeded = false;
                     item.CleanupFailed = true;
-                    item.MigrationStatus = $"Cleanup failed: {ex.Message}";
+                    item.MigrationStatus = $"Cleanup failed: {errorMessage}";
                 });
             }
         }
@@ -384,7 +399,10 @@ public partial class MigrationWizardViewModel : ViewModelBase
             MigrationSummary = BuildMigrationSummary();
             RebuildCleanupCandidates();
             if (FailedMigrationCount == 0)
+            {
                 CurrentStep = 3;
+            }
+
             NotifyMigrationStateChanged();
         });
     }
@@ -412,17 +430,23 @@ public partial class MigrationWizardViewModel : ViewModelBase
             });
 
             appleCreateAttempted = true;
-            await _appleCreator.CreateAsync(createRequest, progress).ConfigureAwait(false);
+            var createResult = await _appleCreator.CreateAsync(createRequest, progress).ConfigureAwait(false);
+            if (createResult.IsFailure)
+                throw new InvalidOperationException(createResult.Failure.Message ?? "Container creation failed");
 
             if (dockerWasRunning)
             {
                 await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = "Stopping Docker original");
-                await _dockerLifecycle.StopAsync(item.Source, progress: progress).ConfigureAwait(false);
+                var stopResult = await _dockerLifecycle.StopAsync(item.Source, progress: progress).ConfigureAwait(false);
+                if (stopResult.IsFailure)
+                    throw new InvalidOperationException(stopResult.Failure.Message ?? "Failed to stop Docker container");
                 dockerStopped = true;
             }
 
             await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = "Starting Apple container");
-            await _appleLifecycle.StartAsync(appleContainer, progress: progress).ConfigureAwait(false);
+            var startResult = await _appleLifecycle.StartAsync(appleContainer, progress: progress).ConfigureAwait(false);
+            if (startResult.IsFailure)
+                throw new InvalidOperationException(startResult.Failure.Message ?? "Failed to start Apple container");
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -466,28 +490,20 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
         if (appleCreateAttempted)
         {
-            try
-            {
-                await _appleLifecycle.DeleteAsync(appleContainer, progress: progress).ConfigureAwait(false);
+            var deleteResult = await _appleLifecycle.DeleteAsync(appleContainer, progress: progress).ConfigureAwait(false);
+            if (deleteResult.IsSuccess)
                 messages.Add("Removed partial Apple container.");
-            }
-            catch (Exception ex)
-            {
-                messages.Add($"Could not remove partial Apple container: {ex.Message}");
-            }
+            else
+                messages.Add($"Could not remove partial Apple container: {deleteResult.Failure.Message}");
         }
 
         if (dockerStopped)
         {
-            try
-            {
-                await _dockerLifecycle.StartAsync(dockerContainer, progress: progress).ConfigureAwait(false);
+            var startResult = await _dockerLifecycle.StartAsync(dockerContainer, progress: progress).ConfigureAwait(false);
+            if (startResult.IsSuccess)
                 messages.Add("Docker original restarted.");
-            }
-            catch (Exception ex)
-            {
-                messages.Add($"Could not restart Docker original: {ex.Message}");
-            }
+            else
+                messages.Add($"Could not restart Docker original: {startResult.Failure.Message}");
         }
 
         return string.Join(" ", messages);
@@ -618,6 +634,14 @@ public partial class MigrationWizardViewModel : ViewModelBase
         NextCommand.NotifyCanExecuteChanged();
         BackCommand.NotifyCanExecuteChanged();
     }
+
+    partial void OnSelectedArchitectureChanged(string? value)
+    {
+        OnPropertyChanged(nameof(CanConfirmArchitecture));
+    }
+
+    public bool CanConfirmArchitecture => SelectedArchitecture is not null;
+
 }
 
 public sealed class MigrationCleanupCompletedEventArgs : EventArgs
