@@ -1,5 +1,4 @@
 using System.Globalization;
-using System.Text;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
@@ -23,6 +22,7 @@ public class AppleContainerCreator : IContainerCreator
         CancellationToken cancellationToken = default)
     {
         var args = BuildArgs(request);
+        progress?.Report("$ /usr/local/bin/container " + FormatArguments(args, redactEnvironment: true));
         await _processHost.RunAsync(
             "/usr/local/bin/container",
             args,
@@ -102,4 +102,34 @@ public class AppleContainerCreator : IContainerCreator
 
         return args;
     }
+
+    private static string FormatArguments(IReadOnlyList<string> args, bool redactEnvironment)
+    {
+        var formatted = new List<string>(args.Count);
+        for (var i = 0; i < args.Count; i++)
+        {
+            if (redactEnvironment && args[i] == "--env" && i + 1 < args.Count)
+            {
+                formatted.Add(args[i]);
+                formatted.Add(RedactEnvironment(args[++i]));
+                continue;
+            }
+
+            formatted.Add(QuoteArgument(args[i]));
+        }
+
+        return string.Join(" ", formatted);
+    }
+
+    private static string RedactEnvironment(string value)
+    {
+        var separator = value.IndexOf('=');
+        var name = separator < 0 ? value : value[..separator];
+        return QuoteArgument($"{name}=***");
+    }
+
+    private static string QuoteArgument(string value)
+        => value.Any(char.IsWhiteSpace) || value.Contains('"')
+            ? "\"" + value.Replace("\"", "\\\"", StringComparison.Ordinal) + "\""
+            : value;
 }

@@ -2,9 +2,11 @@ namespace Float.Core.Models;
 
 public sealed record Container
 {
-    public string Name { get; init; } = string.Empty;
+    public required string Name { get; init; }
 
-    public ContainerImage Image { get; init; } = default!;
+    public required ContainerImage Image { get; init; }
+
+    public string? Architecture { get; init; }
 
     public IReadOnlyList<ContainerEnvironment> EnvironmentVariables { get; init; } = [];
 

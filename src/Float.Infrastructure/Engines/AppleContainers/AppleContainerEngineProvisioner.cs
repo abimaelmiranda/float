@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using System.Linq;
 using System.Net.Http;
+using System.Text;
 using System.Text.Json;
 using System.Threading;
 using System.Threading.Tasks;
@@ -31,7 +32,7 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
         _processHost = processHost;
     }
 
-    public bool IsEngineInstalled()
+    public async Task<bool> IsEngineInstalled()
     {
         EnsureSupportedPlatform();
         return File.Exists(BinaryPath);
@@ -57,16 +58,21 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
             var escapedPath = installerPath.Replace("\\", "\\\\").Replace("\"", "\\\"");
             var script = $"do shell script \"installer -pkg \\\"{escapedPath}\\\" -target /\" with administrator privileges";
 
+            var errors = new StringBuilder();
             var result = await _processHost.RunWithResultAsync(
                 "osascript",
                 ["-e", script],
                 workingDirectory: null,
                 onOutput: line => progress?.Report(line),
-                onError:  line => progress?.Report(line),
+                onError:  line =>
+                {
+                    errors.AppendLine(line);
+                    progress?.Report(line);
+                },
                 cancellationToken: cancellationToken).ConfigureAwait(false);
 
             if (!result.Succeeded)
-                throw new InvalidOperationException($"Installer exited with code {result.ExitCode}.");
+                throw EngineCommandFailed("installer", result.ExitCode, errors);
         }
         finally
         {
@@ -77,22 +83,27 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
         progress?.Report("Installation complete.");
     }
 
-    public Task UninstallEngineAsync()
+    public async Task UninstallEngineAsync()
     {
         EnsureSupportedPlatform();
 
-        return _processHost.RunWithResultAsync(
+        var errors = new StringBuilder();
+        var result = await _processHost.RunWithResultAsync(
             UninstallScriptPath,
             ["-d"],
             workingDirectory: null,
             onOutput: _ => { },
-            onError:  _ => { },
-            cancellationToken: default);
+            onError:  line => errors.AppendLine(line),
+            cancellationToken: default).ConfigureAwait(false);
+
+        if (!result.Succeeded)
+            throw EngineCommandFailed("uninstall", result.ExitCode, errors);
     }
 
     private static async Task<string> GetDownloadUrlAsync()
     {
         using var response = await HttpClient.GetAsync(LatestReleaseUrl).ConfigureAwait(false);
+        // TODO: replace flow-control exception with result pattern.
         response.EnsureSuccessStatusCode();
 
         using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
@@ -108,17 +119,20 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
             .ToArray();
 
         if (assets.Length == 0)
+            // TODO: replace flow-control exception with result pattern.
             throw new InvalidOperationException("No release assets found.");
 
         var pkg = assets.FirstOrDefault(a => a.Name!.EndsWith(".pkg", StringComparison.OrdinalIgnoreCase))
                   ?? assets[0];
 
+        // TODO: replace flow-control exception with result pattern.
         return pkg.Url ?? throw new InvalidOperationException("Download URL not found.");
     }
 
     private static async Task DownloadFileAsync(string downloadUrl, string destinationPath, CancellationToken cancellationToken)
     {
         using var response = await HttpClient.GetAsync(downloadUrl, HttpCompletionOption.ResponseHeadersRead, cancellationToken).ConfigureAwait(false);
+        // TODO: replace flow-control exception with result pattern.
         response.EnsureSuccessStatusCode();
 
         await using var contentStream = await response.Content.ReadAsStreamAsync(cancellationToken).ConfigureAwait(false);
@@ -136,12 +150,13 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
     private static void EnsureSupportedPlatform()
     {
         if (!OperatingSystem.IsMacOS())
+            // TODO: replace flow-control exception with result pattern.
             throw new PlatformNotSupportedException("AppleContainers engine is only supported on macOS.");
     }
 
     public async Task<bool> IsEngineRunningAsync(CancellationToken cancellationToken = default)
     {
-        if (!IsEngineInstalled()) return false;
+        if (!await IsEngineInstalled()) return false;
 
         var result = await _processHost.RunWithResultAsync(
             BinaryPath,
@@ -156,30 +171,47 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
 
     public async Task StartEngineAsync(CancellationToken cancellationToken = default)
     {
-        if (!IsEngineInstalled()) return;
+        if (!await IsEngineInstalled()) return;
 
+        var errors = new StringBuilder();
         var result = await _processHost.RunWithResultAsync(
             BinaryPath,
             ["system", "start", "--enable-kernel-install"],
             workingDirectory: null,
             onOutput: _ => { },
-            onError:  _ => { },
+            onError:  line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
         if (!result.Succeeded)
-            throw new InvalidOperationException($"Failed to start engine. Exit code: {result.ExitCode}");
+            throw EngineCommandFailed("system start", result.ExitCode, errors);
     }
 
     public async Task StopEngineAsync(CancellationToken cancellationToken = default)
     {
-        if (!IsEngineInstalled()) return;
+        if (! await IsEngineInstalled()) return;
 
-        await _processHost.RunWithResultAsync(
+        var errors = new StringBuilder();
+        var result = await _processHost.RunWithResultAsync(
             BinaryPath,
             ["system", "stop"],
             workingDirectory: null,
             onOutput: _ => { },
-            onError:  _ => { },
+            onError:  line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        if (!result.Succeeded)
+            throw EngineCommandFailed("system stop", result.ExitCode, errors);
+    }
+
+    private static InvalidOperationException EngineCommandFailed(
+        string command,
+        int exitCode,
+        StringBuilder errors)
+    {
+        var message = $"Apple container engine command '{command}' failed with exit code {exitCode}.";
+        var detail = errors.ToString().Trim();
+        return string.IsNullOrWhiteSpace(detail)
+            ? new InvalidOperationException(message)
+            : new InvalidOperationException(message + Environment.NewLine + detail);
     }
 }

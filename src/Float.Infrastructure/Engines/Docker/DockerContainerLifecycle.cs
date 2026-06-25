@@ -1,19 +1,17 @@
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using System.Text;
 
-namespace Float.Infrastructure.Engines.AppleContainers;
+namespace Float.Infrastructure.Engines.Docker;
 
-public sealed class AppleContainerLifecycle : IContainerLifecycle
+public sealed class DockerContainerLifecycle : IContainerLifecycle
 {
-    public ContainerEngine Engine => ContainerEngine.AppleContainers;
+    public ContainerEngine Engine => ContainerEngine.Docker;
 
     private readonly IProcessHost _processHost;
 
-    public AppleContainerLifecycle(IProcessHost processHost)
+    public DockerContainerLifecycle(IProcessHost processHost)
     {
         _processHost = processHost;
     }
@@ -40,9 +38,7 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
-        => container.Instance?.Status == ContainerStatus.Running
-            ? RunDeleteAsync(container, cancellationToken, progress)
-            : RunAsync("rm", container, cancellationToken, progress);
+        => RunAsync("rm", container, cancellationToken, progress);
 
     private async Task RunAsync(
         string command,
@@ -58,9 +54,9 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
 
         var output = new StringBuilder();
         var errors = new StringBuilder();
-        progress?.Report($"$ /usr/local/bin/container {command} {QuoteArgument(container.Name)}");
+        progress?.Report($"$ docker {command} {QuoteArgument(container.Name)}");
         var result = await _processHost.RunWithResultAsync(
-            "/usr/local/bin/container",
+            "docker",
             [command, container.Name],
             workingDirectory: null,
             onOutput: line =>
@@ -77,30 +73,22 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
 
         if (!result.Succeeded)
             throw new InvalidOperationException(
-                BuildFailureMessage(command, container.Name, result.ExitCode, output, errors));
+                BuildFailureMessage("Docker", command, container.Name, result.ExitCode, output, errors));
     }
 
     private static string BuildFailureMessage(
+        string engine,
         string command,
         string containerName,
         int exitCode,
         StringBuilder output,
         StringBuilder errors)
     {
-        var message = $"Apple container command '{command}' failed for '{containerName}' with exit code {exitCode}.";
+        var message = $"{engine} command '{command}' failed for '{containerName}' with exit code {exitCode}.";
         var detail = errors.Length > 0 ? errors.ToString().Trim() : output.ToString().Trim();
         return string.IsNullOrWhiteSpace(detail)
             ? message
             : message + Environment.NewLine + detail;
-    }
-
-    private async Task RunDeleteAsync(
-        Container container,
-        CancellationToken cancellationToken,
-        IProgress<string>? progress)
-    {
-        await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
-        await RunAsync("rm", container, cancellationToken, progress).ConfigureAwait(false);
     }
 
     private static string QuoteArgument(string value)

@@ -2,6 +2,7 @@ using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Infrastructure.Common;
 using Float.Infrastructure.Engines.AppleContainers;
+using Float.Infrastructure.Engines.Docker;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.Infrastructure;
@@ -17,6 +18,10 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IContainerReader, AppleContainerReader>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerCreator, AppleContainerCreator>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerLifecycle, AppleContainerLifecycle>(ContainerEngine.AppleContainers);
+
+        services.AddKeyedSingleton<IEngineProvisioner, DockerContainerEngineProvisioner>(ContainerEngine.Docker);
+        services.AddKeyedSingleton<IContainerReader, DockerReader>(ContainerEngine.Docker);
+        services.AddKeyedSingleton<IContainerLifecycle, DockerContainerLifecycle>(ContainerEngine.Docker);
 
         // Active engine forwarding — change the key here to switch engines
         services.AddSingleton<IEngineProvisioner>(sp =>

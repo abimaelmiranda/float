@@ -156,6 +156,7 @@ public sealed class ProcessHost : IProcessHost
         {
             var stderr = stderrBuffer.ToString().Trim();
             var detail = string.IsNullOrEmpty(stderr) ? "" : $"\n{stderr}";
+            // TODO: replace flow-control exception with result pattern.
             throw new InvalidOperationException(
                 $"Process '{startInfo.FileName}' failed with exit code {process.ExitCode}.{detail}");
         }

@@ -4,7 +4,7 @@ namespace Float.Core.Models;
 
 public sealed record ContainerInstance
 {
-    public ContainerStatus Status { get; init; } = ContainerStatus.Unknown;
+    public required ContainerStatus Status { get; init; }
 
     public ContainerHealth Health { get; init; } = ContainerHealth.Unknown;
 

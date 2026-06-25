@@ -47,10 +47,11 @@ public sealed class ContainerBuilder : IContainerWithImage, IContainerWithPorts,
     public Container Build()
     {
         var image = Guard.NotNull(_image, nameof(_image));
+        var name = Guard.NotWhiteSpace(_name, nameof(_name));
 
         return new Container
         {
-            Name = _name ?? string.Empty,
+            Name = name,
             Image = image,
             EnvironmentVariables = _environmentVariables.ToArray(),
             Volumes = _volumes.ToArray(),
