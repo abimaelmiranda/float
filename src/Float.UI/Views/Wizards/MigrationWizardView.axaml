@@ -7,27 +7,30 @@
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Header -->
-        <Border Grid.Row="0" Padding="24,52,24,16">
-            <Grid ColumnDefinitions="*,Auto">
-                <StackPanel Spacing="4">
-                    <TextBlock Text="Migrate from Docker"
-                               FontSize="20"
-                               FontWeight="SemiBold"/>
-                    <TextBlock FontSize="13"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
-                        <Run Text="Step "/>
-                        <Run Text="{Binding CurrentStep}"/>
-                        <Run Text=" of "/>
-                        <Run Text="{Binding TotalSteps}"/>
-                    </TextBlock>
-                </StackPanel>
+        <Border Grid.Row="0" Padding="24,52,24,12">
+            <Grid ColumnDefinitions="*,Auto,Auto"
+                  ColumnSpacing="12">
+                <TextBlock Text="Migrate from Docker"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
 
-                <Button Grid.Column="1"
+                <TextBlock Grid.Column="1"
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           VerticalAlignment="Center">
+                    <Run Text="Step "/>
+                    <Run Text="{Binding CurrentStep}"/>
+                    <Run Text=" of "/>
+                    <Run Text="{Binding TotalSteps}"/>
+                </TextBlock>
+
+                <Button Grid.Column="2"
                         Theme="{StaticResource ActionButtonTheme}"
                         Command="{Binding RefreshCommand}"
                         IsEnabled="{Binding !IsLoading}"
                         IsVisible="{Binding ShowRefresh}"
-                        VerticalAlignment="Top">
+                        VerticalAlignment="Center">
                     <StackPanel Orientation="Horizontal" Spacing="6">
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconRefresh}"
@@ -110,7 +113,8 @@
                 <!-- List -->
                 <DockPanel IsVisible="{Binding ShowContainerList}">
                     <Border DockPanel.Dock="Top"
-                            Padding="4,0,4,12">
+                            MinHeight="44"
+                            Padding="4,0,4,10">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="3">
                                 <TextBlock Text="Choose containers"
@@ -135,58 +139,53 @@
                                 <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
                                     <Border Background="{DynamicResource FloatCardBackgroundBrush}"
                                             CornerRadius="8"
-                                            Padding="12"
+                                            Padding="14,10"
                                             Margin="0,0,0,8">
-                                        <Grid ColumnDefinitions="Auto,*,Auto"
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
                                               ColumnSpacing="12">
                                             <CheckBox Grid.Column="0"
                                                       IsChecked="{Binding IsSelected}"
                                                       VerticalAlignment="Center"/>
 
                                             <StackPanel Grid.Column="1"
-                                                        Spacing="4">
-                                                <StackPanel Orientation="Horizontal"
-                                                            Spacing="8">
-                                                    <TextBlock Text="{Binding Name}"
-                                                               FontSize="13"
-                                                               FontWeight="SemiBold"/>
-                                                    <StackPanel Orientation="Horizontal"
-                                                                Spacing="5"
-                                                                VerticalAlignment="Center">
-                                                        <Ellipse Classes="status-dot"
-                                                                 Classes.running="{Binding IsRunning}"
-                                                                 Width="7"
-                                                                 Height="7"/>
-                                                        <TextBlock Text="{Binding StatusLabel}"
-                                                                   FontSize="11"
-                                                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
-                                                    </StackPanel>
-                                                </StackPanel>
-
+                                                        Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="13"
+                                                           FontWeight="Medium"/>
                                                 <TextBlock Text="{Binding ImageTag}"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                            TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
 
+                                            <StackPanel Grid.Column="2"
+                                                        Orientation="Horizontal"
+                                                        Spacing="12"
+                                                        VerticalAlignment="Center">
                                                 <StackPanel Orientation="Horizontal"
-                                                            Spacing="12">
-                                                    <TextBlock Text="{Binding PortSummary}"
-                                                               FontSize="11"
-                                                               Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
-                                                    <TextBlock Text="{Binding VolumeSummary}"
-                                                               FontSize="11"
-                                                               Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
-                                                    <TextBlock Text="{Binding ArchitectureLabel}"
+                                                            Spacing="5"
+                                                            VerticalAlignment="Center">
+                                                    <Ellipse Classes="status-dot"
+                                                             Classes.running="{Binding IsRunning}"
+                                                             Width="7"
+                                                             Height="7"/>
+                                                    <TextBlock Text="{Binding StatusLabel}"
                                                                FontSize="11"
                                                                Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                                 </StackPanel>
+                                                <TextBlock Text="{Binding PortSummary}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                                <TextBlock Text="{Binding VolumeSummary}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                                <TextBlock Text="{Binding ArchitectureLabel}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                             </StackPanel>
 
-                                            <Path Grid.Column="2"
-                                                  Classes="icon icon-sm"
-                                                  Data="{StaticResource IconMigration}"
-                                                  Stroke="{DynamicResource FloatSecondaryTextBrush}"
-                                                  VerticalAlignment="Center"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -207,7 +206,8 @@
                 IsVisible="{Binding IsMigrationStep}">
             <DockPanel>
                 <Border DockPanel.Dock="Top"
-                        Padding="4,0,4,12">
+                        MinHeight="44"
+                        Padding="4,0,4,10">
                     <StackPanel Spacing="3">
                         <TextBlock Text="Migration progress"
                                    FontSize="15"
@@ -224,22 +224,24 @@
                             <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
                                 <Border Background="{DynamicResource FloatCardBackgroundBrush}"
                                         CornerRadius="8"
-                                        Padding="12"
+                                        Padding="14,10"
                                         Margin="0,0,0,8"
                                         IsVisible="{Binding IsSelected}">
                                     <StackPanel Spacing="8">
                                         <Grid ColumnDefinitions="*,Auto"
                                               ColumnSpacing="12">
-                                            <StackPanel Spacing="4">
+                                            <StackPanel Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}"
                                                            FontSize="13"
-                                                           FontWeight="SemiBold"/>
+                                                           FontWeight="Medium"/>
                                                 <TextBlock Text="{Binding ImageTag}"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                            TextTrimming="CharacterEllipsis"/>
                                                 <TextBlock Text="{Binding MigrationStatus}"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                                            TextWrapping="Wrap"/>
                                             </StackPanel>
@@ -305,18 +307,26 @@
 
                 <DockPanel IsVisible="{Binding HasCleanupCandidates}">
                     <Border DockPanel.Dock="Top"
-                            Padding="4,0,4,12">
-                        <StackPanel Spacing="3">
-                            <TextBlock Text="Cleanup Docker originals"
-                                       FontSize="15"
-                                       FontWeight="SemiBold"/>
-                            <TextBlock Text="{Binding MigrationSummary}"
+                            MinHeight="44"
+                            Padding="4,0,4,10">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="Cleanup Docker originals"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding MigrationSummary}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding CleanupSummary}"
                                        FontSize="12"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                            <TextBlock Text="{Binding CleanupSummary}"
-                                       FontSize="12"
-                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                        </StackPanel>
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxWidth="260"/>
+                        </Grid>
                     </Border>
 
                     <ScrollViewer>
@@ -326,7 +336,7 @@
                                 <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
                                     <Border Background="{DynamicResource FloatCardBackgroundBrush}"
                                             CornerRadius="8"
-                                            Padding="12"
+                                            Padding="14,10"
                                             Margin="0,0,0,8">
                                         <Grid ColumnDefinitions="Auto,*,Auto"
                                               ColumnSpacing="12">
@@ -335,25 +345,24 @@
                                                       VerticalAlignment="Center"/>
 
                                             <StackPanel Grid.Column="1"
-                                                        Spacing="4">
+                                                        Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
                                                 <TextBlock Text="{Binding Name}"
                                                            FontSize="13"
-                                                           FontWeight="SemiBold"/>
+                                                           FontWeight="Medium"/>
                                                 <TextBlock Text="{Binding ImageTag}"
-                                                           FontSize="12"
+                                                           FontSize="11"
                                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                            TextTrimming="CharacterEllipsis"/>
-                                                <TextBlock Text="{Binding MigrationStatus}"
-                                                           FontSize="12"
-                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                                           TextWrapping="Wrap"/>
                                             </StackPanel>
 
                                             <TextBlock Grid.Column="2"
-                                                       Text="Apagar original"
-                                                       FontSize="12"
+                                                       Text="{Binding MigrationStatus}"
+                                                       FontSize="11"
                                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                                       VerticalAlignment="Center"/>
+                                                       VerticalAlignment="Center"
+                                                       TextWrapping="Wrap"/>
                                         </Grid>
                                     </Border>
                                 </DataTemplate>
@@ -365,13 +374,12 @@
         </Border>
 
         <!-- Step footer -->
-        <Border Grid.Row="2" Padding="24,16">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button Grid.Column="0"
-                        Theme="{StaticResource ActionButtonTheme}"
-                        Content="Back"
-                        Command="{Binding BackCommand}"
-                        IsEnabled="{Binding CanGoBack}"/>
+        <Border Grid.Row="2"
+                Padding="24,16"
+                Background="{DynamicResource FloatFooterBackgroundBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="0,1,0,0">
+            <Grid ColumnDefinitions="140,*,140">
 
                 <TextBlock Grid.Column="1"
                            Text="{Binding FooterSummary}"
@@ -385,7 +393,8 @@
                         Theme="{StaticResource PrimaryButtonTheme}"
                         Command="{Binding NextCommand}"
                         IsVisible="{Binding !IsCleanupStep}"
-                        IsEnabled="{Binding CanUseNext}">
+                        IsEnabled="{Binding CanUseNext}"
+                        HorizontalAlignment="Stretch">
                     <TextBlock Text="{Binding NextButtonText}"/>
                 </Button>
 
@@ -393,7 +402,8 @@
                         Theme="{StaticResource PrimaryButtonTheme}"
                         Command="{Binding ConfirmCleanupCommand}"
                         IsVisible="{Binding IsCleanupStep}"
-                        IsEnabled="{Binding CanFinishCleanup}">
+                        IsEnabled="{Binding CanFinishCleanup}"
+                        HorizontalAlignment="Stretch">
                     <TextBlock Text="Finish cleanup"/>
                 </Button>
             </Grid>
@@ -402,18 +412,19 @@
         <Border Grid.RowSpan="3"
                 Background="#99000000"
                 IsVisible="{Binding HasPendingArchitecturePrompt}">
-            <Border Width="420"
+            <Border Width="380"
+                    MaxHeight="260"
                     Padding="18"
-                    CornerRadius="8"
+                    CornerRadius="10"
                     HorizontalAlignment="Center"
                     VerticalAlignment="Center"
                     Background="{DynamicResource FloatCardBackgroundBrush}"
                     BorderBrush="{DynamicResource SidebarBorderBrush}"
                     BorderThickness="1">
-                <StackPanel Spacing="14">
+                <StackPanel Spacing="12">
                     <StackPanel Spacing="4">
                         <TextBlock Text="Choose image architecture"
-                                   FontSize="16"
+                                   FontSize="15"
                                    FontWeight="SemiBold"/>
                         <TextBlock Text="Docker did not expose the image architecture for this container."
                                    FontSize="12"
@@ -421,34 +432,37 @@
                                    TextWrapping="Wrap"/>
                     </StackPanel>
 
-                    <StackPanel Spacing="3">
+                    <StackPanel Spacing="2">
                         <TextBlock Text="{Binding PendingArchitectureName}"
                                    FontSize="13"
                                    FontWeight="SemiBold"/>
                         <TextBlock Text="{Binding PendingArchitectureImageTag}"
                                    FontSize="12"
                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   TextWrapping="Wrap"/>
+                                   TextTrimming="CharacterEllipsis"/>
                     </StackPanel>
 
-                    <Grid ColumnDefinitions="*,*"
-                          ColumnSpacing="8">
-                        <Button Grid.Column="0"
-                                Theme="{StaticResource ActionButtonTheme}"
+                    <ComboBox ItemsSource="{Binding ArchitectureOptions}"
+                              SelectedItem="{Binding SelectedArchitecture}"
+                              FontSize="13"
+                              HorizontalAlignment="Stretch"/>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                Margin="0,12,0,0">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding CancelArchitecturePromptCommand}"
+                                Content="Cancel"
+                                HorizontalAlignment="Right"/>
+                        <Button Theme="{StaticResource PrimaryButtonTheme}"
+                                Content="Confirm"
+                                IsEnabled="{Binding CanConfirmArchitecture}"
                                 Command="{Binding ResolveArchitectureCommand}"
-                                CommandParameter="arm64"
-                                Content="arm64"/>
-                        <Button Grid.Column="1"
-                                Theme="{StaticResource ActionButtonTheme}"
-                                Command="{Binding ResolveArchitectureCommand}"
-                                CommandParameter="amd64"
-                                Content="amd64"/>
-                    </Grid>
-
-                    <Button Theme="{StaticResource ActionButtonTheme}"
-                            Command="{Binding CancelArchitecturePromptCommand}"
-                            Content="Cancel"
-                            HorizontalAlignment="Right"/>
+                                CommandParameter="{Binding SelectedArchitecture}"
+                                HorizontalAlignment="Right"
+                                Padding="16,6"
+                                FontSize="12"/>
+                    </StackPanel>
                 </StackPanel>
             </Border>
         </Border>

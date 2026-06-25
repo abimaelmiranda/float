@@ -267,27 +267,26 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     {
         try
         {
-            await Task.Run(() => _creator.CreateAsync(request, progress, cancellationToken), cancellationToken).ConfigureAwait(false);
+            var result = await _creator.CreateAsync(request, progress, cancellationToken).ConfigureAwait(false);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsCreating = false;
-                IsComplete = true;
+                result.Match(
+                    onSuccess: _ =>
+                    {
+                        IsComplete = true;
+                    },
+                    onFailure: error =>
+                    {
+                        HasError = true;
+                        ErrorMessage = error.Message ?? "Container creation failed";
+                    });
             });
         }
         catch (OperationCanceledException)
         {
             await Dispatcher.UIThread.InvokeAsync(() => IsCreating = false);
-        }
-        catch (Exception ex)
-        {
-            // TODO: replace flow-control exception with result pattern.
-            await Dispatcher.UIThread.InvokeAsync(() =>
-            {
-                IsCreating = false;
-                HasError = true;
-                ErrorMessage = ex.Message;
-            });
         }
         finally
         {

@@ -112,33 +112,9 @@
                 </StackPanel>
 
                 <!-- ── Step 2: Platform ───────────────────────────────── -->
-                <StackPanel IsVisible="{Binding IsStep2}" Spacing="20" MaxWidth="520">
+                <StackPanel IsVisible="{Binding IsStep2}" Spacing="16" MaxWidth="520">
 
-                    <!-- Rosetta toggle card -->
-                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
-                            CornerRadius="10"
-                            Padding="16,14">
-                        <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="Enable Rosetta (AMD64 Emulation)"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"/>
-                                <TextBlock Text="Required for x86_64/amd64-only images. Uses Apple Rosetta 2 to translate instructions at near-native speed."
-                                           FontSize="12"
-                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                           TextWrapping="Wrap"
-                                           MaxWidth="360"/>
-                            </StackPanel>
-                            <ToggleSwitch Grid.Column="1"
-                                         IsChecked="{Binding EnableRosetta}"
-                                         VerticalAlignment="Center"
-                                         Margin="16,0,0,0"
-                                         OnContent=""
-                                         OffContent=""/>
-                        </Grid>
-                    </Border>
-
-                    <!-- Architecture -->
+                    <!-- Group: Architecture -->
                     <StackPanel Spacing="6">
                         <TextBlock Text="ARCHITECTURE"
                                    FontSize="11"
@@ -149,57 +125,101 @@
                                   SelectedItem="{Binding Architecture}"
                                   FontSize="13"
                                   HorizontalAlignment="Stretch"/>
-                        <TextBlock Text="Set automatically when toggling Rosetta above."
+                        <TextBlock Text="Set automatically when toggling Rosetta below."
                                    FontSize="11"
                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                     </StackPanel>
 
-                    <!-- Resources -->
-                    <Grid ColumnDefinitions="*,16,*">
-                        <StackPanel Grid.Column="0" Spacing="6">
-                            <TextBlock Text="CPU CORES"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
-                            <TextBox Text="{Binding CpuCount}"
-                                     PlaceholderText="e.g. 2  (optional)"
-                                     FontSize="13"/>
-                        </StackPanel>
-                        <StackPanel Grid.Column="2" Spacing="6">
-                            <TextBlock Text="MEMORY"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
-                            <TextBox Text="{Binding Memory}"
-                                     PlaceholderText="e.g. 512m, 2g  (optional)"
-                                     FontSize="13"/>
-                        </StackPanel>
-                    </Grid>
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}" Margin="0,2"/>
 
-                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
-                            CornerRadius="10"
-                            Padding="16,14">
+                    <!-- Group: Resources -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="RESOURCES"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
+                        <Grid ColumnDefinitions="*,16,*">
+                            <StackPanel Grid.Column="0" Spacing="6">
+                                <TextBlock Text="CPU CORES"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           LetterSpacing="1"/>
+                                <TextBox Text="{Binding CpuCount}"
+                                         PlaceholderText="e.g. 2  (optional)"
+                                         FontSize="13"/>
+                            </StackPanel>
+                            <StackPanel Grid.Column="2" Spacing="6">
+                                <TextBlock Text="MEMORY"
+                                           FontSize="11"
+                                           FontWeight="SemiBold"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           LetterSpacing="1"/>
+                                <TextBox Text="{Binding Memory}"
+                                         PlaceholderText="e.g. 512m, 2g  (optional)"
+                                         FontSize="13"/>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}" Margin="0,2"/>
+
+                    <!-- Group: Rosetta -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="ENABLE ROSETTA"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
                         <Grid ColumnDefinitions="*,Auto">
-                            <StackPanel Grid.Column="0" Spacing="4">
-                                <TextBlock Text="Keep container alive"
-                                           FontSize="14"
-                                           FontWeight="SemiBold"/>
-                                <TextBlock Text="Appends a persistent command for cases where the image exits immediately, such as test containers or minimal base images."
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="AMD64 Emulation"
+                                           FontSize="13"
+                                           FontWeight="Medium"/>
+                                <TextBlock Text="Required for x86_64/amd64-only images. Uses Apple Rosetta 2 to translate instructions at near-native speed."
                                            FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                            TextWrapping="Wrap"
-                                           MaxWidth="360"/>
+                                           MaxWidth="380"/>
                             </StackPanel>
                             <ToggleSwitch Grid.Column="1"
-                                         IsChecked="{Binding KeepAlive}"
-                                         VerticalAlignment="Center"
-                                         Margin="16,0,0,0"
-                                         OnContent=""
-                                         OffContent=""/>
+                                          IsChecked="{Binding EnableRosetta}"
+                                          VerticalAlignment="Center"
+                                          Margin="16,0,0,0"
+                                          OnContent=""
+                                          OffContent=""/>
                         </Grid>
-                    </Border>
+                    </StackPanel>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}" Margin="0,2"/>
+
+                    <!-- Group: Keep Alive -->
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="KEEP CONTAINER ALIVE"
+                                   FontSize="11"
+                                   FontWeight="SemiBold"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   LetterSpacing="1"/>
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Grid.Column="0" Spacing="2">
+                                <TextBlock Text="Persistent command"
+                                           FontSize="13"
+                                           FontWeight="Medium"/>
+                                <TextBlock Text="For cases where the image exits immediately, such as test containers or minimal base images."
+                                           FontSize="12"
+                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                           TextWrapping="Wrap"
+                                           MaxWidth="380"/>
+                            </StackPanel>
+                            <ToggleSwitch Grid.Column="1"
+                                          IsChecked="{Binding KeepAlive}"
+                                          VerticalAlignment="Center"
+                                          Margin="16,0,0,0"
+                                          OnContent=""
+                                          OffContent=""/>
+                        </Grid>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- ── Step 3: Ports & Volumes ────────────────────────── -->
