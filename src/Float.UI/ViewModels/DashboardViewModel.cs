@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
+using Float.Core.Models.Results;
 
 namespace Float.UI.ViewModels;
 
@@ -21,8 +22,11 @@ public partial class DashboardViewModel : ViewModelBase
 
     [ObservableProperty] public partial bool HasError { get; set; }
     [ObservableProperty] public partial string ErrorMessage { get; set; } = "";
+    [ObservableProperty] public partial Container? PendingDeleteContainer { get; set; }
 
     public bool HasSelectedContainer => SelectedContainer is not null;
+    public bool HasPendingDelete => PendingDeleteContainer is not null;
+    public string PendingDeleteName => PendingDeleteContainer?.Name ?? "";
 
     public ObservableCollection<ContainerItemViewModel> Containers { get; } = [];
 
@@ -37,8 +41,15 @@ public partial class DashboardViewModel : ViewModelBase
         OnPropertyChanged(nameof(HasSelectedContainer));
     }
 
+    partial void OnPendingDeleteContainerChanged(Container? value)
+    {
+        OnPropertyChanged(nameof(HasPendingDelete));
+        OnPropertyChanged(nameof(PendingDeleteName));
+    }
+
     public event EventHandler? RequestCreateContainer;
     public event EventHandler<string>? OperationFailed;
+    public event EventHandler<string>? OperationSucceeded;
 
     [RelayCommand]
     private void NewContainer() => RequestCreateContainer?.Invoke(this, EventArgs.Empty);
@@ -51,73 +62,122 @@ public partial class DashboardViewModel : ViewModelBase
 
     [RelayCommand]
     private Task StartContainerAsync(Container? container)
-        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.StartAsync(c, ct));
+        => RunLifecycleAsync(container, "Starting...", (c, ct) => _containerLifecycle.StartAsync(c, ct));
 
     [RelayCommand]
     private Task StopContainerAsync(Container? container)
-        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.StopAsync(c, ct));
+        => RunLifecycleAsync(container, "Stopping...", (c, ct) => _containerLifecycle.StopAsync(c, ct));
 
     [RelayCommand]
     private Task RestartContainerAsync(Container? container)
-        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.RestartAsync(c, ct));
+        => RunLifecycleAsync(container, "Restarting...", (c, ct) => _containerLifecycle.RestartAsync(c, ct));
 
     [RelayCommand]
-    private Task DeleteContainerAsync(Container? container)
-        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.DeleteAsync(c, ct));
+    private void RequestDelete(Container? container)
+    {
+        PendingDeleteContainer = container;
+    }
+
+    [RelayCommand]
+    private void CancelDelete()
+    {
+        PendingDeleteContainer = null;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmDeleteAsync()
+    {
+        var container = PendingDeleteContainer;
+        PendingDeleteContainer = null;
+        if (container is null)
+            return;
+
+        var name = container.Name;
+        var deleted = await RunLifecycleAsync(container, "Deleting...", (c, ct) => _containerLifecycle.DeleteAsync(c, ct))
+            .ConfigureAwait(false);
+        if (deleted)
+            OperationSucceeded?.Invoke(this, $"Container '{name}' deleted.");
+    }
 
     public async Task RefreshAsync()
     {
-        IReadOnlyList<Container> containers;
-
-        try
-        {
-            containers = await _containerReader.ListAsync().ConfigureAwait(false);
-        }
-        catch (Exception ex)
-        {
-            await ShowErrorAsync(ex.Message).ConfigureAwait(false);
-            return;
-        }
-
-        var items = containers.Select(container => new ContainerItemViewModel(container)).ToArray();
-        var selectedName = SelectedContainer?.Name;
+        var result = await _containerReader.ListAsync().ConfigureAwait(false);
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             Containers.Clear();
-            foreach (var item in items)
-            {
-                Containers.Add(item);
-            }
+            result.Match(
+                onSuccess: containers =>
+                {
+                    var items = containers.Select(container => new ContainerItemViewModel(container)).ToArray();
+                    var selectedName = SelectedContainer?.Name;
 
-            HasError = false;
-            ErrorMessage = "";
-            SelectedContainer = selectedName is null
-                ? null
-                : Containers.FirstOrDefault(container => container.Name == selectedName);
+                    foreach (var item in items)
+                    {
+                        Containers.Add(item);
+                    }
+
+                    HasError = false;
+                    ErrorMessage = "";
+                    SelectedContainer = selectedName is null
+                        ? null
+                        : Containers.FirstOrDefault(container => container.Name == selectedName);
+                },
+                onFailure: error =>
+                {
+                    HasError = true;
+                    ErrorMessage = error.Message ?? "Failed to list containers";
+                    OperationFailed?.Invoke(this, ErrorMessage);
+                });
         });
     }
 
-    private async Task RunLifecycleAsync(
+    private async Task<bool> RunLifecycleAsync(
         Container? container,
-        Func<Container, CancellationToken, Task> action)
+        string busyLabel,
+        Func<Container, CancellationToken, Task<Result>> action)
     {
         if (container is null)
         {
-            return;
+            return false;
         }
+
+        var item = Containers.FirstOrDefault(c => c.Name == container.Name);
+        await SetBusyAsync(item, true, busyLabel).ConfigureAwait(false);
 
         try
         {
-            await Task.Run(() => action(container, CancellationToken.None)).ConfigureAwait(false);
+            var result = await Task.Run(() => action(container, CancellationToken.None)).ConfigureAwait(false);
+            if (result.IsFailure)
+            {
+                await ShowErrorAsync(result.Failure.Message ?? "Container command failed.").ConfigureAwait(false);
+                return false;
+            }
+
+            await RefreshAsync().ConfigureAwait(false);
+            return true;
         }
         catch (Exception ex)
         {
             await ShowErrorAsync(ex.Message).ConfigureAwait(false);
-            return;
+            return false;
         }
+        finally
+        {
+            await SetBusyAsync(item, false, "").ConfigureAwait(false);
+        }
+    }
 
-        await RefreshAsync().ConfigureAwait(false);
+    private static async Task SetBusyAsync(ContainerItemViewModel? item, bool isBusy, string label)
+    {
+        if (item is null)
+            return;
+
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            item.IsBusy = isBusy;
+            item.BusyLabel = label;
+        });
     }
 
     private async Task ShowErrorAsync(string message)

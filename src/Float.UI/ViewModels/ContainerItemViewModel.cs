@@ -14,6 +14,8 @@ public partial class ContainerItemViewModel : ViewModelBase
 
     public bool IsRunning => Status == ContainerStatus.Running;
     public string StatusLabel => Status.ToString();
+    [ObservableProperty] public partial bool IsBusy { get; set; }
+    [ObservableProperty] public partial string BusyLabel { get; set; } = "";
 
     public ContainerItemViewModel(Container source)
     {

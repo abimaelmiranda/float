@@ -104,10 +104,25 @@
                                                 Orientation="Horizontal"
                                                 Spacing="2"
                                                 VerticalAlignment="Center">
+                                        <StackPanel Orientation="Horizontal"
+                                                    Spacing="6"
+                                                    Margin="0,0,8,0"
+                                                    VerticalAlignment="Center"
+                                                    IsVisible="{Binding IsBusy}">
+                                            <ProgressBar Width="34"
+                                                         Height="4"
+                                                         IsIndeterminate="True"
+                                                         VerticalAlignment="Center"/>
+                                            <TextBlock Text="{Binding BusyLabel}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                       VerticalAlignment="Center"/>
+                                        </StackPanel>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding !IsRunning}"
                                                 ToolTip.Tip="Start">
                                             <Path Classes="icon icon-sm"
@@ -118,6 +133,7 @@
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding IsRunning}"
                                                 ToolTip.Tip="Stop">
                                             <Path Classes="icon icon-sm"
@@ -128,6 +144,7 @@
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="Restart">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconRestart}"
@@ -135,8 +152,9 @@
                                         </Button>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
-                                                Command="{Binding $parent[UserControl].DataContext.DeleteContainerCommand}"
+                                                Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="Delete">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconDelete}"
@@ -203,6 +221,10 @@
                                                        FontSize="13"
                                                        VerticalAlignment="Center"/>
                                         </StackPanel>
+                                        <TextBlock Text="{Binding BusyLabel}"
+                                                   IsVisible="{Binding IsBusy}"
+                                                   FontSize="12"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
                                     </StackPanel>
 
                                     <!-- Image -->
@@ -241,6 +263,7 @@
                                                 Content="Stop Container"
                                                 Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding IsRunning}"
                                                 HorizontalAlignment="Left"/>
 
@@ -248,6 +271,7 @@
                                                 Content="Start Container"
                                                 Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding !IsRunning}"
                                                 HorizontalAlignment="Left"/>
 
@@ -255,12 +279,14 @@
                                                 Content="Restart"
                                                 Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
                                                 Content="Delete Container"
-                                                Command="{Binding $parent[UserControl].DataContext.DeleteContainerCommand}"
+                                                Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
                                                 CommandParameter="{Binding Source}"
+                                                IsEnabled="{Binding !IsBusy}"
                                                 HorizontalAlignment="Left"/>
                                     </StackPanel>
 
@@ -271,6 +297,42 @@
                     </DataTemplate>
                 </ContentControl.ContentTemplate>
             </ContentControl>
+        </Border>
+
+        <!-- ── Delete confirmation overlay ─────────────────────────── -->
+        <Border Grid.ColumnSpan="2"
+                Background="#99000000"
+                IsVisible="{Binding HasPendingDelete}">
+            <Border Width="380"
+                    Padding="18"
+                    CornerRadius="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource FloatCardBackgroundBrush}"
+                    BorderBrush="{DynamicResource SidebarBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Delete container"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+                    <TextBlock FontSize="13"
+                               TextWrapping="Wrap">
+                        Are you sure you want to delete
+                        <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
+                        This action cannot be undone.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8"
+                                HorizontalAlignment="Right">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Content="Cancel"
+                                Command="{Binding CancelDeleteCommand}"/>
+                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                Content="Delete"
+                                Command="{Binding ConfirmDeleteCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Border>
 
     </Grid>
