@@ -4,6 +4,8 @@ using System.Threading.Tasks;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 
 namespace Float.UI.ViewModels;
 
@@ -39,13 +41,24 @@ public abstract partial class ProvisioningViewModelBase : ViewModelBase
 
         try
         {
-            await ProvisionAsync(progress, _cts.Token).ConfigureAwait(false);
+            var result = await ProvisionAsync(progress, _cts.Token).ConfigureAwait(false);
 
             Dispatcher.UIThread.Post(async () =>
             {
-                IsRunning  = false;
-                IsComplete = true;
-                await OnProvisioningCompletedAsync().ConfigureAwait(false);
+                IsRunning = false;
+
+                await result.Match(
+                    onSuccess: async () =>
+                    {
+                        IsComplete = true;
+                        await OnProvisioningCompletedAsync().ConfigureAwait(false);
+                    },
+                    onFailure: async error =>
+                    {
+                        HasError = true;
+                        ErrorMessage = error.Message ?? "An unknown error occurred";
+                        await OnProvisioningFailedAsync(error).ConfigureAwait(false);
+                    });
             });
         }
         catch (OperationCanceledException)
@@ -54,17 +67,6 @@ public abstract partial class ProvisioningViewModelBase : ViewModelBase
             {
                 IsRunning = false;
                 await OnProvisioningCancelledAsync().ConfigureAwait(false);
-            });
-        }
-        catch (Exception ex)
-        {
-            // TODO: replace flow-control exception with result pattern.
-            Dispatcher.UIThread.Post(async () =>
-            {
-                IsRunning    = false;
-                HasError     = true;
-                ErrorMessage = ex.Message;
-                await OnProvisioningFailedAsync(ex).ConfigureAwait(false);
             });
         }
         finally
@@ -105,9 +107,9 @@ public abstract partial class ProvisioningViewModelBase : ViewModelBase
         OnPropertyChanged(nameof(ShowConsole));
     }
 
-    protected abstract Task ProvisionAsync(IProgress<string> progress, CancellationToken cancellationToken);
+    protected abstract Task<Result> ProvisionAsync(IProgress<string> progress, CancellationToken cancellationToken);
 
     protected virtual Task OnProvisioningCompletedAsync() => Task.CompletedTask;
     protected virtual Task OnProvisioningCancelledAsync() => Task.CompletedTask;
-    protected virtual Task OnProvisioningFailedAsync(Exception ex) => Task.CompletedTask;
+    protected virtual Task OnProvisioningFailedAsync(Error error) => Task.CompletedTask;
 }

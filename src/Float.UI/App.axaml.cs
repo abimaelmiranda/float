@@ -6,7 +6,9 @@ using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
 using Avalonia.Platform;
 using Avalonia.Styling;
+using Float.Core.Abstractions.Services;
 using Float.Infrastructure;
+using Float.UI.Services;
 using Float.UI.ViewModels;
 using Float.UI.ViewModels.Setup;
 using Float.UI.ViewModels.Wizards;
@@ -20,6 +22,7 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private MainWindowViewModel? _mainWindowVm;
     private TrayIcon? _trayIcon;
+    private UserNotificationService? _notificationService;
 
     public override void Initialize()
     {
@@ -32,6 +35,11 @@ public partial class App : Application
         {
             var services = new ServiceCollection();
             services.AddFloatInfrastructure();
+
+            var notificationService = new UserNotificationService();
+            _notificationService = notificationService;
+            services.AddSingleton<IUserNotificationService>(notificationService);
+
             services.AddSingleton<DashboardViewModel>();
             services.AddSingleton<MigrationWizardViewModel>();
             services.AddSingleton<EngineSetupViewModel>();
@@ -44,6 +52,8 @@ public partial class App : Application
             _mainWindowVm = provider.GetRequiredService<MainWindowViewModel>();
             _mainWindow = new MainWindow { DataContext = _mainWindowVm };
             desktop.MainWindow = _mainWindow;
+
+            notificationService.SetMainWindow(_mainWindow);
 
             desktop.Exit += async (_, _) => await _mainWindowVm.ShutdownAsync().ConfigureAwait(false);
         }
@@ -90,4 +100,5 @@ public partial class App : Application
     private void OnNewContainerClick(object? sender, EventArgs e) => ShowMainWindow();
     private void OnMigrateClick(object? sender, EventArgs e)      => ShowMainWindow();
     private void OnRefreshClick(object? sender, EventArgs e) { }
+
 }

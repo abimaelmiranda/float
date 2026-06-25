@@ -51,6 +51,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
         dashboardVm.OperationFailed += OnDashboardOperationFailed;
+        dashboardVm.OperationSucceeded += (_, msg) => ShowNotification("Done", msg);
         migrationVm.MigrationCompleted += OnMigrationCompleted;
         createContainerVm.ContainerCreated += OnContainerCreated;
         createContainerVm.Cancelled += OnCreateContainerCancelled;
@@ -86,19 +87,13 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!IsEngineRunning)
         {
             IsEngineStarting = true;
-            try
-            {
-                await _provisioner.StartEngineAsync().ConfigureAwait(false);
-            }
-            catch (Exception ex)
+            var result = await _provisioner.StartEngineAsync().ConfigureAwait(false);
+            if (result.IsFailure)
             {
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    ShowNotification("Engine start failed", ex.Message));
+                    ShowNotification("Engine start failed", result.Failure.Message ?? "Unknown error"));
             }
-            finally
-            {
-                IsEngineStarting = false;
-            }
+            IsEngineStarting = false;
 
             await RefreshEngineStatusAsync().ConfigureAwait(false);
         }
@@ -224,4 +219,5 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnIsDarkThemeChanged(bool value) =>
         OnPropertyChanged(nameof(ThemeToggleLabel));
+
 }

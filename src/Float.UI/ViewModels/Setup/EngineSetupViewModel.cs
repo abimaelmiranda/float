@@ -3,6 +3,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
+using Float.Core.Models.Results;
 
 namespace Float.UI.ViewModels.Setup;
 
@@ -17,7 +18,7 @@ public partial class EngineSetupViewModel : ProvisioningViewModelBase
         _provisioner = provisioner;
     }
 
-    protected override Task ProvisionAsync(IProgress<string> progress, CancellationToken cancellationToken)
+    protected override Task<Result> ProvisionAsync(IProgress<string> progress, CancellationToken cancellationToken)
         => _provisioner.InstallEngineAsync(progress, cancellationToken);
 
     [RelayCommand]

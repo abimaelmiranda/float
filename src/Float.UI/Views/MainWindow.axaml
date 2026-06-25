@@ -169,9 +169,12 @@
                         <Button Grid.Column="1"
                                 Theme="{StaticResource ActionButtonTheme}"
                                 Command="{Binding HideNotificationCommand}"
-                                VerticalAlignment="Top"
+                                VerticalAlignment="Center"
+                                Padding="4"
                                 ToolTip.Tip="Close">
-                            <Path Classes="icon icon-sm"
+                            <Path Classes="icon"
+                                  Width="12"
+                                  Height="12"
                                   Data="{StaticResource IconClose}"
                                   Stroke="{Binding $parent[Button].Foreground}"/>
                         </Button>
