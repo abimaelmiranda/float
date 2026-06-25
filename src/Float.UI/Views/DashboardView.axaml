@@ -120,8 +120,8 @@
                                         </StackPanel>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnStartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding !IsRunning}"
                                                 ToolTip.Tip="Start">
@@ -131,8 +131,8 @@
                                         </Button>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnStopContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding IsRunning}"
                                                 ToolTip.Tip="Stop">
@@ -142,8 +142,8 @@
                                         </Button>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnRestartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="Restart">
                                             <Path Classes="icon icon-sm"
@@ -152,8 +152,8 @@
                                         </Button>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
-                                                Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnRequestDeleteClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 ToolTip.Tip="Delete">
                                             <Path Classes="icon icon-sm"
@@ -194,7 +194,7 @@
                                                VerticalAlignment="Center"/>
                                     <Button Grid.Column="1"
                                             Theme="{StaticResource ActionButtonTheme}"
-                                            Command="{Binding $parent[UserControl].DataContext.CloseDetailCommand}"
+                                            Click="OnCloseDetailClick"
                                             ToolTip.Tip="Close">
                                         <Path Classes="icon icon-sm"
                                               Data="{StaticResource IconClose}"
@@ -261,31 +261,31 @@
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Content="Stop Container"
-                                                Command="{Binding $parent[UserControl].DataContext.StopContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnStopContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding IsRunning}"
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Content="Start Container"
-                                                Command="{Binding $parent[UserControl].DataContext.StartContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnStartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding !IsRunning}"
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Content="Restart"
-                                                Command="{Binding $parent[UserControl].DataContext.RestartContainerCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnRestartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
                                                 Content="Delete Container"
-                                                Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
-                                                CommandParameter="{Binding Source}"
+                                                Tag="{Binding Source}"
+                                                Click="OnRequestDeleteClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 HorizontalAlignment="Left"/>
                                     </StackPanel>
