@@ -19,6 +19,9 @@ public partial class DashboardViewModel : ViewModelBase
     [ObservableProperty]
     public partial ContainerItemViewModel? SelectedContainer { get; set; }
 
+    [ObservableProperty] public partial bool HasError { get; set; }
+    [ObservableProperty] public partial string ErrorMessage { get; set; } = "";
+
     public bool HasSelectedContainer => SelectedContainer is not null;
 
     public ObservableCollection<ContainerItemViewModel> Containers { get; } = [];
@@ -35,6 +38,7 @@ public partial class DashboardViewModel : ViewModelBase
     }
 
     public event EventHandler? RequestCreateContainer;
+    public event EventHandler<string>? OperationFailed;
 
     [RelayCommand]
     private void NewContainer() => RequestCreateContainer?.Invoke(this, EventArgs.Empty);
@@ -46,16 +50,20 @@ public partial class DashboardViewModel : ViewModelBase
     private void CloseDetail() => SelectedContainer = null;
 
     [RelayCommand]
-    private Task StartContainerAsync(Container? container) => RunLifecycleAsync(container, _containerLifecycle.StartAsync);
+    private Task StartContainerAsync(Container? container)
+        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.StartAsync(c, ct));
 
     [RelayCommand]
-    private Task StopContainerAsync(Container? container) => RunLifecycleAsync(container, _containerLifecycle.StopAsync);
+    private Task StopContainerAsync(Container? container)
+        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.StopAsync(c, ct));
 
     [RelayCommand]
-    private Task RestartContainerAsync(Container? container) => RunLifecycleAsync(container, _containerLifecycle.RestartAsync);
+    private Task RestartContainerAsync(Container? container)
+        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.RestartAsync(c, ct));
 
     [RelayCommand]
-    private Task DeleteContainerAsync(Container? container) => RunLifecycleAsync(container, _containerLifecycle.DeleteAsync);
+    private Task DeleteContainerAsync(Container? container)
+        => RunLifecycleAsync(container, (c, ct) => _containerLifecycle.DeleteAsync(c, ct));
 
     public async Task RefreshAsync()
     {
@@ -65,8 +73,9 @@ public partial class DashboardViewModel : ViewModelBase
         {
             containers = await _containerReader.ListAsync().ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
+            await ShowErrorAsync(ex.Message).ConfigureAwait(false);
             return;
         }
 
@@ -81,6 +90,8 @@ public partial class DashboardViewModel : ViewModelBase
                 Containers.Add(item);
             }
 
+            HasError = false;
+            ErrorMessage = "";
             SelectedContainer = selectedName is null
                 ? null
                 : Containers.FirstOrDefault(container => container.Name == selectedName);
@@ -100,11 +111,22 @@ public partial class DashboardViewModel : ViewModelBase
         {
             await Task.Run(() => action(container, CancellationToken.None)).ConfigureAwait(false);
         }
-        catch
+        catch (Exception ex)
         {
+            await ShowErrorAsync(ex.Message).ConfigureAwait(false);
             return;
         }
 
         await RefreshAsync().ConfigureAwait(false);
+    }
+
+    private async Task ShowErrorAsync(string message)
+    {
+        await Dispatcher.UIThread.InvokeAsync(() =>
+        {
+            HasError = true;
+            ErrorMessage = message;
+            OperationFailed?.Invoke(this, message);
+        });
     }
 }

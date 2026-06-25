@@ -12,22 +12,36 @@
             <!-- Header bar -->
             <Border DockPanel.Dock="Top"
                     Padding="20,52,20,12">
-                <Grid ColumnDefinitions="*,Auto">
-                    <TextBlock Text="Containers"
-                               FontSize="20"
-                               FontWeight="SemiBold"
-                               VerticalAlignment="Center"/>
-                    <Button Grid.Column="1"
-                            Theme="{StaticResource PrimaryButtonTheme}"
-                            Command="{Binding NewContainerCommand}">
-                        <StackPanel Orientation="Horizontal" Spacing="6">
-                            <Path Classes="icon icon-sm"
-                                  Data="{StaticResource IconNewContainer}"
-                                  Stroke="White"/>
-                            <TextBlock Text="New Container" VerticalAlignment="Center"/>
-                        </StackPanel>
-                    </Button>
-                </Grid>
+                <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="Containers"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource PrimaryButtonTheme}"
+                                Command="{Binding NewContainerCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconNewContainer}"
+                                      Stroke="White"/>
+                                <TextBlock Text="New Container" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Border IsVisible="{Binding HasError}"
+                            Padding="10"
+                            CornerRadius="6"
+                            Background="{DynamicResource FloatCardBackgroundBrush}"
+                            BorderBrush="{DynamicResource StatusErrorBrush}"
+                            BorderThickness="1">
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource StatusErrorBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+                </StackPanel>
             </Border>
 
             <!-- List -->

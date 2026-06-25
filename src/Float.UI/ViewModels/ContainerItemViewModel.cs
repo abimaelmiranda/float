@@ -21,7 +21,8 @@ public partial class ContainerItemViewModel : ViewModelBase
         Name = source.Name;
         ImageTag = source.Image.Tag;
         PortSummary = BuildPortSummary(source.Ports);
-        Status = source.Instance?.Status ?? ContainerStatus.Unknown;
+        Status = source.Instance?.Status
+            ?? throw new InvalidOperationException($"Container '{source.Name}' is missing instance status.");
     }
 
     private static string BuildPortSummary(IEnumerable<ContainerPortMapping> ports)

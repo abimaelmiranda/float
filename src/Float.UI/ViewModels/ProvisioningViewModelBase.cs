@@ -58,6 +58,7 @@ public abstract partial class ProvisioningViewModelBase : ViewModelBase
         }
         catch (Exception ex)
         {
+            // TODO: replace flow-control exception with result pattern.
             Dispatcher.UIThread.Post(async () =>
             {
                 IsRunning    = false;

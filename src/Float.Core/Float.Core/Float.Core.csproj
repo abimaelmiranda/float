@@ -11,6 +11,8 @@
     <Folder Include="Enums/" />
     <Folder Include="Models/" />
     <Folder Include="Models/Builders/" />
+    <Folder Include="Models/Results/" />
+    <Folder Include="Models/Results/Errors/" />
     <Folder Include="Utils/" />
   </ItemGroup>
 

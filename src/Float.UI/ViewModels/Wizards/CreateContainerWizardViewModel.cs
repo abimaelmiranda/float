@@ -118,6 +118,12 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         _creator = creator;
     }
 
+    public void StartNewRun()
+    {
+        _cts?.Cancel();
+        Reset();
+    }
+
     // ── Navigation commands ──────────────────────────────────────────────
 
     [RelayCommand]
@@ -275,6 +281,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            // TODO: replace flow-control exception with result pattern.
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 IsCreating = false;

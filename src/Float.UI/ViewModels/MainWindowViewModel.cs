@@ -19,6 +19,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private readonly CreateContainerWizardViewModel _createContainerVm;
     private readonly IEngineProvisioner _provisioner;
     private readonly DispatcherTimer _statusTimer;
+    private readonly DispatcherTimer _notificationTimer;
 
     [ObservableProperty] public partial ViewModelBase CurrentPageViewModel { get; set; }
     [ObservableProperty] public partial bool ShowingContainers { get; set; }
@@ -27,6 +28,9 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public partial bool IsEngineRunning { get; set; }
     [ObservableProperty] public partial bool IsEngineStarting { get; set; }
     [ObservableProperty] public partial bool IsDarkTheme { get; set; }
+    [ObservableProperty] public partial bool IsNotificationVisible { get; set; }
+    [ObservableProperty] public partial string NotificationTitle { get; set; } = "";
+    [ObservableProperty] public partial string NotificationMessage { get; set; } = "";
 
     public string EngineStatusLabel => IsEngineStarting ? "Starting…"
                                      : IsEngineRunning  ? "Engine running"
@@ -46,6 +50,8 @@ public partial class MainWindowViewModel : ViewModelBase
         _createContainerVm = createContainerVm;
 
         dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
+        dashboardVm.OperationFailed += OnDashboardOperationFailed;
+        migrationVm.MigrationCompleted += OnMigrationCompleted;
         createContainerVm.ContainerCreated += OnContainerCreated;
         createContainerVm.Cancelled += OnCreateContainerCancelled;
 
@@ -57,7 +63,10 @@ public partial class MainWindowViewModel : ViewModelBase
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
         _statusTimer.Tick += async (_, _) => await RefreshEngineStatusAsync().ConfigureAwait(false);
 
-        if (!engineProvisioner.IsEngineInstalled())
+        _notificationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(8) };
+        _notificationTimer.Tick += (_, _) => HideNotification();
+
+        if (!engineProvisioner.IsEngineInstalled().GetAwaiter().GetResult())
         {
             IsSetupMode = true;
             engineSetupVm.SetupCompleted += OnSetupCompleted;
@@ -77,9 +86,20 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!IsEngineRunning)
         {
             IsEngineStarting = true;
-            try   { await _provisioner.StartEngineAsync().ConfigureAwait(false); }
-            catch (Exception) { /* start failed; status refreshed below */ }
-            finally { IsEngineStarting = false; }
+            try
+            {
+                await _provisioner.StartEngineAsync().ConfigureAwait(false);
+            }
+            catch (Exception ex)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    ShowNotification("Engine start failed", ex.Message));
+            }
+            finally
+            {
+                IsEngineStarting = false;
+            }
+
             await RefreshEngineStatusAsync().ConfigureAwait(false);
         }
 
@@ -114,6 +134,8 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnRequestCreateContainer(object? sender, EventArgs e)
     {
+        HideNotification();
+        _createContainerVm.StartNewRun();
         ShowingContainers = false;
         ShowingMigration = false;
         CurrentPageViewModel = _createContainerVm;
@@ -123,12 +145,43 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnCreateContainerCancelled(object? sender, EventArgs e) => ReturnToDashboard();
 
+    private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
+    {
+        ReturnToDashboard();
+        ShowNotification(
+            e.Failed == 0 ? "Migration complete" : "Migration complete with cleanup issues",
+            e.Summary);
+    }
+
+    private void OnDashboardOperationFailed(object? sender, string message)
+    {
+        ShowNotification("Container operation failed", message);
+    }
+
     private void ReturnToDashboard()
     {
         ShowingContainers = true;
         ShowingMigration = false;
         CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
+    }
+
+    private void ShowNotification(string title, string message)
+    {
+        _notificationTimer.Stop();
+        NotificationTitle = title;
+        NotificationMessage = message;
+        IsNotificationVisible = true;
+        _notificationTimer.Start();
+    }
+
+    [RelayCommand]
+    private void HideNotification()
+    {
+        _notificationTimer.Stop();
+        IsNotificationVisible = false;
+        NotificationTitle = "";
+        NotificationMessage = "";
     }
 
     [RelayCommand]
@@ -141,11 +194,13 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
-    private void ShowMigration()
+    private async Task ShowMigrationAsync()
     {
+        HideNotification();
         ShowingContainers = false;
         ShowingMigration = true;
         CurrentPageViewModel = _migrationVm;
+        await _migrationVm.StartNewRunAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
