@@ -1,25 +1,26 @@
 using Float.Core.Models;
+using Float.Core.Models.Results;
 
 namespace Float.Core.Abstractions.Services;
 
 public interface IContainerLifecycle : IContainerEngineAware
 {
-    Task StartAsync(
+    Task<Result> StartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null);
 
-    Task StopAsync(
+    Task<Result> StopAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null);
 
-    Task RestartAsync(
+    Task<Result> RestartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null);
 
-    Task DeleteAsync(
+    Task<Result> DeleteAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null);

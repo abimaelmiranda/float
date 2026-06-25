@@ -2,6 +2,8 @@ using System.Globalization;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
 
@@ -16,25 +18,25 @@ public class AppleContainerCreator : IContainerCreator
         _processHost = processHost;
     }
 
-    public async Task<string> CreateAsync(
+    public async Task<Result<string>> CreateAsync(
         ContainerCreateRequest request,
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
         var args = BuildArgs(request);
         progress?.Report("$ /usr/local/bin/container " + FormatArguments(args, redactEnvironment: true));
-        await _processHost.RunAsync(
+        var result = await _processHost.RunWithResultAsync(
             "/usr/local/bin/container",
             args,
             workingDirectory: null,
-            onOutput: line =>
-            {
-                progress?.Report(line);
-            },
+            onOutput: line => progress?.Report(line),
             onError: line => progress?.Report(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return request.Name ?? string.Empty;
+        if (result.IsFailure)
+            return Result.WithFailure<string>(result.Failure);
+
+        return Result.WithSuccess(request.Name ?? string.Empty);
     }
 
     private static List<string> BuildArgs(ContainerCreateRequest request)

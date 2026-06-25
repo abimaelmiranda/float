@@ -1,9 +1,8 @@
-using System.Threading;
-using System.Threading.Tasks;
-using System.Text;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
 
@@ -18,89 +17,73 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
         _processHost = processHost;
     }
 
-    public Task StartAsync(
+    public Task<Result> StartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("start", container, cancellationToken, progress);
 
-    public Task StopAsync(
+    public Task<Result> StopAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("stop", container, cancellationToken, progress);
 
-    public Task RestartAsync(
+    public Task<Result> RestartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
-        => RunAsync("restart", container, cancellationToken, progress);
+        => RestartCoreAsync(container, cancellationToken, progress);
 
-    public Task DeleteAsync(
+    public async Task<Result> DeleteAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
-        => container.Instance?.Status == ContainerStatus.Running
-            ? RunDeleteAsync(container, cancellationToken, progress)
-            : RunAsync("rm", container, cancellationToken, progress);
+    {
+        if (container.Instance?.Status == ContainerStatus.Running)
+        {
+            var stopResult = await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
+            if (stopResult.IsFailure)
+                return stopResult;
+        }
 
-    private async Task RunAsync(
+        return await RunAsync("rm", container, cancellationToken, progress).ConfigureAwait(false);
+    }
+
+    private async Task<Result> RestartCoreAsync(
+        Container container,
+        CancellationToken cancellationToken,
+        IProgress<string>? progress)
+    {
+        var stopResult = await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
+        return stopResult.IsFailure
+            ? stopResult
+            : await RunAsync("start", container, cancellationToken, progress).ConfigureAwait(false);
+    }
+
+    private async Task<Result> RunAsync(
         string command,
         Container container,
         CancellationToken cancellationToken,
         IProgress<string>? progress)
     {
         if (string.IsNullOrWhiteSpace(container.Name))
-        {
-            // TODO: replace flow-control exception with result pattern.
-            throw new InvalidOperationException("Container name is required.");
-        }
+            return Result.WithFailure(DomainErrors.Validation("Container name is required."));
 
-        var output = new StringBuilder();
-        var errors = new StringBuilder();
         progress?.Report($"$ /usr/local/bin/container {command} {QuoteArgument(container.Name)}");
         var result = await _processHost.RunWithResultAsync(
             "/usr/local/bin/container",
             [command, container.Name],
             workingDirectory: null,
-            onOutput: line =>
-            {
-                output.AppendLine(line);
-                progress?.Report(line);
-            },
-            onError: line =>
-            {
-                errors.AppendLine(line);
-                progress?.Report(line);
-            },
+            onOutput: line => progress?.Report(line),
+            onError: line => progress?.Report(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw new InvalidOperationException(
-                BuildFailureMessage(command, container.Name, result.ExitCode, output, errors));
-    }
+        if (result.IsFailure)
+            return Result.WithFailure(DomainErrors.CommandFailed(
+                $"Apple container command '{command}' failed for '{container.Name}'. {result.Failure.Message}"));
 
-    private static string BuildFailureMessage(
-        string command,
-        string containerName,
-        int exitCode,
-        StringBuilder output,
-        StringBuilder errors)
-    {
-        var message = $"Apple container command '{command}' failed for '{containerName}' with exit code {exitCode}.";
-        var detail = errors.Length > 0 ? errors.ToString().Trim() : output.ToString().Trim();
-        return string.IsNullOrWhiteSpace(detail)
-            ? message
-            : message + Environment.NewLine + detail;
-    }
-
-    private async Task RunDeleteAsync(
-        Container container,
-        CancellationToken cancellationToken,
-        IProgress<string>? progress)
-    {
-        await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
-        await RunAsync("rm", container, cancellationToken, progress).ConfigureAwait(false);
+        return Result.WithSuccess();
     }
 
     private static string QuoteArgument(string value)

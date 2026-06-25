@@ -3,6 +3,8 @@ using System.Text.Json;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 using Float.Infrastructure.Engines.Docker.Json;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,26 +25,35 @@ public class DockerReader : IContainerReader
         _engineProvisioner = engineProvisioner;
     }
 
-    public async Task<IReadOnlyList<Container>> ListAsync(
+    public async Task<Result<IReadOnlyList<Container>>> ListAsync(
         bool includeAll = true,
         CancellationToken cancellationToken = default)
     {
         if (!await _engineProvisioner.IsEngineInstalled())
-            // TODO: replace flow-control exception with result pattern.
-            throw new InvalidOperationException("Docker is not available.");
+            return Result.WithFailure<IReadOnlyList<Container>>(
+                DomainErrors.EngineNotAvailable("Docker is not available."));
 
-        var ids = await ListContainerIdsAsync(includeAll, cancellationToken).ConfigureAwait(false);
+        var idsResult = await ListContainerIdsAsync(includeAll, cancellationToken).ConfigureAwait(false);
+        if (idsResult.IsFailure)
+            return Result.WithFailure<IReadOnlyList<Container>>(idsResult.Failure);
+
+        var ids = idsResult.GetValueOrThrow();
         if (ids.Length == 0)
-            return [];
+            return Result.WithSuccess<IReadOnlyList<Container>>([]);
 
-        var inspected = await InspectAsync(ids, cancellationToken).ConfigureAwait(false);
+        var inspectedResult = await InspectAsync(ids, cancellationToken).ConfigureAwait(false);
+        if (inspectedResult.IsFailure)
+            return Result.WithFailure<IReadOnlyList<Container>>(inspectedResult.Failure);
+
+        var inspected = inspectedResult.GetValueOrThrow();
         var imageArchitectures = await ResolveMissingImageArchitecturesAsync(inspected, cancellationToken)
             .ConfigureAwait(false);
 
-        return inspected.Select(container => Map(container, imageArchitectures)).ToArray();
+        var containers = inspected.Select(container => Map(container, imageArchitectures)).ToArray();
+        return Result.WithSuccess<IReadOnlyList<Container>>(containers);
     }
 
-    private async Task<string[]> ListContainerIdsAsync(bool includeAll, CancellationToken cancellationToken)
+    private async Task<Result<string[]>> ListContainerIdsAsync(bool includeAll, CancellationToken cancellationToken)
     {
         var args = new List<string> { "ps", "--quiet" };
         if (includeAll)
@@ -58,15 +69,17 @@ public class DockerReader : IContainerReader
             onError: line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw DockerCommandFailed("ps", result.ExitCode, errors);
+        if (result.IsFailure)
+            return Result.WithFailure<string[]>(result.Failure);
 
-        return output
+        var ids = output
             .ToString()
             .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
+
+        return Result.WithSuccess(ids);
     }
 
-    private async Task<DockerInspectContainer[]> InspectAsync(
+    private async Task<Result<DockerInspectContainer[]>> InspectAsync(
         IReadOnlyList<string> ids,
         CancellationToken cancellationToken)
     {
@@ -83,22 +96,29 @@ public class DockerReader : IContainerReader
             onError: line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw DockerCommandFailed("inspect", result.ExitCode, errors);
+        if (result.IsFailure)
+            return Result.WithFailure<DockerInspectContainer[]>(result.Failure);
 
         if (output.Length == 0)
-            throw new InvalidOperationException("Docker command 'inspect' returned no output.");
+            return Result.WithFailure<DockerInspectContainer[]>(
+                DomainErrors.CommandFailed("Docker command 'inspect' returned no output."));
 
         try
         {
             var containers = JsonSerializer.Deserialize(
                 output.ToString(),
                 DockerContainerJsonContext.Default.DockerInspectContainerArray);
-            return containers ?? throw new InvalidOperationException("Docker command 'inspect' returned null JSON.");
+
+            if (containers is null)
+                return Result.WithFailure<DockerInspectContainer[]>(
+                    DomainErrors.ParseError("Docker command 'inspect' returned null JSON."));
+
+            return Result.WithSuccess(containers);
         }
         catch (JsonException ex)
         {
-            throw new InvalidOperationException("Docker command 'inspect' returned invalid JSON.", ex);
+            return Result.WithFailure<DockerInspectContainer[]>(
+                DomainErrors.ParseError($"Docker command 'inspect' returned invalid JSON. {ex.Message}"));
         }
     }
 
@@ -120,16 +140,16 @@ public class DockerReader : IContainerReader
         var architectures = new Dictionary<string, string>(StringComparer.Ordinal);
         foreach (var imageRef in refs)
         {
-            var architecture = await InspectImageArchitectureAsync(imageRef, cancellationToken)
+            var result = await InspectImageArchitectureAsync(imageRef, cancellationToken)
                 .ConfigureAwait(false);
-            if (architecture is not null)
-                architectures[imageRef] = architecture;
+            if (result.IsSuccess && result.GetValueOrThrow() is not null)
+                architectures[imageRef] = result.GetValueOrThrow()!;
         }
 
         return architectures;
     }
 
-    private async Task<string?> InspectImageArchitectureAsync(
+    private async Task<Result<string?>> InspectImageArchitectureAsync(
         string imageRef,
         CancellationToken cancellationToken)
     {
@@ -143,28 +163,33 @@ public class DockerReader : IContainerReader
             onError: line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw DockerCommandFailed("image inspect", result.ExitCode, errors);
+        if (result.IsFailure)
+            return Result.WithFailure<string?>(result.Failure);
 
         if (output.Length == 0)
-            throw new InvalidOperationException($"Docker command 'image inspect' returned no output for image '{imageRef}'.");
+            return Result.WithFailure<string?>(
+                DomainErrors.CommandFailed($"Docker command 'image inspect' returned no output for image '{imageRef}'."));
 
         try
         {
             var images = JsonSerializer.Deserialize(
                 output.ToString(),
                 DockerContainerJsonContext.Default.DockerInspectImageArray);
+
             if (images is null)
-                throw new InvalidOperationException($"Docker command 'image inspect' returned null JSON for image '{imageRef}'.");
+                return Result.WithFailure<string?>(
+                    DomainErrors.ParseError($"Docker command 'image inspect' returned null JSON for image '{imageRef}'."));
 
             if (images.Length == 0)
-                throw new InvalidOperationException($"Docker command 'image inspect' returned no image entries for '{imageRef}'.");
+                return Result.WithFailure<string?>(
+                    DomainErrors.ParseError($"Docker command 'image inspect' returned no image entries for '{imageRef}'."));
 
-            return NormalizeArchitectureOrNull(images[0].Architecture);
+            return Result.WithSuccess<string?>(NormalizeArchitectureOrNull(images[0].Architecture));
         }
         catch (JsonException ex)
         {
-            throw new InvalidOperationException($"Docker command 'image inspect' returned invalid JSON for image '{imageRef}'.", ex);
+            return Result.WithFailure<string?>(
+                DomainErrors.ParseError($"Docker command 'image inspect' returned invalid JSON for image '{imageRef}'. {ex.Message}"));
         }
     }
 
@@ -393,18 +418,5 @@ public class DockerReader : IContainerReader
             throw new InvalidOperationException($"Docker container '{containerName}' is missing required field {propertyName}.");
 
         return value;
-    }
-
-    private static InvalidOperationException DockerCommandFailed(
-        string command,
-        int exitCode,
-        StringBuilder errors)
-    {
-        var detail = errors.ToString().Trim();
-        var message = $"Docker command '{command}' failed with exit code {exitCode}.";
-        if (!string.IsNullOrWhiteSpace(detail))
-            message += Environment.NewLine + detail;
-
-        return new InvalidOperationException(message);
     }
 }

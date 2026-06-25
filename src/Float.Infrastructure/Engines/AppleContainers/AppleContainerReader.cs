@@ -1,11 +1,10 @@
-using System.Linq;
 using System.Text;
 using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
@@ -25,11 +24,11 @@ public class AppleContainerReader : IContainerReader
         _processHost = processHost;
     }
 
-    public async Task<IReadOnlyList<Container>> ListAsync(bool includeAll = true, CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyList<Container>>> ListAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
         if (!await _engineProvisioner.IsEngineInstalled())
-            // TODO: replace flow-control exception with result pattern.
-            throw new InvalidOperationException("Apple Container is not available.");
+            return Result.WithFailure<IReadOnlyList<Container>>(
+                DomainErrors.EngineNotAvailable("Apple Container is not available."));
 
         var output = new StringBuilder();
         var args = new List<string> { "ls", "--format", "json" };
@@ -48,14 +47,23 @@ public class AppleContainerReader : IContainerReader
             onError:  line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw AppleCommandFailed("ls", result.ExitCode, errors);
+        if (result.IsFailure)
+            return Result.WithFailure<IReadOnlyList<Container>>(result.Failure);
 
         var outputStr = output.ToString();
         if (string.IsNullOrWhiteSpace(outputStr))
-            return [];
+            return Result.WithSuccess<IReadOnlyList<Container>>([]);
 
-        return ParseOutput(outputStr);
+        try
+        {
+            var containers = ParseOutput(outputStr);
+            return Result.WithSuccess<IReadOnlyList<Container>>(containers);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Result.WithFailure<IReadOnlyList<Container>>(
+                DomainErrors.ParseError(ex.Message));
+        }
     }
 
     private static Container[] ParseOutput(string output)
@@ -91,7 +99,6 @@ public class AppleContainerReader : IContainerReader
         var config = src.Configuration;
         var status = src.Status;
 
-        // id IS the name — apple/container has no separate name field
         var name = RequireValue(src.Id, "container", "id");
 
         var image = new ContainerImage(RequireValue(config?.Image?.Reference, name, "configuration.image.reference"));
@@ -165,18 +172,5 @@ public class AppleContainerReader : IContainerReader
             throw new InvalidOperationException($"Apple container '{containerName}' is missing required field {propertyName}.");
 
         return value;
-    }
-
-    private static InvalidOperationException AppleCommandFailed(
-        string command,
-        int exitCode,
-        StringBuilder errors)
-    {
-        var detail = errors.ToString().Trim();
-        var message = $"Apple container command '{command}' failed with exit code {exitCode}.";
-        if (!string.IsNullOrWhiteSpace(detail))
-            message += Environment.NewLine + detail;
-
-        return new InvalidOperationException(message);
     }
 }

@@ -1,3 +1,5 @@
+using Float.Core.Models.Results;
+
 namespace Float.Core.Abstractions.Services;
 
 public interface IProcessHost
@@ -20,7 +22,7 @@ public interface IProcessHost
         CancellationToken cancellationToken = default,
         IReadOnlyDictionary<string, string>? environment = null);
 
-    Task<ProcessResult> RunWithResultAsync(
+    Task<Result> RunWithResultAsync(
         string executable,
         string arguments,
         string? workingDirectory,
@@ -29,7 +31,7 @@ public interface IProcessHost
         CancellationToken cancellationToken = default,
         IReadOnlyDictionary<string, string>? environment = null);
 
-    Task<ProcessResult> RunWithResultAsync(
+    Task<Result> RunWithResultAsync(
         string executable,
         IReadOnlyList<string> arguments,
         string? workingDirectory,

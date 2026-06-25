@@ -1,7 +1,8 @@
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
-using System.Text;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 
 namespace Float.Infrastructure.Engines.Docker;
 
@@ -16,79 +17,53 @@ public sealed class DockerContainerLifecycle : IContainerLifecycle
         _processHost = processHost;
     }
 
-    public Task StartAsync(
+    public Task<Result> StartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("start", container, cancellationToken, progress);
 
-    public Task StopAsync(
+    public Task<Result> StopAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("stop", container, cancellationToken, progress);
 
-    public Task RestartAsync(
+    public Task<Result> RestartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("restart", container, cancellationToken, progress);
 
-    public Task DeleteAsync(
+    public Task<Result> DeleteAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
         => RunAsync("rm", container, cancellationToken, progress);
 
-    private async Task RunAsync(
+    private async Task<Result> RunAsync(
         string command,
         Container container,
         CancellationToken cancellationToken,
         IProgress<string>? progress)
     {
         if (string.IsNullOrWhiteSpace(container.Name))
-        {
-            // TODO: replace flow-control exception with result pattern.
-            throw new InvalidOperationException("Container name is required.");
-        }
+            return Result.WithFailure(DomainErrors.Validation("Container name is required."));
 
-        var output = new StringBuilder();
-        var errors = new StringBuilder();
         progress?.Report($"$ docker {command} {QuoteArgument(container.Name)}");
         var result = await _processHost.RunWithResultAsync(
             "docker",
             [command, container.Name],
             workingDirectory: null,
-            onOutput: line =>
-            {
-                output.AppendLine(line);
-                progress?.Report(line);
-            },
-            onError: line =>
-            {
-                errors.AppendLine(line);
-                progress?.Report(line);
-            },
+            onOutput: line => progress?.Report(line),
+            onError: line => progress?.Report(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        if (!result.Succeeded)
-            throw new InvalidOperationException(
-                BuildFailureMessage("Docker", command, container.Name, result.ExitCode, output, errors));
-    }
+        if (result.IsFailure)
+            return Result.WithFailure(DomainErrors.CommandFailed(
+                $"Docker command '{command}' failed for '{container.Name}'. {result.Failure.Message}"));
 
-    private static string BuildFailureMessage(
-        string engine,
-        string command,
-        string containerName,
-        int exitCode,
-        StringBuilder output,
-        StringBuilder errors)
-    {
-        var message = $"{engine} command '{command}' failed for '{containerName}' with exit code {exitCode}.";
-        var detail = errors.Length > 0 ? errors.ToString().Trim() : output.ToString().Trim();
-        return string.IsNullOrWhiteSpace(detail)
-            ? message
-            : message + Environment.NewLine + detail;
+        return Result.WithSuccess();
     }
 
     private static string QuoteArgument(string value)

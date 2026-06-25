@@ -1,5 +1,7 @@
 using System.Diagnostics;
 using Float.Core.Abstractions.Services;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
 
 namespace Float.Infrastructure.Common;
 
@@ -21,7 +23,7 @@ public sealed class ProcessHost : IProcessHost
             onError,
             cancellationToken,
             environment,
-            captureResult: false);
+            throwOnFailure: true);
 
     public Task RunAsync(
         string executable,
@@ -39,9 +41,9 @@ public sealed class ProcessHost : IProcessHost
             onError,
             cancellationToken,
             environment,
-            captureResult: false);
+            throwOnFailure: true);
 
-    public Task<ProcessResult> RunWithResultAsync(
+    public Task<Result> RunWithResultAsync(
         string executable,
         string arguments,
         string? workingDirectory,
@@ -57,9 +59,9 @@ public sealed class ProcessHost : IProcessHost
             onError,
             cancellationToken,
             environment,
-            captureResult: true);
+            throwOnFailure: false);
 
-    public Task<ProcessResult> RunWithResultAsync(
+    public Task<Result> RunWithResultAsync(
         string executable,
         IReadOnlyList<string> arguments,
         string? workingDirectory,
@@ -75,9 +77,9 @@ public sealed class ProcessHost : IProcessHost
             onError,
             cancellationToken,
             environment,
-            captureResult: true);
+            throwOnFailure: false);
 
-    private static Task<ProcessResult> RunCoreAsync(
+    private static Task<Result> RunCoreAsync(
         string executable,
         string? arguments,
         string? workingDirectory,
@@ -85,7 +87,7 @@ public sealed class ProcessHost : IProcessHost
         Action<string> onError,
         CancellationToken cancellationToken,
         IReadOnlyDictionary<string, string>? environment,
-        bool captureResult)
+        bool throwOnFailure)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -97,10 +99,10 @@ public sealed class ProcessHost : IProcessHost
             RedirectStandardError = true,
         };
         ApplyEnvironment(startInfo, environment);
-        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, captureResult);
+        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, throwOnFailure);
     }
 
-    private static Task<ProcessResult> RunCoreAsync(
+    private static Task<Result> RunCoreAsync(
         string executable,
         IReadOnlyList<string> arguments,
         string? workingDirectory,
@@ -108,7 +110,7 @@ public sealed class ProcessHost : IProcessHost
         Action<string> onError,
         CancellationToken cancellationToken,
         IReadOnlyDictionary<string, string>? environment,
-        bool captureResult)
+        bool throwOnFailure)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -121,7 +123,7 @@ public sealed class ProcessHost : IProcessHost
         foreach (var argument in arguments)
             startInfo.ArgumentList.Add(argument);
         ApplyEnvironment(startInfo, environment);
-        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, captureResult);
+        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, throwOnFailure);
     }
 
     private static void ApplyEnvironment(ProcessStartInfo startInfo, IReadOnlyDictionary<string, string>? environment)
@@ -131,17 +133,22 @@ public sealed class ProcessHost : IProcessHost
             startInfo.Environment[pair.Key] = pair.Value;
     }
 
-    private static async Task<ProcessResult> RunCoreAsync(
+    private static async Task<Result> RunCoreAsync(
         ProcessStartInfo startInfo,
         Action<string> onOutput,
         Action<string> onError,
         CancellationToken cancellationToken,
-        bool captureResult)
+        bool throwOnFailure)
     {
         using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
         if (!process.Start())
-            throw new InvalidOperationException($"Unable to start process '{startInfo.FileName}'.");
+        {
+            var error = DomainErrors.CommandFailed($"Unable to start process '{startInfo.FileName}'.");
+            if (throwOnFailure)
+                throw new InvalidOperationException(error.Message);
+            return Result.WithFailure(error);
+        }
 
         var stderrBuffer = new System.Text.StringBuilder();
         Action<string> stderrHandler = line => { stderrBuffer.AppendLine(line); onError(line); };
@@ -151,17 +158,18 @@ public sealed class ProcessHost : IProcessHost
         await process.WaitForExitAsync(cancellationToken).ConfigureAwait(false);
         await Task.WhenAll(stdoutTask, stderrTask).ConfigureAwait(false);
 
-        var result = new ProcessResult(process.ExitCode);
-        if (!captureResult && !result.Succeeded)
+        if (process.ExitCode != 0)
         {
             var stderr = stderrBuffer.ToString().Trim();
             var detail = string.IsNullOrEmpty(stderr) ? "" : $"\n{stderr}";
-            // TODO: replace flow-control exception with result pattern.
-            throw new InvalidOperationException(
+            var error = DomainErrors.CommandFailed(
                 $"Process '{startInfo.FileName}' failed with exit code {process.ExitCode}.{detail}");
+            if (throwOnFailure)
+                throw new InvalidOperationException(error.Message);
+            return Result.WithFailure(error);
         }
 
-        return result;
+        return Result.WithSuccess();
     }
 
     private static async Task PumpAsync(
