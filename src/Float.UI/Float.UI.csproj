@@ -26,7 +26,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Float.Core/Float.Core/Float.Core.csproj" />
+    <ProjectReference Include="../Float.Core/Float.Core.csproj" />
     <ProjectReference Include="../Float.Infrastructure/Float.Infrastructure.csproj" />
   </ItemGroup>
 </Project>
