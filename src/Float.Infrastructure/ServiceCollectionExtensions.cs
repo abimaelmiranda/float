@@ -13,6 +13,7 @@ public static class ServiceCollectionExtensions
     public static IServiceCollection AddFloatInfrastructure(this IServiceCollection services)
     {
         services.AddSingleton<ISettingsService, SettingsService>();
+        services.AddSingleton<IRegistryService, AppleRegistryService>();
         services.AddSingleton<IProcessHost, ProcessHost>();
         services.AddSingleton<IFileSystemService, FileSystemService>();
 

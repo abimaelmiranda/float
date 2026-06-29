@@ -48,6 +48,7 @@ public partial class App : Application
             services.AddSingleton<MainWindowViewModel>();
 
             services.AddSingleton<SettingsViewModel>();
+            services.AddSingleton<RegistriesViewModel>();
             var provider = services.BuildServiceProvider();
             ViewLocator.Services = provider;
 

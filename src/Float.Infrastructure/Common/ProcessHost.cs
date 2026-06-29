@@ -79,6 +79,25 @@ public sealed class ProcessHost : IProcessHost
             environment,
             throwOnFailure: false);
 
+    public Task<Result> RunWithResultAsync(
+        string executable,
+        IReadOnlyList<string> arguments,
+        string? workingDirectory,
+        Action<string> onOutput,
+        Action<string> onError,
+        string? stdinInput,
+        CancellationToken cancellationToken = default)
+        => RunCoreAsync(
+            executable,
+            arguments,
+            workingDirectory,
+            onOutput,
+            onError,
+            cancellationToken,
+            environment: null,
+            throwOnFailure: false,
+            stdinInput: stdinInput);
+
     private static Task<Result> RunCoreAsync(
         string executable,
         string? arguments,
@@ -110,7 +129,8 @@ public sealed class ProcessHost : IProcessHost
         Action<string> onError,
         CancellationToken cancellationToken,
         IReadOnlyDictionary<string, string>? environment,
-        bool throwOnFailure)
+        bool throwOnFailure,
+        string? stdinInput = null)
     {
         var startInfo = new ProcessStartInfo
         {
@@ -119,11 +139,12 @@ public sealed class ProcessHost : IProcessHost
             UseShellExecute = false,
             RedirectStandardOutput = true,
             RedirectStandardError = true,
+            RedirectStandardInput = stdinInput is not null,
         };
         foreach (var argument in arguments)
             startInfo.ArgumentList.Add(argument);
         ApplyEnvironment(startInfo, environment);
-        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, throwOnFailure);
+        return RunCoreAsync(startInfo, onOutput, onError, cancellationToken, throwOnFailure, stdinInput);
     }
 
     private static void ApplyEnvironment(ProcessStartInfo startInfo, IReadOnlyDictionary<string, string>? environment)
@@ -138,7 +159,8 @@ public sealed class ProcessHost : IProcessHost
         Action<string> onOutput,
         Action<string> onError,
         CancellationToken cancellationToken,
-        bool throwOnFailure)
+        bool throwOnFailure,
+        string? stdinInput = null)
     {
         using var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
 
@@ -148,6 +170,12 @@ public sealed class ProcessHost : IProcessHost
             if (throwOnFailure)
                 throw new InvalidOperationException(error.Message);
             return Result.WithFailure(error);
+        }
+
+        if (stdinInput is not null)
+        {
+            await process.StandardInput.WriteLineAsync(stdinInput).ConfigureAwait(false);
+            process.StandardInput.Close();
         }
 
         var stderrBuffer = new System.Text.StringBuilder();

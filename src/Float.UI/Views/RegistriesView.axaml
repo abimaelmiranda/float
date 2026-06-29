@@ -1,0 +1,195 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:shared="using:Float.UI.Views.Shared"
+             x:Class="Float.UI.Views.RegistriesView"
+             x:DataType="vm:RegistriesViewModel">
+
+    <Grid>
+        <DockPanel>
+
+            <!-- Toolbar -->
+            <Border DockPanel.Dock="Top"
+                    Padding="24,20,24,0">
+                <Grid ColumnDefinitions="*,Auto">
+                    <TextBlock Text="Registries"
+                               FontSize="20"
+                               FontWeight="SemiBold"
+                               VerticalAlignment="Center"/>
+                    <StackPanel Grid.Column="1" Orientation="Horizontal" Spacing="8">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding RefreshRegistriesCommand}"
+                                ToolTip.Tip="Refresh">
+                            <Path Classes="icon icon-sm"
+                                  Data="{StaticResource IconRefresh}"
+                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                        </Button>
+                        <Button Theme="{StaticResource PrimaryButtonTheme}"
+                                Command="{Binding ShowLoginFormCommand}"
+                                IsVisible="{Binding !IsLoginFormVisible}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconNewContainer}"
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="Add Registry" FontSize="12"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <!-- Login form -->
+            <Border DockPanel.Dock="Top"
+                    IsVisible="{Binding IsLoginFormVisible}"
+                    Margin="24,16,24,0"
+                    Padding="16"
+                    CornerRadius="10"
+                    Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                <StackPanel Spacing="12">
+                    <Grid ColumnDefinitions="*,16,120">
+                        <StackPanel Grid.Column="0" Spacing="5">
+                            <TextBlock Classes="section-label" Text="SERVER"/>
+                            <TextBox Text="{Binding LoginServer}"
+                                     PlaceholderText="e.g. docker.io, ghcr.io"
+                                     FontSize="13"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Classes="section-label" Text="SCHEME"/>
+                            <ComboBox ItemsSource="{Binding SchemeOptions}"
+                                      SelectedItem="{Binding LoginScheme}"
+                                      FontSize="13"
+                                      HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Grid>
+                    <Grid ColumnDefinitions="*,16,*">
+                        <StackPanel Grid.Column="0" Spacing="5">
+                            <TextBlock Classes="section-label" Text="USERNAME"/>
+                            <TextBox Text="{Binding LoginUsername}"
+                                     PlaceholderText="Username"
+                                     FontSize="13"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="2" Spacing="5">
+                            <TextBlock Classes="section-label" Text="PASSWORD"/>
+                            <TextBox Text="{Binding LoginPassword}"
+                                     PlaceholderText="Password"
+                                     PasswordChar="*"
+                                     FontSize="13"/>
+                        </StackPanel>
+                    </Grid>
+                    <Border IsVisible="{Binding HasLoginError}"
+                            Padding="10"
+                            CornerRadius="6"
+                            Background="{DynamicResource FloatCardBackgroundBrush}"
+                            BorderBrush="{DynamicResource StatusErrorBrush}"
+                            BorderThickness="1">
+                        <TextBlock Text="{Binding LoginError}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource StatusErrorBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Content="Cancel"
+                                Command="{Binding CancelLoginCommand}"
+                                FontSize="12" Padding="12,5"/>
+                        <Button Theme="{StaticResource PrimaryButtonTheme}"
+                                Content="Login"
+                                Command="{Binding LoginCommand}"
+                                IsEnabled="{Binding !IsLoggingIn}"
+                                FontSize="12" Padding="12,5"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+
+            <!-- Error banner -->
+            <shared:InlineErrorBanner DockPanel.Dock="Top" Margin="24,12,24,0"/>
+
+            <!-- List -->
+            <ScrollViewer Padding="24,16,24,24">
+                <StackPanel Spacing="8">
+
+                    <!-- Empty state -->
+                    <Border IsVisible="{Binding !Registries.Count}"
+                            Padding="24"
+                            CornerRadius="10"
+                            Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                        <StackPanel Spacing="6" HorizontalAlignment="Center">
+                            <TextBlock Text="No registries"
+                                       FontSize="14"
+                                       FontWeight="Medium"
+                                       HorizontalAlignment="Center"/>
+                            <TextBlock Text="Add a registry to pull private images"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       HorizontalAlignment="Center"/>
+                        </StackPanel>
+                    </Border>
+
+                    <ItemsControl ItemsSource="{Binding Registries}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate DataType="vm:RegistryItemViewModel">
+                                <Border Margin="0,0,0,4"
+                                        Padding="14,12"
+                                        CornerRadius="8"
+                                        Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}">
+                                    <Grid ColumnDefinitions="*,Auto">
+                                        <StackPanel Grid.Column="0" Spacing="2" VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Hostname}"
+                                                       FontSize="13"
+                                                       FontWeight="Medium"/>
+                                            <TextBlock Text="{Binding Username}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                                       IsVisible="{Binding HasUsername}"/>
+                                        </StackPanel>
+                                        <Button Grid.Column="1"
+                                                Theme="{StaticResource ActionButtonTheme}"
+                                                Command="{Binding RequestLogoutCommand}"
+                                                VerticalAlignment="Center"
+                                                Padding="8,4"
+                                                FontSize="12"
+                                                Content="Logout"/>
+                                    </Grid>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+
+                </StackPanel>
+            </ScrollViewer>
+        </DockPanel>
+
+        <!-- Logout confirm overlay -->
+        <Border Background="#99000000"
+                IsVisible="{Binding HasPendingLogout}">
+            <Border Width="380"
+                    Padding="18"
+                    CornerRadius="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource FloatCardBackgroundBrush}"
+                    BorderBrush="{DynamicResource SidebarBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Log out of registry"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+                    <TextBlock FontSize="13" TextWrapping="Wrap">
+                        Remove saved credentials for
+                        <Run Text="{Binding PendingLogoutName}" FontWeight="SemiBold"/>?
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal" Spacing="8" HorizontalAlignment="Right">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Content="Cancel"
+                                Command="{Binding CancelLogoutCommand}"/>
+                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                Content="Log out"
+                                Command="{Binding ConfirmLogoutCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+
+    </Grid>
+
+</UserControl>

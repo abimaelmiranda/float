@@ -156,6 +156,17 @@
                     </StackPanel>
                 </Button>
 
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Classes.active="{Binding ShowingRegistries}"
+                        Command="{Binding ShowRegistriesCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconRegistry}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="Registries" FontSize="13"/>
+                    </StackPanel>
+                </Button>
+
             </StackPanel>
         </DockPanel>
 
