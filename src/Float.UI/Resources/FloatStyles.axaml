@@ -8,12 +8,12 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <!-- Window / content area -->
-                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#F5F5F7"/>
+                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#E8E8ED"/>
                     <SolidColorBrush x:Key="FloatCardBackgroundBrush"    Color="#FFFFFF"/>
-                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#EFEFEF"/>
+                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#D8D8DE"/>
                     <!-- Sidebar -->
-                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#EBEBEB"/>
-                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#D1D1D6"/>
+                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#D5D5DB"/>
+                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#B8B8C0"/>
                     <!-- Muted text -->
                     <SolidColorBrush x:Key="FloatSecondaryTextBrush"     Color="#6C6C70"/>
                 </ResourceDictionary>
