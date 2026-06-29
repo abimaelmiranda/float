@@ -93,10 +93,8 @@
 
         <!-- Footer -->
         <Border Grid.Row="1"
-                Padding="40,16"
-                Background="{DynamicResource FloatFooterBackgroundBrush}"
-                BorderBrush="{DynamicResource SidebarBorderBrush}"
-                BorderThickness="0,1,0,0">
+                Classes="footer-bar"
+                Padding="40,16">
             <Grid ColumnDefinitions="Auto,*,Auto">
 
                 <Button Grid.Column="0"

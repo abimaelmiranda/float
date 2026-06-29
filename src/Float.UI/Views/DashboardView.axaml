@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:shared="using:Float.UI.Views.Shared"
              x:Class="Float.UI.Views.DashboardView"
              x:DataType="vm:DashboardViewModel">
 
@@ -30,17 +31,7 @@
                         </Button>
                     </Grid>
 
-                    <Border IsVisible="{Binding HasError}"
-                            Padding="10"
-                            CornerRadius="6"
-                            Background="{DynamicResource FloatCardBackgroundBrush}"
-                            BorderBrush="{DynamicResource StatusErrorBrush}"
-                            BorderThickness="1">
-                        <TextBlock Text="{Binding ErrorMessage}"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource StatusErrorBrush}"
-                                   TextWrapping="Wrap"/>
-                    </Border>
+                    <shared:InlineErrorBanner/>
                 </StackPanel>
             </Border>
 
@@ -209,11 +200,7 @@
 
                                     <!-- Status -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="STATUS"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="STATUS"/>
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <Ellipse Classes="status-dot"
                                                      Classes.running="{Binding IsRunning}"/>
@@ -229,11 +216,7 @@
 
                                     <!-- Image -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="IMAGE"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="IMAGE"/>
                                         <TextBlock Text="{Binding ImageTag}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
@@ -241,11 +224,7 @@
 
                                     <!-- Ports -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="PORTS"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="PORTS"/>
                                         <TextBlock Text="{Binding PortSummary}"
                                                    FontSize="13"
                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
@@ -253,11 +232,7 @@
 
                                     <!-- Actions -->
                                     <StackPanel Spacing="6">
-                                        <TextBlock Text="ACTIONS"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="ACTIONS"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
                                                 Content="Stop Container"
@@ -300,40 +275,7 @@
         </Border>
 
         <!-- ── Delete confirmation overlay ─────────────────────────── -->
-        <Border Grid.ColumnSpan="2"
-                Background="#99000000"
-                IsVisible="{Binding HasPendingDelete}">
-            <Border Width="380"
-                    Padding="18"
-                    CornerRadius="10"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Background="{DynamicResource FloatCardBackgroundBrush}"
-                    BorderBrush="{DynamicResource SidebarBorderBrush}"
-                    BorderThickness="1">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Delete container"
-                               FontSize="15"
-                               FontWeight="SemiBold"/>
-                    <TextBlock FontSize="13"
-                               TextWrapping="Wrap">
-                        Are you sure you want to delete
-                        <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
-                        This action cannot be undone.
-                    </TextBlock>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8"
-                                HorizontalAlignment="Right">
-                        <Button Theme="{StaticResource ActionButtonTheme}"
-                                Content="Cancel"
-                                Command="{Binding CancelDeleteCommand}"/>
-                        <Button Theme="{StaticResource DangerButtonTheme}"
-                                Content="Delete"
-                                Command="{Binding ConfirmDeleteCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-        </Border>
+        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="Delete container"/>
 
     </Grid>
 

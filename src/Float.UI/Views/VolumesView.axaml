@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:shared="using:Float.UI.Views.Shared"
              x:Name="Root"
              x:Class="Float.UI.Views.VolumesView"
              x:DataType="vm:VolumesViewModel">
@@ -37,17 +38,7 @@
                         </Button>
                     </Grid>
 
-                    <Border IsVisible="{Binding HasError}"
-                            Padding="10"
-                            CornerRadius="6"
-                            Background="{DynamicResource FloatCardBackgroundBrush}"
-                            BorderBrush="{DynamicResource StatusErrorBrush}"
-                            BorderThickness="1">
-                        <TextBlock Text="{Binding ErrorMessage}"
-                                   FontSize="12"
-                                   Foreground="{DynamicResource StatusErrorBrush}"
-                                   TextWrapping="Wrap"/>
-                    </Border>
+                    <shared:InlineErrorBanner/>
                 </StackPanel>
             </Border>
 
@@ -127,73 +118,45 @@
                             <ScrollViewer Padding="16,0,16,16">
                                 <StackPanel Spacing="20">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="NAME"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="NAME"/>
                                         <TextBlock Text="{Binding Name}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="TYPE"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="TYPE"/>
                                         <TextBlock Text="{Binding Kind}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="DRIVER"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="DRIVER"/>
                                         <TextBlock Text="{Binding Driver}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="SIZE"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="SIZE"/>
                                         <TextBlock Text="{Binding Size}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="FORMAT"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="FORMAT"/>
                                         <TextBlock Text="{Binding Format}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Text="SOURCE"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="SOURCE"/>
                                         <TextBlock Text="{Binding SourcePath}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="8">
-                                        <TextBlock Text="ACTIONS"
-                                                   FontSize="10"
-                                                   FontWeight="SemiBold"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                                                   LetterSpacing="1"/>
+                                        <TextBlock Classes="section-label" Text="ACTIONS"/>
                                         <Button Theme="{StaticResource DangerButtonTheme}"
                                                 Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
                                                 CommandParameter="{Binding}"
@@ -209,39 +172,6 @@
             </ContentControl>
         </Border>
 
-        <Border Grid.ColumnSpan="2"
-                Background="#99000000"
-                IsVisible="{Binding HasPendingDelete}">
-            <Border Width="380"
-                    Padding="18"
-                    CornerRadius="10"
-                    HorizontalAlignment="Center"
-                    VerticalAlignment="Center"
-                    Background="{DynamicResource FloatCardBackgroundBrush}"
-                    BorderBrush="{DynamicResource SidebarBorderBrush}"
-                    BorderThickness="1">
-                <StackPanel Spacing="12">
-                    <TextBlock Text="Delete volume"
-                               FontSize="15"
-                               FontWeight="SemiBold"/>
-                    <TextBlock FontSize="13"
-                               TextWrapping="Wrap">
-                        Are you sure you want to delete
-                        <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
-                        This action cannot be undone.
-                    </TextBlock>
-                    <StackPanel Orientation="Horizontal"
-                                Spacing="8"
-                                HorizontalAlignment="Right">
-                        <Button Theme="{StaticResource ActionButtonTheme}"
-                                Content="Cancel"
-                                Command="{Binding CancelDeleteCommand}"/>
-                        <Button Theme="{StaticResource DangerButtonTheme}"
-                                Content="Delete"
-                                Command="{Binding ConfirmDeleteCommand}"/>
-                    </StackPanel>
-                </StackPanel>
-            </Border>
-        </Border>
+        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="Delete volume"/>
     </Grid>
 </UserControl>

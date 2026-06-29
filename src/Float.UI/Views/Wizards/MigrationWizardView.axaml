@@ -375,10 +375,8 @@
 
         <!-- Step footer -->
         <Border Grid.Row="2"
-                Padding="24,16"
-                Background="{DynamicResource FloatFooterBackgroundBrush}"
-                BorderBrush="{DynamicResource SidebarBorderBrush}"
-                BorderThickness="0,1,0,0">
+                Classes="footer-bar"
+                Padding="24,16">
             <Grid ColumnDefinitions="140,*,140">
 
                 <TextBlock Grid.Column="1"

@@ -47,11 +47,7 @@
                           RowDefinitions="Auto,20,Auto,20,Auto"
                           HorizontalAlignment="Stretch">
                         <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
-                            <TextBlock Text="REGISTRY"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
+                            <TextBlock Classes="section-label" Text="REGISTRY"/>
                             <ComboBox ItemsSource="{Binding RegistryOptions}"
                                       SelectedItem="{Binding Registry, Mode=TwoWay}"
                                       FontSize="13"
@@ -59,33 +55,21 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="0" Grid.Column="2" Spacing="6">
-                            <TextBlock Text="IMAGE NAME"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
+                            <TextBlock Classes="section-label" Text="IMAGE NAME"/>
                             <TextBox Text="{Binding ImageName, Mode=TwoWay}"
                                      PlaceholderText="e.g. ubuntu, org/image, library/node"
                                      FontSize="13"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
-                            <TextBlock Text="TAG"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
+                            <TextBlock Classes="section-label" Text="TAG"/>
                             <TextBox Text="{Binding Tag, Mode=TwoWay}"
                                      PlaceholderText="e.g. latest, 22.04, 1.0.0"
                                      FontSize="13"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="2" Spacing="6">
-                            <TextBlock Text="CONTAINER NAME"
-                                       FontSize="11"
-                                       FontWeight="SemiBold"
-                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                       LetterSpacing="1"/>
+                            <TextBlock Classes="section-label" Text="CONTAINER NAME"/>
                             <TextBox Text="{Binding ContainerName, Mode=TwoWay}"
                                      PlaceholderText="Optional — auto-generated if left blank"
                                      FontSize="13"/>
@@ -97,11 +81,7 @@
                                 CornerRadius="10"
                                 Padding="14,12">
                             <StackPanel Spacing="4">
-                                <TextBlock Text="IMAGE PREVIEW"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                           LetterSpacing="1"/>
+                                <TextBlock Classes="section-label" Text="IMAGE PREVIEW"/>
                                 <TextBlock Text="{Binding ImageReference}"
                                            FontSize="13"
                                            FontWeight="Medium"
@@ -116,11 +96,7 @@
 
                     <!-- Group: Architecture -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="ARCHITECTURE"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="ARCHITECTURE"/>
                         <ComboBox ItemsSource="{Binding ArchitectureOptions}"
                                   SelectedItem="{Binding Architecture}"
                                   FontSize="13"
@@ -134,28 +110,16 @@
 
                     <!-- Group: Resources -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="RESOURCES"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="RESOURCES"/>
                         <Grid ColumnDefinitions="*,16,*">
                             <StackPanel Grid.Column="0" Spacing="6">
-                                <TextBlock Text="CPU CORES"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                           LetterSpacing="1"/>
+                                <TextBlock Classes="section-label" Text="CPU CORES"/>
                                 <TextBox Text="{Binding CpuCount}"
                                          PlaceholderText="e.g. 2  (optional)"
                                          FontSize="13"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="6">
-                                <TextBlock Text="MEMORY"
-                                           FontSize="11"
-                                           FontWeight="SemiBold"
-                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                           LetterSpacing="1"/>
+                                <TextBlock Classes="section-label" Text="MEMORY"/>
                                 <TextBox Text="{Binding Memory}"
                                          PlaceholderText="e.g. 512m, 2g  (optional)"
                                          FontSize="13"/>
@@ -167,11 +131,7 @@
 
                     <!-- Group: Rosetta -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="ENABLE ROSETTA"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="ENABLE ROSETTA"/>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="2">
                                 <TextBlock Text="AMD64 Emulation"
@@ -196,11 +156,7 @@
 
                     <!-- Group: Keep Alive -->
                     <StackPanel Spacing="6">
-                        <TextBlock Text="KEEP CONTAINER ALIVE"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="KEEP CONTAINER ALIVE"/>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="2">
                                 <TextBlock Text="Persistent command"
@@ -227,11 +183,7 @@
 
                     <!-- Ports -->
                     <StackPanel Spacing="10">
-                        <TextBlock Text="PORT MAPPINGS"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="PORT MAPPINGS"/>
 
                         <ItemsControl ItemsSource="{Binding PortMappings}">
                             <ItemsControl.ItemTemplate>
@@ -286,11 +238,7 @@
 
                     <!-- Volumes -->
                     <StackPanel Spacing="10">
-                        <TextBlock Text="VOLUME MOUNTS"
-                                   FontSize="11"
-                                   FontWeight="SemiBold"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   LetterSpacing="1"/>
+                        <TextBlock Classes="section-label" Text="VOLUME MOUNTS"/>
 
                         <ItemsControl ItemsSource="{Binding Volumes}">
                             <ItemsControl.ItemTemplate>
@@ -356,11 +304,7 @@
 
                 <!-- ── Step 4: Environment ────────────────────────────── -->
                 <StackPanel IsVisible="{Binding IsStep4}" Spacing="10" MaxWidth="520">
-                    <TextBlock Text="ENVIRONMENT VARIABLES"
-                               FontSize="11"
-                               FontWeight="SemiBold"
-                               Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                               LetterSpacing="1"/>
+                    <TextBlock Classes="section-label" Text="ENVIRONMENT VARIABLES"/>
 
                     <ItemsControl ItemsSource="{Binding EnvironmentVariables}">
                         <ItemsControl.ItemTemplate>
@@ -522,10 +466,8 @@
 
         <!-- ── Footer ───────────────────────────────────────────────────── -->
         <Border Grid.Row="2"
-                Padding="32,16"
-                Background="{DynamicResource FloatFooterBackgroundBrush}"
-                BorderBrush="{DynamicResource SidebarBorderBrush}"
-                BorderThickness="0,1,0,0">
+                Classes="footer-bar"
+                Padding="32,16">
             <Grid ColumnDefinitions="Auto,*,Auto,8,Auto">
 
                 <!-- ── Wizard footer (steps 1-5) ── -->
