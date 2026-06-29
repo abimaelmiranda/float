@@ -3,6 +3,7 @@ using Float.Core.Enums;
 using Float.Infrastructure.Common;
 using Float.Infrastructure.Engines.AppleContainers;
 using Float.Infrastructure.Engines.Docker;
+using Float.Infrastructure.Services;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.Infrastructure;
@@ -11,6 +12,7 @@ public static class ServiceCollectionExtensions
 {
     public static IServiceCollection AddFloatInfrastructure(this IServiceCollection services)
     {
+        services.AddSingleton<ISettingsService, SettingsService>();
         services.AddSingleton<IProcessHost, ProcessHost>();
         services.AddSingleton<IFileSystemService, FileSystemService>();
 

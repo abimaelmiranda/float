@@ -49,6 +49,8 @@
                     <NativeMenu>
                         <NativeMenuItem Header="Show Float" Click="OnShowFloatClick"/>
                         <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Preferences…" Click="OnSettingsClick"/>
+                        <NativeMenuItemSeparator/>
                         <NativeMenuItem Header="Quit Float" Click="OnQuitClick"/>
                     </NativeMenu>
                 </TrayIcon.Menu>

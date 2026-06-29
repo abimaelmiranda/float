@@ -10,6 +10,7 @@ using Float.UI.ViewModels;
 using Float.UI.ViewModels.Setup;
 using Float.UI.ViewModels.Wizards;
 using Float.UI.Views;
+
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI;
@@ -19,6 +20,7 @@ public partial class App : Application
     private MainWindow? _mainWindow;
     private MainWindowViewModel? _mainWindowVm;
     private UserNotificationService? _notificationService;
+    private ISettingsService? _settingsService;
 
     public override void Initialize()
     {
@@ -45,14 +47,25 @@ public partial class App : Application
             services.AddSingleton<CreateVolumeWizardViewModel>();
             services.AddSingleton<MainWindowViewModel>();
 
+            services.AddSingleton<SettingsViewModel>();
             var provider = services.BuildServiceProvider();
             ViewLocator.Services = provider;
 
+            _settingsService = provider.GetRequiredService<ISettingsService>();
             _mainWindowVm = provider.GetRequiredService<MainWindowViewModel>();
             _mainWindow = new MainWindow { DataContext = _mainWindowVm };
             desktop.MainWindow = _mainWindow;
 
             notificationService.SetMainWindow(_mainWindow);
+
+            _mainWindow.Closing += (_, e) =>
+            {
+                if (_settingsService.Get().CloseToTray)
+                {
+                    e.Cancel = true;
+                    _mainWindow.Hide();
+                }
+            };
 
             desktop.Exit += async (_, _) => await _mainWindowVm.ShutdownAsync().ConfigureAwait(false);
         }
@@ -74,7 +87,12 @@ public partial class App : Application
 
     // ── Native menu ──────────────────────────────────────────────────────
     private void OnAboutClick(object? sender, EventArgs e) { }
-    private void OnSettingsClick(object? sender, EventArgs e) { }
+
+    private void OnSettingsClick(object? sender, EventArgs e)
+    {
+        ShowMainWindow();
+        _mainWindowVm?.ShowSettingsCommand.Execute(null);
+    }
 
     private void OnQuitClick(object? sender, EventArgs e)
     {

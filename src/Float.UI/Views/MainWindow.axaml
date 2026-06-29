@@ -99,7 +99,8 @@
 
                 <Button Theme="{StaticResource NavItemTheme}"
                         Margin="8,0,8,12"
-                        IsEnabled="False">
+                        Classes.active="{Binding ShowingSettings}"
+                        Command="{Binding ShowSettingsCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconSettings}"

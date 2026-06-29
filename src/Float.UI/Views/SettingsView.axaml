@@ -1,0 +1,182 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels"
+             x:Class="Float.UI.Views.SettingsView"
+             x:DataType="vm:SettingsViewModel">
+
+    <ScrollViewer>
+        <StackPanel Spacing="0" Margin="32,32,32,32" MaxWidth="520">
+
+            <TextBlock Text="Preferences"
+                       FontSize="20"
+                       FontWeight="SemiBold"
+                       Margin="0,0,0,24"/>
+
+            <!-- Container Defaults -->
+            <TextBlock Text="CONTAINER DEFAULTS"
+                       Classes="section-label"
+                       Margin="0,0,0,10"/>
+
+            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="10"
+                    Padding="16"
+                    Margin="0,0,0,20">
+                <StackPanel Spacing="14">
+
+                    <Grid ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,8,0">
+                            <TextBlock Text="Default Registry" FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                            <ComboBox ItemsSource="{Binding RegistryOptions}"
+                                      SelectedItem="{Binding DefaultRegistry}"
+                                      FontSize="13"
+                                      HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="5" Margin="8,0,0,0">
+                            <TextBlock Text="Default Architecture" FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                            <ComboBox ItemsSource="{Binding ArchitectureOptions}"
+                                      SelectedItem="{Binding DefaultArchitecture}"
+                                      FontSize="13"
+                                      HorizontalAlignment="Stretch"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,*">
+                        <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,8,0">
+                            <TextBlock Text="Default CPU Cores" FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                            <TextBox Text="{Binding DefaultCpuCount}"
+                                     PlaceholderText="e.g. 2 (optional)"
+                                     FontSize="13"/>
+                        </StackPanel>
+                        <StackPanel Grid.Column="1" Spacing="5" Margin="8,0,0,0">
+                            <TextBlock Text="Default Memory" FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                            <TextBox Text="{Binding DefaultMemory}"
+                                     PlaceholderText="e.g. 512m, 2g (optional)"
+                                     FontSize="13"/>
+                        </StackPanel>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Keep Alive" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Append 'sleep infinity' to keep container running"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding DefaultKeepAlive}"/>
+                    </Grid>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Start Immediately" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Use 'container run' instead of 'container create'"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding StartImmediately}"/>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <!-- Container Behavior -->
+            <TextBlock Text="CONTAINER BEHAVIOR"
+                       Classes="section-label"
+                       Margin="0,0,0,10"/>
+
+            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="10"
+                    Padding="16"
+                    Margin="0,0,0,20">
+                <StackPanel Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Force Delete Running Containers" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Use --force flag, skipping the stop step"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding ForceDeleteRunning}"/>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,80">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Stop Timeout (seconds)" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Seconds before SIGKILL when stopping a container"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <TextBox Grid.Column="1"
+                                 Text="{Binding StopTimeoutSeconds}"
+                                 FontSize="13"
+                                 VerticalAlignment="Center"
+                                 HorizontalContentAlignment="Center"/>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <!-- Application -->
+            <TextBlock Text="APPLICATION"
+                       Classes="section-label"
+                       Margin="0,0,0,10"/>
+
+            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                    CornerRadius="10"
+                    Padding="16"
+                    Margin="0,0,0,24">
+                <StackPanel Spacing="14">
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Close to Tray" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Closing the window keeps Float running in the menu bar"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding CloseToTray}"/>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Stop Engine on Quit" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Stop the container engine when Float quits"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding StopEngineOnQuit}"/>
+                    </Grid>
+
+                </StackPanel>
+            </Border>
+
+            <!-- Footer -->
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
+                <Button Theme="{StaticResource ActionButtonTheme}"
+                        Content="Cancel"
+                        Command="{Binding CloseCommand}"
+                        Padding="16,6"
+                        FontSize="12"/>
+                <Button Theme="{StaticResource PrimaryButtonTheme}"
+                        Content="Save"
+                        Command="{Binding SaveCommand}"
+                        Padding="16,6"
+                        FontSize="12"/>
+            </StackPanel>
+
+        </StackPanel>
+    </ScrollViewer>
+
+</UserControl>

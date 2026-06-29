@@ -15,6 +15,7 @@ namespace Float.UI.ViewModels.Wizards;
 public partial class CreateContainerWizardViewModel : ViewModelBase
 {
     private readonly IContainerCreator _creator;
+    private readonly ISettingsService _settingsService;
     private CancellationTokenSource? _cts;
     private int _outputSession;
 
@@ -117,9 +118,11 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
     public string[] RegistryOptions { get; } = ["docker", "ghcr"];
 
-    public CreateContainerWizardViewModel(IContainerCreator creator)
+    public CreateContainerWizardViewModel(IContainerCreator creator, ISettingsService settingsService)
     {
         _creator = creator;
+        _settingsService = settingsService;
+        LoadDefaults();
     }
 
     public void StartNewRun()
@@ -260,6 +263,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
             CpuCount = double.TryParse(CpuCount, out var cpu) ? cpu : null,
             Memory = string.IsNullOrWhiteSpace(Memory) ? null : Memory.Trim(),
             KeepAlive = KeepAlive,
+            StartImmediately = _settingsService.Get().StartImmediately,
             Ports = ports,
             Volumes = volumes,
             EnvironmentVariables = envVars,
@@ -308,15 +312,11 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     private void Reset()
     {
         CurrentStep = 1;
-        Registry = "docker";
         ImageName = "";
         Tag = "latest";
         ContainerName = "";
         EnableRosetta = false;
-        Architecture = "arm64";
-        CpuCount = "";
-        Memory = "";
-        KeepAlive = false;
+        LoadDefaults();
         PortMappings.Clear();
         Volumes.Clear();
         EnvironmentVariables.Clear();
@@ -328,6 +328,16 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         ErrorMessage = "";
 
         Interlocked.Increment(ref _outputSession);
+    }
+
+    private void LoadDefaults()
+    {
+        var s = _settingsService.Get();
+        Registry = s.DefaultRegistry;
+        Architecture = s.DefaultArchitecture;
+        CpuCount = s.DefaultCpuCount;
+        Memory = s.DefaultMemory;
+        KeepAlive = s.DefaultKeepAlive;
     }
 
     private string BuildImageReference()

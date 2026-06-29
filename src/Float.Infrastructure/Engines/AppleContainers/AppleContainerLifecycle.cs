@@ -1,3 +1,4 @@
+using System.Globalization;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
@@ -11,23 +12,25 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
     public ContainerEngine Engine => ContainerEngine.AppleContainers;
 
     private readonly IProcessHost _processHost;
+    private readonly ISettingsService _settingsService;
 
-    public AppleContainerLifecycle(IProcessHost processHost)
+    public AppleContainerLifecycle(IProcessHost processHost, ISettingsService settingsService)
     {
         _processHost = processHost;
+        _settingsService = settingsService;
     }
 
     public Task<Result> StartAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
-        => RunAsync("start", container, cancellationToken, progress);
+        => RunAsync(["start"], container, cancellationToken, progress);
 
     public Task<Result> StopAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
-        => RunAsync("stop", container, cancellationToken, progress);
+        => StopCoreAsync(container, cancellationToken, progress);
 
     public Task<Result> RestartAsync(
         Container container,
@@ -35,19 +38,35 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
         IProgress<string>? progress = null)
         => RestartCoreAsync(container, cancellationToken, progress);
 
+    private Task<Result> StopCoreAsync(
+        Container container,
+        CancellationToken cancellationToken,
+        IProgress<string>? progress)
+    {
+        var timeout = _settingsService.Get().StopTimeoutSeconds;
+        return RunAsync(
+            ["stop", "--time", timeout.ToString(CultureInfo.InvariantCulture)],
+            container, cancellationToken, progress);
+    }
+
     public async Task<Result> DeleteAsync(
         Container container,
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
     {
+        var forceDelete = _settingsService.Get().ForceDeleteRunning;
+
+        if (forceDelete)
+            return await RunAsync(["rm", "--force"], container, cancellationToken, progress).ConfigureAwait(false);
+
         if (container.Instance?.Status == ContainerStatus.Running)
         {
-            var stopResult = await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
+            var stopResult = await StopCoreAsync(container, cancellationToken, progress).ConfigureAwait(false);
             if (stopResult.IsFailure)
                 return stopResult;
         }
 
-        return await RunAsync("rm", container, cancellationToken, progress).ConfigureAwait(false);
+        return await RunAsync(["rm"], container, cancellationToken, progress).ConfigureAwait(false);
     }
 
     private async Task<Result> RestartCoreAsync(
@@ -55,14 +74,15 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
         CancellationToken cancellationToken,
         IProgress<string>? progress)
     {
-        var stopResult = await RunAsync("stop", container, cancellationToken, progress).ConfigureAwait(false);
+        var stopResult = await StopCoreAsync(container, cancellationToken, progress).ConfigureAwait(false);
         return stopResult.IsFailure
             ? stopResult
-            : await RunAsync("start", container, cancellationToken, progress).ConfigureAwait(false);
+            : await RunAsync(["start"], container, cancellationToken, progress).ConfigureAwait(false);
     }
 
+    // commandParts: the command verb + any flags, e.g. ["stop", "--time", "5"] or ["rm", "--force"]
     private async Task<Result> RunAsync(
-        string command,
+        string[] commandParts,
         Container container,
         CancellationToken cancellationToken,
         IProgress<string>? progress)
@@ -70,10 +90,11 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
         if (string.IsNullOrWhiteSpace(container.Name))
             return Result.WithFailure(DomainErrors.Validation("Container name is required."));
 
-        progress?.Report($"$ /usr/local/bin/container {command} {QuoteArgument(container.Name)}");
+        var args = new List<string>(commandParts) { container.Name };
+        progress?.Report($"$ /usr/local/bin/container {string.Join(" ", commandParts)} {QuoteArgument(container.Name)}");
         var result = await _processHost.RunWithResultAsync(
             "/usr/local/bin/container",
-            [command, container.Name],
+            args,
             workingDirectory: null,
             onOutput: line => progress?.Report(line),
             onError: line => progress?.Report(line),
@@ -81,7 +102,7 @@ public sealed class AppleContainerLifecycle : IContainerLifecycle
 
         if (result.IsFailure)
             return Result.WithFailure(DomainErrors.CommandFailed(
-                $"Apple container command '{command}' failed for '{container.Name}'. {result.Failure.Message}"));
+                $"Apple container command '{commandParts[0]}' failed for '{container.Name}'. {result.Failure.Message}"));
 
         return Result.WithSuccess();
     }
