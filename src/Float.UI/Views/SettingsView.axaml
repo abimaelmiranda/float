@@ -1,19 +1,20 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.SettingsView"
              x:DataType="vm:SettingsViewModel">
 
     <ScrollViewer>
         <StackPanel Spacing="0" Margin="32,32,32,32" MaxWidth="520">
 
-            <TextBlock Text="Preferences"
+            <TextBlock Text="{x:Static resx:UiStrings.Preferences}"
                        FontSize="20"
                        FontWeight="SemiBold"
                        Margin="0,0,0,24"/>
 
             <!-- Container Defaults -->
-            <TextBlock Text="CONTAINER DEFAULTS"
+            <TextBlock Text="{x:Static resx:UiStrings.ContainerDefaults}"
                        Classes="section-label"
                        Margin="0,0,0,10"/>
 
@@ -25,7 +26,7 @@
 
                     <Grid ColumnDefinitions="*,*">
                         <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,8,0">
-                            <TextBlock Text="Default Registry" FontSize="12"
+                            <TextBlock Text="{x:Static resx:UiStrings.DefaultRegistry}" FontSize="12"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                             <ComboBox ItemsSource="{Binding RegistryOptions}"
                                       SelectedItem="{Binding DefaultRegistry}"
@@ -33,7 +34,7 @@
                                       HorizontalAlignment="Stretch"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="5" Margin="8,0,0,0">
-                            <TextBlock Text="Default Architecture" FontSize="12"
+                            <TextBlock Text="{x:Static resx:UiStrings.DefaultArchitecture}" FontSize="12"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                             <ComboBox ItemsSource="{Binding ArchitectureOptions}"
                                       SelectedItem="{Binding DefaultArchitecture}"
@@ -46,14 +47,14 @@
 
                     <Grid ColumnDefinitions="*,*">
                         <StackPanel Grid.Column="0" Spacing="5" Margin="0,0,8,0">
-                            <TextBlock Text="Default CPU Cores" FontSize="12"
+                            <TextBlock Text="{x:Static resx:UiStrings.DefaultCpuCores}" FontSize="12"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                             <TextBox Text="{Binding DefaultCpuCount}"
                                      PlaceholderText="e.g. 2 (optional)"
                                      FontSize="13"/>
                         </StackPanel>
                         <StackPanel Grid.Column="1" Spacing="5" Margin="8,0,0,0">
-                            <TextBlock Text="Default Memory" FontSize="12"
+                            <TextBlock Text="{x:Static resx:UiStrings.DefaultMemory}" FontSize="12"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                             <TextBox Text="{Binding DefaultMemory}"
                                      PlaceholderText="e.g. 512m, 2g (optional)"
@@ -65,8 +66,8 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Keep Alive" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Append 'sleep infinity' to keep container running"
+                            <TextBlock Text="{x:Static resx:UiStrings.KeepAlive}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.KeepAliveDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -75,8 +76,8 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Start Immediately" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Use 'container run' instead of 'container create'"
+                            <TextBlock Text="{x:Static resx:UiStrings.StartImmediately}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.StartImmediatelyDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -87,7 +88,7 @@
             </Border>
 
             <!-- Container Behavior -->
-            <TextBlock Text="CONTAINER BEHAVIOR"
+            <TextBlock Text="{x:Static resx:UiStrings.ContainerBehavior}"
                        Classes="section-label"
                        Margin="0,0,0,10"/>
 
@@ -99,8 +100,8 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Force Delete Running Containers" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Use --force flag, skipping the stop step"
+                            <TextBlock Text="{x:Static resx:UiStrings.ForceDeleteRunningContainers}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.ForceDeleteRunningContainersDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -111,8 +112,8 @@
 
                     <Grid ColumnDefinitions="*,80">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Stop Timeout (seconds)" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Seconds before SIGKILL when stopping a container"
+                            <TextBlock Text="{x:Static resx:UiStrings.StopTimeoutSeconds}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.StopTimeoutSecondsDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -127,7 +128,7 @@
             </Border>
 
             <!-- Application -->
-            <TextBlock Text="APPLICATION"
+            <TextBlock Text="{x:Static resx:UiStrings.Application}"
                        Classes="section-label"
                        Margin="0,0,0,10"/>
 
@@ -139,8 +140,8 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Close to Tray" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Closing the window keeps Float running in the menu bar"
+                            <TextBlock Text="{x:Static resx:UiStrings.CloseToTray}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.CloseToTrayDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -151,8 +152,8 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Stop Engine on Quit" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Stop the container engine when Float quits"
+                            <TextBlock Text="{x:Static resx:UiStrings.StopEngineOnQuit}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.StopEngineOnQuitDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
@@ -163,12 +164,28 @@
 
                     <Grid ColumnDefinitions="*,Auto">
                         <StackPanel Grid.Column="0" Spacing="2">
-                            <TextBlock Text="Show in Dock" FontSize="13" FontWeight="Medium"/>
-                            <TextBlock Text="Show Float in the Dock alongside other apps"
+                            <TextBlock Text="{x:Static resx:UiStrings.ShowInDock}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.ShowInDockDescription}"
                                        FontSize="11"
                                        Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         </StackPanel>
                         <CheckBox Grid.Column="1" IsChecked="{Binding ShowInDock}"/>
+                    </Grid>
+
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,180">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="{x:Static resx:UiStrings.Language}" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="{Binding LanguageRestartMessage}"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <ComboBox Grid.Column="1"
+                                  ItemsSource="{Binding LanguageOptions}"
+                                  SelectedItem="{Binding Language}"
+                                  FontSize="13"
+                                  VerticalAlignment="Center"/>
                     </Grid>
 
                 </StackPanel>
@@ -177,12 +194,12 @@
             <!-- Footer -->
             <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" Spacing="8">
                 <Button Theme="{StaticResource ActionButtonTheme}"
-                        Content="Cancel"
+                        Content="{x:Static resx:UiStrings.Cancel}"
                         Command="{Binding CloseCommand}"
                         Padding="16,6"
                         FontSize="12"/>
                 <Button Theme="{StaticResource PrimaryButtonTheme}"
-                        Content="Save"
+                        Content="{x:Static resx:UiStrings.Save}"
                         Command="{Binding SaveCommand}"
                         Padding="16,6"
                         FontSize="12"/>

@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
 using Float.UI.Platform;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -26,12 +27,15 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] public partial string StopTimeoutSeconds { get; set; } = "5";
 
     // Application
+    [ObservableProperty] public partial string Language { get; set; } = "en";
     [ObservableProperty] public partial bool CloseToTray { get; set; } = true;
     [ObservableProperty] public partial bool StopEngineOnQuit { get; set; } = true;
     [ObservableProperty] public partial bool ShowInDock { get; set; }
 
     public string[] RegistryOptions { get; } = ["docker", "ghcr"];
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
+    public string[] LanguageOptions { get; } = ["en", "pt-BR"];
+    public string LanguageRestartMessage => UiStrings.LanguageRestartRequired;
 
     public SettingsViewModel(ISettingsService settingsService)
     {
@@ -53,6 +57,7 @@ public partial class SettingsViewModel : ViewModelBase
             StartImmediately = StartImmediately,
             ForceDeleteRunning = ForceDeleteRunning,
             StopTimeoutSeconds = timeout > 0 ? timeout : 5,
+            Language = Language,
             CloseToTray = CloseToTray,
             StopEngineOnQuit = StopEngineOnQuit,
             ShowInDock = ShowInDock,
@@ -76,6 +81,7 @@ public partial class SettingsViewModel : ViewModelBase
         StartImmediately = s.StartImmediately;
         ForceDeleteRunning = s.ForceDeleteRunning;
         StopTimeoutSeconds = s.StopTimeoutSeconds.ToString();
+        Language = s.Language;
         CloseToTray = s.CloseToTray;
         StopEngineOnQuit = s.StopEngineOnQuit;
         ShowInDock = s.ShowInDock;

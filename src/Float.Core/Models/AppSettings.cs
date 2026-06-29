@@ -15,6 +15,7 @@ public sealed record AppSettings
     public int StopTimeoutSeconds { get; init; } = 5;
 
     // Application behavior
+    public string Language { get; init; } = "en";
     public bool CloseToTray { get; init; } = true;
     public bool StopEngineOnQuit { get; init; } = true;
     public bool ShowInDock { get; init; } = false;
