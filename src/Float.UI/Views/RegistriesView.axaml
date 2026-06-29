@@ -10,7 +10,7 @@
 
             <!-- Toolbar -->
             <Border DockPanel.Dock="Top"
-                    Padding="24,20,24,0">
+                    Padding="20,52,20,12">
                 <Grid ColumnDefinitions="*,Auto">
                     <TextBlock Text="Registries"
                                FontSize="20"
