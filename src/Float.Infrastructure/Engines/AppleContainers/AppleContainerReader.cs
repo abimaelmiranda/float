@@ -102,4 +102,40 @@ public class AppleContainerReader : IContainerReader
         }
     }
 
+    public async Task<Result<IReadOnlyList<ContainerVolumeInfo>>> ListVolumesAsync(bool includeAll = true, CancellationToken cancellationToken = default)
+    {
+        if (!await _engineProvisioner.IsEngineInstalled())
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(
+                DomainErrors.EngineNotAvailable("Apple Container is not available."));
+
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
+        var args = new List<string> { "volume", "list", "--format", "json" };
+
+        var result = await _processHost.RunWithResultAsync(
+            "/usr/local/bin/container",
+            args,
+            workingDirectory: null,
+            onOutput: line => output.AppendLine(line),
+            onError: line => errors.AppendLine(line),
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        if (result.IsFailure)
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(result.Failure);
+
+        var outputStr = output.ToString();
+        if (string.IsNullOrWhiteSpace(outputStr))
+            return Result.WithSuccess<IReadOnlyList<ContainerVolumeInfo>>([]);
+
+        try
+        {
+            var volumes = AppleVolumeJsonParser.ParseVolumes(outputStr);
+            return Result.WithSuccess<IReadOnlyList<ContainerVolumeInfo>>(volumes);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(
+                DomainErrors.ParseError(ex.Message));
+        }
+    }
 }
