@@ -179,19 +179,9 @@
             <!-- Logs tab -->
             <TabItem Header="Logs">
                 <Grid RowDefinitions="*,Auto">
-                    <!-- Empty / loading state -->
-                    <TextBlock Grid.Row="0"
-                               Text="{x:Static resx:UiStrings.NoLogs}"
-                               IsVisible="{Binding !LogLines.Count}"
-                               HorizontalAlignment="Center"
-                               VerticalAlignment="Center"
-                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                               FontSize="13"/>
-
                     <!-- Log lines -->
                     <ScrollViewer Grid.Row="0"
                                   x:Name="LogScrollViewer"
-                                  IsVisible="{Binding !!LogLines.Count}"
                                   Padding="20,16,20,16">
                         <ItemsControl ItemsSource="{Binding LogLines}">
                             <ItemsControl.ItemTemplate>

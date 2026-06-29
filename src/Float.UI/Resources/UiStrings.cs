@@ -107,7 +107,6 @@ public static class UiStrings
     public static string MigrationProgress => Get(nameof(MigrationProgress));
     public static string Name => Get(nameof(Name));
     public static string NewContainer => Get(nameof(NewContainer));
-    public static string NoLogs => Get(nameof(NoLogs));
     public static string NoMounts => Get(nameof(NoMounts));
     public static string NoRegistries => Get(nameof(NoRegistries));
     public static string NoRegistriesDescription => Get(nameof(NoRegistriesDescription));

@@ -207,7 +207,6 @@
   <data name="MigrationFailedFormat" xml:space="preserve"><value>Migration failed: {0}</value></data>
   <data name="Named" xml:space="preserve"><value>Named</value></data>
   <data name="NoPublishedPorts" xml:space="preserve"><value>No published ports</value></data>
-  <data name="NoLogs" xml:space="preserve"><value>No logs available</value></data>
   <data name="NoMounts" xml:space="preserve"><value>No mounts</value></data>
   <data name="NoVolumes" xml:space="preserve"><value>No volumes</value></data>
   <data name="NotFoundFormat" xml:space="preserve"><value>Not Found: {0}</value></data>
