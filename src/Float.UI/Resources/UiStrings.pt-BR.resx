@@ -238,7 +238,6 @@
   <data name="MigratedFailedCountFormat" xml:space="preserve"><value>{0} migrados, {1} falharam.</value></data>
   <data name="MigratedPartFormat" xml:space="preserve"><value>{0} migrados</value></data>
   <data name="Migrating" xml:space="preserve"><value>Migrando...</value></data>
-  <data name="NamedVolumeSkipped" xml:space="preserve"><value>volume nomeado ignorado</value></data>
   <data name="PreservedPartFormat" xml:space="preserve"><value>{0} preservados</value></data>
   <data name="RemovedPartFormat" xml:space="preserve"><value>{0} Docker original(is) removidos</value></data>
   <data name="CleanupFailedPartFormat" xml:space="preserve"><value>{0} falhas na limpeza</value></data>

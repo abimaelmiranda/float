@@ -69,9 +69,7 @@ public partial class MigrationContainerItemViewModel : ObservableObject
             _ => $"{volumes.Count} {UiStrings.Volumes.ToLowerInvariant()}"
         };
 
-        return volumes.Any(volume => volume.IsNamedVolume)
-            ? $"{summary}, {UiStrings.Get("NamedVolumeSkipped")}"
-            : summary;
+        return summary;
     }
 
     partial void OnMigrationSucceededChanged(bool value)
