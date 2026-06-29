@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels.Wizards"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Wizards.MigrationWizardView"
              x:DataType="vm:MigrationWizardViewModel">
 
@@ -10,7 +11,7 @@
         <Border Grid.Row="0" Padding="24,52,24,12">
             <Grid ColumnDefinitions="*,Auto,Auto"
                   ColumnSpacing="12">
-                <TextBlock Text="Migrate from Docker"
+                <TextBlock Text="{x:Static resx:UiStrings.MigrateFromDocker}"
                            FontSize="20"
                            FontWeight="SemiBold"
                            VerticalAlignment="Center"/>
@@ -19,9 +20,12 @@
                            FontSize="13"
                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                            VerticalAlignment="Center">
-                    <Run Text="Step "/>
+                    <Run Text="{x:Static resx:UiStrings.Step}"/>
+                    <Run Text=" "/>
                     <Run Text="{Binding CurrentStep}"/>
-                    <Run Text=" of "/>
+                    <Run Text=" "/>
+                    <Run Text="{x:Static resx:UiStrings.StepOf}"/>
+                    <Run Text=" "/>
                     <Run Text="{Binding TotalSteps}"/>
                 </TextBlock>
 
@@ -35,7 +39,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconRefresh}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Refresh"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Refresh}"/>
                     </StackPanel>
                 </Button>
             </Grid>
@@ -59,7 +63,7 @@
                     <ProgressBar IsIndeterminate="True"
                                  Width="180"
                                  Height="4"/>
-                    <TextBlock Text="Scanning Docker containers..."
+                    <TextBlock Text="{x:Static resx:UiStrings.ScanningDockerContainers}"
                                FontSize="13"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                HorizontalAlignment="Center"/>
@@ -74,7 +78,7 @@
                           Data="{StaticResource IconMigration}"
                           Stroke="{DynamicResource StatusErrorBrush}"
                           HorizontalAlignment="Center"/>
-                    <TextBlock Text="Docker is not available"
+                    <TextBlock Text="{x:Static resx:UiStrings.DockerUnavailable}"
                                FontSize="17"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"/>
@@ -86,7 +90,7 @@
                                TextAlignment="Center"/>
                     <Button Theme="{StaticResource PrimaryButtonTheme}"
                             Command="{Binding RefreshCommand}"
-                            Content="Try Again"/>
+                            Content="{x:Static resx:UiStrings.TryAgain}"/>
                 </StackPanel>
 
                 <!-- Empty -->
@@ -98,11 +102,11 @@
                           Data="{StaticResource IconMigration}"
                           Stroke="{DynamicResource FloatAccentBrush}"
                           HorizontalAlignment="Center"/>
-                    <TextBlock Text="No Docker containers found"
+                    <TextBlock Text="{x:Static resx:UiStrings.NoDockerContainersFound}"
                                FontSize="17"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Create or start Docker containers, then refresh this list."
+                    <TextBlock Text="{x:Static resx:UiStrings.NoDockerContainersFoundDescription}"
                                FontSize="13"
                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                TextWrapping="Wrap"
@@ -117,10 +121,10 @@
                             Padding="4,0,4,10">
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Spacing="3">
-                                <TextBlock Text="Choose containers"
+                                <TextBlock Text="{x:Static resx:UiStrings.ChooseContainers}"
                                            FontSize="15"
                                            FontWeight="SemiBold"/>
-                                <TextBlock Text="Select the Docker containers you want to migrate."
+                                <TextBlock Text="{x:Static resx:UiStrings.SelectDockerContainers}"
                                            FontSize="12"
                                            Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
                             </StackPanel>
@@ -129,7 +133,7 @@
                                     Theme="{StaticResource ActionButtonTheme}"
                                     Command="{Binding ToggleSelectAllCommand}"
                                     VerticalAlignment="Center"
-                                    Content="Select all"/>
+                                    Content="{x:Static resx:UiStrings.SelectAll}"/>
                         </Grid>
                     </Border>
 
@@ -209,7 +213,7 @@
                         MinHeight="44"
                         Padding="4,0,4,10">
                     <StackPanel Spacing="3">
-                        <TextBlock Text="Migration progress"
+                        <TextBlock Text="{x:Static resx:UiStrings.MigrationProgress}"
                                    FontSize="15"
                                    FontWeight="SemiBold"/>
                         <TextBlock Text="{Binding MigrationSummary}"
@@ -293,7 +297,7 @@
                           Data="{StaticResource IconMigration}"
                           Stroke="{DynamicResource FloatAccentBrush}"
                           HorizontalAlignment="Center"/>
-                    <TextBlock Text="No successful migrations to clean up"
+                    <TextBlock Text="{x:Static resx:UiStrings.NoSuccessfulMigrationsCleanup}"
                                FontSize="17"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"/>
@@ -312,7 +316,7 @@
                         <Grid ColumnDefinitions="*,Auto"
                               ColumnSpacing="12">
                             <StackPanel Spacing="3">
-                                <TextBlock Text="Cleanup Docker originals"
+                                <TextBlock Text="{x:Static resx:UiStrings.CleanupDockerOriginals}"
                                            FontSize="15"
                                            FontWeight="SemiBold"/>
                                 <TextBlock Text="{Binding MigrationSummary}"
@@ -402,7 +406,7 @@
                         IsVisible="{Binding IsCleanupStep}"
                         IsEnabled="{Binding CanFinishCleanup}"
                         HorizontalAlignment="Stretch">
-                    <TextBlock Text="Finish cleanup"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.FinishCleanup}"/>
                 </Button>
             </Grid>
         </Border>
@@ -421,10 +425,10 @@
                     BorderThickness="1">
                 <StackPanel Spacing="12">
                     <StackPanel Spacing="4">
-                        <TextBlock Text="Choose image architecture"
+                        <TextBlock Text="{x:Static resx:UiStrings.ChooseImageArchitecture}"
                                    FontSize="15"
                                    FontWeight="SemiBold"/>
-                        <TextBlock Text="Docker did not expose the image architecture for this container."
+                        <TextBlock Text="{x:Static resx:UiStrings.DockerArchitectureMissing}"
                                    FontSize="12"
                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                    TextWrapping="Wrap"/>
@@ -450,10 +454,10 @@
                                 Margin="0,12,0,0">
                         <Button Theme="{StaticResource ActionButtonTheme}"
                                 Command="{Binding CancelArchitecturePromptCommand}"
-                                Content="Cancel"
+                                Content="{x:Static resx:UiStrings.Cancel}"
                                 HorizontalAlignment="Right"/>
                         <Button Theme="{StaticResource PrimaryButtonTheme}"
-                                Content="Confirm"
+                                Content="{x:Static resx:UiStrings.Confirm}"
                                 IsEnabled="{Binding CanConfirmArchitecture}"
                                 Command="{Binding ResolveArchitectureCommand}"
                                 CommandParameter="{Binding SelectedArchitecture}"

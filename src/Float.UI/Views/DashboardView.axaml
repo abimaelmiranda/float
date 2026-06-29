@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
              xmlns:shared="using:Float.UI.Views.Shared"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.DashboardView"
              x:DataType="vm:DashboardViewModel">
 
@@ -15,7 +16,7 @@
                     Padding="20,52,20,12">
                 <StackPanel Spacing="10">
                     <Grid ColumnDefinitions="*,Auto">
-                        <TextBlock Text="Containers"
+                        <TextBlock Text="{x:Static resx:UiStrings.Containers}"
                                    FontSize="20"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
@@ -26,7 +27,7 @@
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconNewContainer}"
                                       Stroke="{Binding $parent[Button].Foreground}"/>
-                                <TextBlock Text="New Container" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.NewContainer}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -115,7 +116,7 @@
                                                 Click="OnStartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding !IsRunning}"
-                                                ToolTip.Tip="Start">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Start}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconPlay}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -126,7 +127,7 @@
                                                 Click="OnStopContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 IsVisible="{Binding IsRunning}"
-                                                ToolTip.Tip="Stop">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Stop}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconStop}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -136,7 +137,7 @@
                                                 Tag="{Binding Source}"
                                                 Click="OnRestartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
-                                                ToolTip.Tip="Restart">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Restart}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconRestart}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -146,7 +147,7 @@
                                                 Tag="{Binding Source}"
                                                 Click="OnRequestDeleteClick"
                                                 IsEnabled="{Binding !IsBusy}"
-                                                ToolTip.Tip="Delete">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Delete}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconDelete}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -186,7 +187,7 @@
                                     <Button Grid.Column="1"
                                             Theme="{StaticResource ActionButtonTheme}"
                                             Click="OnCloseDetailClick"
-                                            ToolTip.Tip="Close">
+                                            ToolTip.Tip="{x:Static resx:UiStrings.Close}">
                                         <Path Classes="icon icon-sm"
                                               Data="{StaticResource IconClose}"
                                               Stroke="{Binding $parent[Button].Foreground}"/>
@@ -200,7 +201,7 @@
 
                                     <!-- Status -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="STATUS"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Status}"/>
                                         <StackPanel Orientation="Horizontal" Spacing="6">
                                             <Ellipse Classes="status-dot"
                                                      Classes.running="{Binding IsRunning}"/>
@@ -216,7 +217,7 @@
 
                                     <!-- Image -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="IMAGE"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Image}"/>
                                         <TextBlock Text="{Binding ImageTag}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
@@ -224,7 +225,7 @@
 
                                     <!-- Ports -->
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="PORTS"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Ports}"/>
                                         <TextBlock Text="{Binding PortSummary}"
                                                    FontSize="13"
                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
@@ -232,10 +233,10 @@
 
                                     <!-- Actions -->
                                     <StackPanel Spacing="6">
-                                        <TextBlock Classes="section-label" Text="ACTIONS"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Actions}"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="Stop Container"
+                                                Content="{x:Static resx:UiStrings.StopContainer}"
                                                 Tag="{Binding Source}"
                                                 Click="OnStopContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
@@ -243,7 +244,7 @@
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="Start Container"
+                                                Content="{x:Static resx:UiStrings.StartContainer}"
                                                 Tag="{Binding Source}"
                                                 Click="OnStartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
@@ -251,14 +252,14 @@
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="Restart"
+                                                Content="{x:Static resx:UiStrings.Restart}"
                                                 Tag="{Binding Source}"
                                                 Click="OnRestartContainerClick"
                                                 IsEnabled="{Binding !IsBusy}"
                                                 HorizontalAlignment="Left"/>
 
                                         <Button Theme="{StaticResource DangerButtonTheme}"
-                                                Content="Delete Container"
+                                                Content="{x:Static resx:UiStrings.DeleteContainer}"
                                                 Tag="{Binding Source}"
                                                 Click="OnRequestDeleteClick"
                                                 IsEnabled="{Binding !IsBusy}"
@@ -275,7 +276,7 @@
         </Border>
 
         <!-- ── Delete confirmation overlay ─────────────────────────── -->
-        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="Delete container"/>
+        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="{x:Static resx:UiStrings.DeleteContainerTitle}"/>
 
     </Grid>
 

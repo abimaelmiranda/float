@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Shared.ConfirmDeleteDialog"
              x:DataType="vm:IHasPendingDelete"
              x:Name="Self">
@@ -21,18 +22,18 @@
                            FontWeight="SemiBold"/>
                 <TextBlock FontSize="13"
                            TextWrapping="Wrap">
-                    Are you sure you want to delete
+                    <Run Text="{x:Static resx:UiStrings.DeletePromptPrefix}"/>
                     <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
-                    This action cannot be undone.
+                    <Run Text="{x:Static resx:UiStrings.DeletePromptSuffix}"/>
                 </TextBlock>
                 <StackPanel Orientation="Horizontal"
                             Spacing="8"
                             HorizontalAlignment="Right">
                     <Button Theme="{StaticResource ActionButtonTheme}"
-                            Content="Cancel"
+                            Content="{x:Static resx:UiStrings.Cancel}"
                             Command="{Binding CancelDeleteCommand}"/>
                     <Button Theme="{StaticResource DangerButtonTheme}"
-                            Content="Delete"
+                            Content="{x:Static resx:UiStrings.Delete}"
                             Command="{Binding ConfirmDeleteCommand}"/>
                 </StackPanel>
             </StackPanel>

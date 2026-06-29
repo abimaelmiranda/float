@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Float.UI.ViewModels"
+        xmlns:resx="using:Float.UI.Resources"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
@@ -16,33 +17,33 @@
     <!-- Window menus — appear after Float in the macOS menu bar -->
     <NativeMenu.Menu>
         <NativeMenu>
-            <NativeMenuItem Header="Containers">
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Containers}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="New Container…"       Command="{Binding NewContainerCommand}" Gesture="Ctrl+N"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.NewContainer}"       Command="{Binding NewContainerCommand}" Gesture="Ctrl+N"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Show Containers"      Command="{Binding ShowContainersCommand}"/>
-                        <NativeMenuItem Header="Refresh"              Command="{Binding ShowContainersCommand}" Gesture="Ctrl+R"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Containers}"      Command="{Binding ShowContainersCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"              Command="{Binding ShowContainersCommand}" Gesture="Ctrl+R"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Migrate from Docker…" Command="{Binding ShowMigrationCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.MigrateFromDocker}" Command="{Binding ShowMigrationCommand}"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
-            <NativeMenuItem Header="Images">
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Images}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Show Images" Command="{Binding ShowImagesCommand}"/>
-                        <NativeMenuItem Header="Refresh"     Command="{Binding ShowImagesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Images}" Command="{Binding ShowImagesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"     Command="{Binding ShowImagesCommand}"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
-            <NativeMenuItem Header="Volumes">
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Volumes}">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Create Volume…" Command="{Binding NewVolumeCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.CreateVolume}" Command="{Binding NewVolumeCommand}"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Show Volumes"   Command="{Binding ShowVolumesCommand}"/>
-                        <NativeMenuItem Header="Refresh"        Command="{Binding ShowVolumesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Volumes}"   Command="{Binding ShowVolumesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"        Command="{Binding ShowVolumesCommand}"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -105,7 +106,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconSettings}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Settings" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Settings}" FontSize="13"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -119,7 +120,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconContainers}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Containers" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Containers}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -130,7 +131,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconMigration}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Migrate" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Migrate}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -141,7 +142,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconImages}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Images" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Images}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -152,7 +153,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconVolumes}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Volumes" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Volumes}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -163,7 +164,7 @@
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconRegistry}"
                               Stroke="{Binding $parent[Button].Foreground}"/>
-                        <TextBlock Text="Registries" FontSize="13"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Registries}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -227,7 +228,7 @@
                                 Command="{Binding HideNotificationCommand}"
                                 VerticalAlignment="Center"
                                 Padding="4"
-                                ToolTip.Tip="Close">
+                                ToolTip.Tip="{x:Static resx:UiStrings.Close}">
                             <Path Classes="icon"
                                   Width="12"
                                   Height="12"

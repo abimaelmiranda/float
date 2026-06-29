@@ -1,6 +1,7 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Float.UI.ViewModels"
+        xmlns:resx="using:Float.UI.Resources"
         x:Class="Float.UI.Views.CrashHandlerWindow"
         x:DataType="vm:CrashHandlerViewModel"
         Title="Float"
@@ -74,12 +75,12 @@
                         HorizontalAlignment="Right"
                         Spacing="8">
                 <Button Theme="{StaticResource ActionButtonTheme}"
-                        Content="Copy Details"
+                        Content="{x:Static resx:UiStrings.CopyDetails}"
                         Click="OnCopyDetails"
                         Padding="12,6"
                         FontSize="12"/>
                 <Button Theme="{StaticResource PrimaryButtonTheme}"
-                        Content="Close"
+                        Content="{x:Static resx:UiStrings.Close}"
                         Click="OnClose"
                         Padding="16,6"
                         FontSize="12"/>

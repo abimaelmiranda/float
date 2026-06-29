@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels.Wizards"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Wizards.CreateContainerWizardView"
              x:DataType="vm:CreateContainerWizardViewModel">
 
@@ -20,9 +21,12 @@
                                Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                VerticalAlignment="Center"
                                IsVisible="{Binding IsWizardStep}">
-                        <Run Text="Step "/>
+                        <Run Text="{x:Static resx:UiStrings.Step}"/>
+                        <Run Text=" "/>
                         <Run Text="{Binding CurrentStep}"/>
-                        <Run Text=" of "/>
+                        <Run Text=" "/>
+                        <Run Text="{x:Static resx:UiStrings.StepOf}"/>
+                        <Run Text=" "/>
                         <Run Text="{Binding TotalSteps}"/>
                     </TextBlock>
                 </Grid>
@@ -47,7 +51,7 @@
                           RowDefinitions="Auto,20,Auto,20,Auto"
                           HorizontalAlignment="Stretch">
                         <StackPanel Grid.Row="0" Grid.Column="0" Spacing="6">
-                            <TextBlock Classes="section-label" Text="REGISTRY"/>
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Registry}"/>
                             <ComboBox ItemsSource="{Binding RegistryOptions}"
                                       SelectedItem="{Binding Registry, Mode=TwoWay}"
                                       FontSize="13"
@@ -55,23 +59,23 @@
                         </StackPanel>
 
                         <StackPanel Grid.Row="0" Grid.Column="2" Spacing="6">
-                            <TextBlock Classes="section-label" Text="IMAGE NAME"/>
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.ImageName}"/>
                             <TextBox Text="{Binding ImageName, Mode=TwoWay}"
                                      PlaceholderText="e.g. ubuntu, org/image, library/node"
                                      FontSize="13"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="0" Spacing="6">
-                            <TextBlock Classes="section-label" Text="TAG"/>
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Tag}"/>
                             <TextBox Text="{Binding Tag, Mode=TwoWay}"
                                      PlaceholderText="e.g. latest, 22.04, 1.0.0"
                                      FontSize="13"/>
                         </StackPanel>
 
                         <StackPanel Grid.Row="2" Grid.Column="2" Spacing="6">
-                            <TextBlock Classes="section-label" Text="CONTAINER NAME"/>
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.ContainerName}"/>
                             <TextBox Text="{Binding ContainerName, Mode=TwoWay}"
-                                     PlaceholderText="Optional — auto-generated if left blank"
+                                     PlaceholderText="{x:Static resx:UiStrings.OptionalPlaceholder}"
                                      FontSize="13"/>
                         </StackPanel>
 
@@ -81,7 +85,7 @@
                                 CornerRadius="10"
                                 Padding="14,12">
                             <StackPanel Spacing="4">
-                                <TextBlock Classes="section-label" Text="IMAGE PREVIEW"/>
+                                <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.ImagePreview}"/>
                                 <TextBlock Text="{Binding ImageReference}"
                                            FontSize="13"
                                            FontWeight="Medium"
@@ -96,12 +100,12 @@
 
                     <!-- Group: Architecture -->
                     <StackPanel Spacing="6">
-                        <TextBlock Classes="section-label" Text="ARCHITECTURE"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Architecture}"/>
                         <ComboBox ItemsSource="{Binding ArchitectureOptions}"
                                   SelectedItem="{Binding Architecture}"
                                   FontSize="13"
                                   HorizontalAlignment="Stretch"/>
-                        <TextBlock Text="Set automatically when toggling Rosetta below."
+                        <TextBlock Text="{x:Static resx:UiStrings.SetAutomaticallyRosetta}"
                                    FontSize="11"
                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                     </StackPanel>
@@ -110,16 +114,16 @@
 
                     <!-- Group: Resources -->
                     <StackPanel Spacing="6">
-                        <TextBlock Classes="section-label" Text="RESOURCES"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Resources}"/>
                         <Grid ColumnDefinitions="*,16,*">
                             <StackPanel Grid.Column="0" Spacing="6">
-                                <TextBlock Classes="section-label" Text="CPU CORES"/>
+                                <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.CpuCores}"/>
                                 <TextBox Text="{Binding CpuCount}"
                                          PlaceholderText="e.g. 2  (optional)"
                                          FontSize="13"/>
                             </StackPanel>
                             <StackPanel Grid.Column="2" Spacing="6">
-                                <TextBlock Classes="section-label" Text="MEMORY"/>
+                                <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Memory}"/>
                                 <TextBox Text="{Binding Memory}"
                                          PlaceholderText="e.g. 512m, 2g  (optional)"
                                          FontSize="13"/>
@@ -131,13 +135,13 @@
 
                     <!-- Group: Rosetta -->
                     <StackPanel Spacing="6">
-                        <TextBlock Classes="section-label" Text="ENABLE ROSETTA"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.EnableRosetta}"/>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="2">
-                                <TextBlock Text="AMD64 Emulation"
+                                <TextBlock Text="{x:Static resx:UiStrings.Amd64Emulation}"
                                            FontSize="13"
                                            FontWeight="Medium"/>
-                                <TextBlock Text="Required for x86_64/amd64-only images. Uses Apple Rosetta 2 to translate instructions at near-native speed."
+                                <TextBlock Text="{x:Static resx:UiStrings.RosettaDescription}"
                                            FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                            TextWrapping="Wrap"
@@ -156,13 +160,13 @@
 
                     <!-- Group: Keep Alive -->
                     <StackPanel Spacing="6">
-                        <TextBlock Classes="section-label" Text="KEEP CONTAINER ALIVE"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.KeepContainerAlive}"/>
                         <Grid ColumnDefinitions="*,Auto">
                             <StackPanel Grid.Column="0" Spacing="2">
-                                <TextBlock Text="Persistent command"
+                                <TextBlock Text="{x:Static resx:UiStrings.PersistentCommand}"
                                            FontSize="13"
                                            FontWeight="Medium"/>
-                                <TextBlock Text="For cases where the image exits immediately, such as test containers or minimal base images."
+                                <TextBlock Text="{x:Static resx:UiStrings.KeepContainerAliveDescription}"
                                            FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                            TextWrapping="Wrap"
@@ -183,7 +187,7 @@
 
                     <!-- Ports -->
                     <StackPanel Spacing="10">
-                        <TextBlock Classes="section-label" Text="PORT MAPPINGS"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.PortMappings}"/>
 
                         <ItemsControl ItemsSource="{Binding PortMappings}">
                             <ItemsControl.ItemTemplate>
@@ -192,7 +196,7 @@
                                           Margin="0,0,0,6">
                                         <TextBox Grid.Column="0"
                                                  Text="{Binding HostPort}"
-                                                 PlaceholderText="Host port"
+                                                 PlaceholderText="{x:Static resx:UiStrings.HostPort}"
                                                  FontSize="12"/>
                                         <TextBlock Grid.Column="1"
                                                    Text="→"
@@ -201,7 +205,7 @@
                                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                         <TextBox Grid.Column="2"
                                                  Text="{Binding ContainerPort}"
-                                                 PlaceholderText="Container port"
+                                                 PlaceholderText="{x:Static resx:UiStrings.ContainerPort}"
                                                  FontSize="12"/>
                                         <ComboBox Grid.Column="4"
                                                   ItemsSource="{x:Static vm:PortMappingItem.Protocols}"
@@ -212,7 +216,7 @@
                                                 Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.RemovePortCommand}"
                                                 CommandParameter="{Binding}"
-                                                ToolTip.Tip="Remove">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Remove}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconClose}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -229,7 +233,7 @@
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconNewContainer}"
                                       Stroke="{Binding $parent[Button].Foreground}"/>
-                                <TextBlock Text="Add Port" FontSize="12"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.AddPort}" FontSize="12"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -238,7 +242,7 @@
 
                     <!-- Volumes -->
                     <StackPanel Spacing="10">
-                        <TextBlock Classes="section-label" Text="VOLUME MOUNTS"/>
+                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.VolumeMounts}"/>
 
                         <ItemsControl ItemsSource="{Binding Volumes}">
                             <ItemsControl.ItemTemplate>
@@ -254,7 +258,7 @@
                                                 Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.PickFolderCommand}"
                                                 CommandParameter="{Binding}"
-                                                ToolTip.Tip="Browse…"
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Browse}"
                                                 Padding="4">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconVolumes}"
@@ -271,15 +275,15 @@
                                                  FontSize="12"/>
                                         <CheckBox Grid.Column="6"
                                                   IsChecked="{Binding ReadOnly}"
-                                                  Content="Read only"
+                                                  Content="{x:Static resx:UiStrings.ReadOnly}"
                                                   FontSize="11"
-                                                  ToolTip.Tip="Mount this volume without write access"
+                                                  ToolTip.Tip="{x:Static resx:UiStrings.ReadOnlyDescription}"
                                                   VerticalAlignment="Center"/>
                                         <Button Grid.Column="8"
                                                 Theme="{StaticResource ActionButtonTheme}"
                                                 Command="{Binding $parent[UserControl].DataContext.RemoveVolumeCommand}"
                                                 CommandParameter="{Binding}"
-                                                ToolTip.Tip="Remove">
+                                                ToolTip.Tip="{x:Static resx:UiStrings.Remove}">
                                             <Path Classes="icon icon-sm"
                                                   Data="{StaticResource IconClose}"
                                                   Stroke="{Binding $parent[Button].Foreground}"/>
@@ -296,7 +300,7 @@
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconNewContainer}"
                                       Stroke="{Binding $parent[Button].Foreground}"/>
-                                <TextBlock Text="Add Volume" FontSize="12"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.AddVolume}" FontSize="12"/>
                             </StackPanel>
                         </Button>
                     </StackPanel>
@@ -304,7 +308,7 @@
 
                 <!-- ── Step 4: Environment ────────────────────────────── -->
                 <StackPanel IsVisible="{Binding IsStep4}" Spacing="10" MaxWidth="520">
-                    <TextBlock Classes="section-label" Text="ENVIRONMENT VARIABLES"/>
+                    <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.EnvironmentVariables}"/>
 
                     <ItemsControl ItemsSource="{Binding EnvironmentVariables}">
                         <ItemsControl.ItemTemplate>
@@ -331,7 +335,7 @@
                                             Theme="{StaticResource ActionButtonTheme}"
                                             Command="{Binding $parent[UserControl].DataContext.RemoveEnvVarCommand}"
                                             CommandParameter="{Binding}"
-                                            ToolTip.Tip="Remove">
+                                            ToolTip.Tip="{x:Static resx:UiStrings.Remove}">
                                         <Path Classes="icon icon-sm"
                                               Data="{StaticResource IconClose}"
                                               Stroke="{Binding $parent[Button].Foreground}"/>
@@ -348,7 +352,7 @@
                             <Path Classes="icon icon-sm"
                                   Data="{StaticResource IconNewContainer}"
                                   Stroke="{Binding $parent[Button].Foreground}"/>
-                            <TextBlock Text="Add Variable" FontSize="12"/>
+                            <TextBlock Text="{x:Static resx:UiStrings.AddVariable}" FontSize="12"/>
                         </StackPanel>
                     </Button>
                 </StackPanel>
@@ -360,39 +364,39 @@
                             Padding="16">
                         <StackPanel Spacing="10">
                             <Grid ColumnDefinitions="120,*">
-                                <TextBlock Text="Image" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.Image}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding ImageReference}"
                                            FontSize="13" FontWeight="Medium" TextWrapping="Wrap"/>
                             </Grid>
                             <Grid ColumnDefinitions="120,*">
-                                <TextBlock Text="Name" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.Name}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding ContainerName}"
                                            FontSize="13"/>
                             </Grid>
                             <Grid ColumnDefinitions="120,*">
-                                <TextBlock Text="Architecture" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.Architecture}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Architecture}"
                                            FontSize="13"/>
                             </Grid>
                             <Grid ColumnDefinitions="120,*" IsVisible="{Binding EnableRosetta}">
-                                <TextBlock Text="Rosetta" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.Rosetta}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
-                                <TextBlock Grid.Column="1" Text="Enabled"
+                                <TextBlock Grid.Column="1" Text="{x:Static resx:UiStrings.Enabled}"
                                            FontSize="13"
                                            Foreground="{DynamicResource FloatAccentBrush}"/>
                             </Grid>
                             <Grid ColumnDefinitions="120,*"
                                   IsVisible="{Binding CpuCount, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                <TextBlock Text="CPU Cores" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.CpuCores}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding CpuCount}" FontSize="13"/>
                             </Grid>
                             <Grid ColumnDefinitions="120,*"
                                   IsVisible="{Binding Memory, Converter={x:Static StringConverters.IsNotNullOrEmpty}}">
-                                <TextBlock Text="Memory" FontSize="12"
+                                <TextBlock Text="{x:Static resx:UiStrings.Memory}" FontSize="12"
                                            Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                                 <TextBlock Grid.Column="1" Text="{Binding Memory}" FontSize="13"/>
                             </Grid>
@@ -400,7 +404,7 @@
                     </Border>
 
                     <StackPanel Spacing="6">
-                        <TextBlock Text="Command (Edit if needed)" FontSize="12"
+                        <TextBlock Text="{x:Static resx:UiStrings.CommandEditIfNeeded}" FontSize="12"
                                    Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
                         <TextBox Text="{Binding GeneratedCommand}"
                                  FontFamily="Menlo,Cascadia Code,Consolas,monospace"
@@ -440,7 +444,7 @@
                             CornerRadius="8"
                             Padding="14,12">
                         <StackPanel Spacing="4">
-                            <TextBlock Text="Creation failed"
+                            <TextBlock Text="{x:Static resx:UiStrings.CreationFailed}"
                                        FontWeight="SemiBold"
                                        FontSize="13"
                                        Foreground="{DynamicResource StatusErrorBrush}"/>
@@ -462,7 +466,7 @@
                                        FontWeight="SemiBold"
                                        Foreground="{DynamicResource StatusRunningBrush}"
                                        VerticalAlignment="Center"/>
-                            <TextBlock Text="Container created successfully."
+                            <TextBlock Text="{x:Static resx:UiStrings.ContainerCreatedSuccessfully}"
                                        FontSize="13"
                                        Foreground="{DynamicResource StatusRunningBrush}"
                                        VerticalAlignment="Center"/>
@@ -485,14 +489,14 @@
                 <!-- Cancel (step 1) -->
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Cancel"
+                        Content="{x:Static resx:UiStrings.Cancel}"
                         Command="{Binding CancelCommand}"
                         IsVisible="{Binding IsStep1}"/>
 
                 <!-- Back (steps 2-5) -->
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="← Back"
+                        Content="{x:Static resx:UiStrings.Back}"
                         Command="{Binding BackCommand}"
                         IsVisible="{Binding IsStep1, Converter={x:Static BoolConverters.Not}}">
                     <!-- hidden on step 6 too -->
@@ -507,7 +511,7 @@
                 <!-- Continue (steps 1-4) -->
                 <Button Grid.Column="4"
                         Theme="{StaticResource PrimaryButtonTheme}"
-                        Content="Continue →"
+                        Content="{x:Static resx:UiStrings.Continue}"
                         Command="{Binding NextCommand}"
                         IsEnabled="{Binding CanGoNext}"
                         IsVisible="{Binding IsStep5, Converter={x:Static BoolConverters.Not}}">
@@ -524,7 +528,7 @@
                         Theme="{StaticResource PrimaryButtonTheme}"
                         Command="{Binding CreateContainerCommand}"
                         IsVisible="{Binding IsStep5}">
-                    <TextBlock Text="Create Container"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.CreateContainer}"/>
                 </Button>
 
                 <!-- ── Creating screen footer (step 6) ── -->
@@ -532,28 +536,28 @@
                 <!-- Cancel while in progress -->
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Cancel"
+                        Content="{x:Static resx:UiStrings.Cancel}"
                         Command="{Binding CancelCommand}"
                         IsVisible="{Binding IsCreating}"/>
 
                 <!-- After error: retry -->
                 <Button Grid.Column="2"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Retry"
+                        Content="{x:Static resx:UiStrings.Retry}"
                         Command="{Binding CreateContainerCommand}"
                         IsVisible="{Binding HasError}"/>
 
                 <!-- After success: Create Another -->
                 <Button Grid.Column="2"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Create Another"
+                        Content="{x:Static resx:UiStrings.CreateAnother}"
                         Command="{Binding CreateAnotherCommand}"
                         IsVisible="{Binding IsComplete}"/>
 
                 <!-- After success or error: Done → back to dashboard -->
                 <Button Grid.Column="4"
                         Theme="{StaticResource PrimaryButtonTheme}"
-                        Content="Done"
+                        Content="{x:Static resx:UiStrings.Done}"
                         Command="{Binding DoneCommand}"
                         IsVisible="{Binding IsStep6}">
                     <Button.IsVisible>

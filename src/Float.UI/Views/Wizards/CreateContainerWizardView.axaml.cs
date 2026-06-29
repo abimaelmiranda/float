@@ -1,5 +1,6 @@
 using Avalonia.Controls;
 using Avalonia.Platform.Storage;
+using Float.UI.Resources;
 using Float.UI.ViewModels.Wizards;
 
 namespace Float.UI.Views.Wizards;
@@ -32,7 +33,7 @@ public partial class CreateContainerWizardView : UserControl
 
         var results = await topLevel.StorageProvider.OpenFolderPickerAsync(new FolderPickerOpenOptions
         {
-            Title = "Select Host Directory",
+            Title = UiStrings.Get("SelectHostDirectory"),
             AllowMultiple = false,
         });
 

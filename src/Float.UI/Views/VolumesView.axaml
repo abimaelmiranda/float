@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels"
              xmlns:shared="using:Float.UI.Views.Shared"
+             xmlns:resx="using:Float.UI.Resources"
              x:Name="Root"
              x:Class="Float.UI.Views.VolumesView"
              x:DataType="vm:VolumesViewModel">
@@ -12,7 +13,7 @@
                     Padding="20,52,20,12">
                 <StackPanel Spacing="10">
                     <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
-                        <TextBlock Text="Volumes"
+                        <TextBlock Text="{x:Static resx:UiStrings.Volumes}"
                                    FontSize="20"
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
@@ -23,7 +24,7 @@
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconRefresh}"
                                       Stroke="{Binding $parent[Button].Foreground}"/>
-                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.Refresh}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                         <Button Grid.Column="2"
@@ -33,7 +34,7 @@
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconVolumes}"
                                       Stroke="{Binding $parent[Button].Foreground}"/>
-                                <TextBlock Text="Create Volume" VerticalAlignment="Center"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.CreateVolume}" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -107,7 +108,7 @@
                                     <Button Grid.Column="1"
                                             Theme="{StaticResource ActionButtonTheme}"
                                             Command="{Binding DataContext.CloseDetailCommand, ElementName=Root}"
-                                            ToolTip.Tip="Close">
+                                            ToolTip.Tip="{x:Static resx:UiStrings.Close}">
                                         <Path Classes="icon icon-sm"
                                               Data="{StaticResource IconClose}"
                                               Stroke="{Binding $parent[Button].Foreground}"/>
@@ -118,50 +119,50 @@
                             <ScrollViewer Padding="16,0,16,16">
                                 <StackPanel Spacing="20">
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="NAME"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Name}"/>
                                         <TextBlock Text="{Binding Name}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="TYPE"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Type}"/>
                                         <TextBlock Text="{Binding Kind}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="DRIVER"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Driver}"/>
                                         <TextBlock Text="{Binding Driver}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="SIZE"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Size}"/>
                                         <TextBlock Text="{Binding Size}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="FORMAT"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Format}"/>
                                         <TextBlock Text="{Binding Format}"
                                                    FontSize="13"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="SOURCE"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Source}"/>
                                         <TextBlock Text="{Binding SourcePath}"
                                                    FontSize="13"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
 
                                     <StackPanel Spacing="8">
-                                        <TextBlock Classes="section-label" Text="ACTIONS"/>
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Actions}"/>
                                         <Button Theme="{StaticResource DangerButtonTheme}"
                                                 Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
                                                 CommandParameter="{Binding}"
                                                 HorizontalAlignment="Left">
-                                            <TextBlock Text="Delete Volume"/>
+                                            <TextBlock Text="{x:Static resx:UiStrings.DeleteVolume}"/>
                                         </Button>
                                     </StackPanel>
                                 </StackPanel>
@@ -172,6 +173,6 @@
             </ContentControl>
         </Border>
 
-        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="Delete volume"/>
+        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="{x:Static resx:UiStrings.DeleteVolumeTitle}"/>
     </Grid>
 </UserControl>

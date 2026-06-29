@@ -2,6 +2,7 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Float.UI.App"
              xmlns:local="using:Float.UI"
+             xmlns:resx="using:Float.UI.Resources"
              RequestedThemeVariant="Default"
              Name="Float">
 
@@ -28,11 +29,11 @@
             <NativeMenuItem Header="Float">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="About Float"  Click="OnAboutClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.AboutFloat}"  Click="OnAboutClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Preferences…" Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Preferences}" Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Quit Float"   Click="OnQuitClick"     Gesture="Ctrl+Q"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.QuitFloat}"   Click="OnQuitClick"     Gesture="Ctrl+Q"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -47,14 +48,14 @@
                       Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Show Float" Click="OnShowFloatClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.ShowFloat}" Click="OnShowFloatClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Start Engine" Click="OnStartEngineClick"/>
-                        <NativeMenuItem Header="Stop Engine"  Click="OnStopEngineClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.StartEngine}" Click="OnStartEngineClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.StopEngine}"  Click="OnStopEngineClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Preferences…" Click="OnSettingsClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Preferences}" Click="OnSettingsClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Quit Float" Click="OnQuitClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.QuitFloat}" Click="OnQuitClick"/>
                     </NativeMenu>
                 </TrayIcon.Menu>
             </TrayIcon>
