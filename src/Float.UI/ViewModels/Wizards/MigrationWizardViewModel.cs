@@ -467,8 +467,12 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
             var exportedVolumes = await ExportNamedVolumesAsync(item, progress).ConfigureAwait(false);
 
+            var exportedPaths = exportedVolumes.Select(v => v.ContainerPath).ToArray();
             var allVolumes = item.Source.Volumes
                 .Where(v => !v.IsNamedVolume)
+                .Where(v => !exportedPaths.Any(ep =>
+                    v.ContainerPath == ep ||
+                    v.ContainerPath.StartsWith(ep + "/", StringComparison.Ordinal)))
                 .Concat(exportedVolumes)
                 .ToArray();
 
