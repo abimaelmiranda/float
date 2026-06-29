@@ -63,7 +63,7 @@ public class DockerReader : IContainerReader
         var output = new StringBuilder();
         var errors = new StringBuilder();
         var result = await _processHost.RunWithResultAsync(
-            "docker",
+            "/usr/local/bin/docker",
             args,
             workingDirectory: null,
             onOutput: line => output.AppendLine(line),
@@ -90,7 +90,7 @@ public class DockerReader : IContainerReader
 
         var errors = new StringBuilder();
         var result = await _processHost.RunWithResultAsync(
-            "docker",
+            "/usr/local/bin/docker",
             args,
             workingDirectory: null,
             onOutput: line => output.AppendLine(line),
@@ -149,7 +149,7 @@ public class DockerReader : IContainerReader
         var output = new StringBuilder();
         var errors = new StringBuilder();
         var result = await _processHost.RunWithResultAsync(
-            "docker",
+            "/usr/local/bin/docker",
             ["image", "inspect", imageRef],
             workingDirectory: null,
             onOutput: line => output.AppendLine(line),

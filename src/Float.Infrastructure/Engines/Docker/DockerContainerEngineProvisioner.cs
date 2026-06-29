@@ -20,7 +20,7 @@ public class DockerContainerEngineProvisioner : IEngineProvisioner
 
     public async Task<bool> IsEngineInstalled()
     {
-        var result = await _processHost.RunWithResultAsync("docker",
+        var result = await _processHost.RunWithResultAsync("/usr/local/bin/docker",
             "-v", workingDirectory:
             null, onOutput: _ => { }, onError: _ => { });
 
@@ -29,7 +29,7 @@ public class DockerContainerEngineProvisioner : IEngineProvisioner
 
     public async Task<bool> IsEngineRunningAsync(CancellationToken cancellationToken = default)
     {
-        var result = await _processHost.RunWithResultAsync("docker",
+        var result = await _processHost.RunWithResultAsync("/usr/local/bin/docker",
             "info", workingDirectory:
             null, onOutput: _ => { }, onError: _ => { });
 

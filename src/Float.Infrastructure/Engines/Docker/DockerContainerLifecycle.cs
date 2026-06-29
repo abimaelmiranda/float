@@ -52,7 +52,7 @@ public sealed class DockerContainerLifecycle : IContainerLifecycle
 
         progress?.Report($"$ docker {command} {QuoteArgument(container.Name)}");
         var result = await _processHost.RunWithResultAsync(
-            "docker",
+            "/usr/local/bin/docker",
             [command, container.Name],
             workingDirectory: null,
             onOutput: line => progress?.Report(line),
