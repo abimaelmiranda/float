@@ -14,4 +14,13 @@ public class FileSystemService : IFileSystemService
         Directory.CreateDirectory(dir);
         return dir;
     }
+
+    public string GetFloatVolumesDir()
+    {
+        var dir = Path.Combine(
+            Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
+            ".float", "volumes");
+        Directory.CreateDirectory(dir);
+        return dir;
+    }
 }
