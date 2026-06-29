@@ -1,4 +1,6 @@
 using System.Collections.ObjectModel;
+using System.IO;
+using System.Text;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
@@ -16,6 +18,8 @@ public partial class MigrationWizardViewModel : ViewModelBase
     private readonly IContainerCreator _appleCreator;
     private readonly IContainerLifecycle _appleLifecycle;
     private readonly IContainerLifecycle _dockerLifecycle;
+    private readonly IProcessHost _processHost;
+    private readonly IFileSystemService _fileSystemService;
     private bool _hasLoaded;
     private CancellationTokenSource? _loadCts;
 
@@ -86,12 +90,16 @@ public partial class MigrationWizardViewModel : ViewModelBase
         [FromKeyedServices(ContainerEngine.Docker)] IContainerReader dockerReader,
         [FromKeyedServices(ContainerEngine.AppleContainers)] IContainerCreator appleCreator,
         [FromKeyedServices(ContainerEngine.AppleContainers)] IContainerLifecycle appleLifecycle,
-        [FromKeyedServices(ContainerEngine.Docker)] IContainerLifecycle dockerLifecycle)
+        [FromKeyedServices(ContainerEngine.Docker)] IContainerLifecycle dockerLifecycle,
+        IProcessHost processHost,
+        IFileSystemService fileSystemService)
     {
         _dockerReader = dockerReader;
         _appleCreator = appleCreator;
         _appleLifecycle = appleLifecycle;
         _dockerLifecycle = dockerLifecycle;
+        _processHost = processHost;
+        _fileSystemService = fileSystemService;
     }
 
     public async Task StartNewRunAsync()
@@ -446,7 +454,25 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
         try
         {
-            var createRequest = BuildCreateRequest(item);
+            // Stop Docker before export when there are named/anonymous volumes (data consistency)
+            var hasNamedVolumes = item.Source.Volumes.Any(v => v.IsNamedVolume);
+            if (dockerWasRunning && hasNamedVolumes)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = UiStrings.Get("StoppingDockerOriginal"));
+                var stopResult = await _dockerLifecycle.StopAsync(item.Source, progress: progress).ConfigureAwait(false);
+                if (stopResult.IsFailure)
+                    throw new InvalidOperationException(stopResult.Failure.Message ?? UiStrings.Get("FailedStopDockerContainer"));
+                dockerStopped = true;
+            }
+
+            var exportedVolumes = await ExportNamedVolumesAsync(item, progress).ConfigureAwait(false);
+
+            var allVolumes = item.Source.Volumes
+                .Where(v => !v.IsNamedVolume)
+                .Concat(exportedVolumes)
+                .ToArray();
+
+            var createRequest = BuildCreateRequest(item, allVolumes);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -459,7 +485,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
             if (createResult.IsFailure)
                 throw new InvalidOperationException(createResult.Failure.Message ?? UiStrings.Get("ContainerCreationFailed"));
 
-            if (dockerWasRunning)
+            if (dockerWasRunning && !dockerStopped)
             {
                 await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = UiStrings.Get("StoppingDockerOriginal"));
                 var stopResult = await _dockerLifecycle.StopAsync(item.Source, progress: progress).ConfigureAwait(false);
@@ -504,6 +530,43 @@ public partial class MigrationWizardViewModel : ViewModelBase
         }
     }
 
+    private async Task<ContainerVolume[]> ExportNamedVolumesAsync(
+        MigrationContainerItemViewModel item,
+        IProgress<string> progress)
+    {
+        var namedVolumes = item.Source.Volumes.Where(v => v.IsNamedVolume).ToArray();
+        if (namedVolumes.Length == 0)
+            return [];
+
+        var result = new List<ContainerVolume>(namedVolumes.Length);
+        var volumesBase = Path.Combine(_fileSystemService.GetFloatVolumesDir(), item.Source.Name!);
+
+        for (var i = 0; i < namedVolumes.Length; i++)
+        {
+            var vol = namedVolumes[i];
+            var hostDest = Path.Combine(volumesBase, i.ToString());
+            Directory.CreateDirectory(hostDest);
+
+            progress.Report(string.Format(UiStrings.Get("ExportingVolumeFormat"), i + 1, namedVolumes.Length));
+
+            var errors = new StringBuilder();
+            var runResult = await _processHost.RunWithResultAsync(
+                "/usr/local/bin/docker",
+                ["cp", $"{item.Source.Name}:{vol.ContainerPath}/.", hostDest],
+                null,
+                onOutput: line => progress.Report(line),
+                onError: line => errors.AppendLine(line)).ConfigureAwait(false);
+
+            if (runResult.IsFailure)
+                throw new InvalidOperationException(
+                    string.Format(UiStrings.Get("VolumeExportFailed"), errors.ToString().Trim()));
+
+            result.Add(vol with { HostPath = hostDest, IsNamedVolume = false });
+        }
+
+        return [.. result];
+    }
+
     private async Task<string> RollbackAsync(
         Container appleContainer,
         Container dockerContainer,
@@ -537,18 +600,15 @@ public partial class MigrationWizardViewModel : ViewModelBase
     private static IProgress<string> CreateItemProgress(MigrationContainerItemViewModel item)
         => new Progress<string>(item.AppendLogLine);
 
-    private static ContainerCreateRequest BuildCreateRequest(MigrationContainerItemViewModel item)
+    private static ContainerCreateRequest BuildCreateRequest(
+        MigrationContainerItemViewModel item,
+        ContainerVolume[] volumes)
     {
         var source = item.Source;
         var architecture = item.EffectiveArchitecture;
         if (architecture is null)
             throw new InvalidOperationException(
                 string.Format(UiStrings.Get("CouldNotDetectDockerArchitectureFormat"), source.Name));
-
-        // TODO: export Docker named volume data to host path before migration.
-        var bindMounts = source.Volumes
-            .Where(volume => !volume.IsNamedVolume)
-            .ToArray();
 
         return new ContainerCreateRequest
         {
@@ -558,7 +618,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
             EnableRosetta = architecture == ContainerArchitecture.Amd64,
             StartImmediately = false,
             Ports = source.Ports,
-            Volumes = bindMounts,
+            Volumes = volumes,
             EnvironmentVariables = source.EnvironmentVariables
         };
     }
