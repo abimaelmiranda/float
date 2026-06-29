@@ -25,7 +25,7 @@ public partial class RegistryItemViewModel : ViewModelBase
     private void RequestLogout() => RequestLogoutAction?.Invoke(this);
 }
 
-public partial class RegistriesViewModel : ViewModelBase
+public partial class RegistriesViewModel : ViewModelBase, IHasError
 {
     private readonly IRegistryService _registryService;
 

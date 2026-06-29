@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI.ViewModels;
 
-public partial class ImagesViewModel : ViewModelBase
+public partial class ImagesViewModel : ViewModelBase, IHasError, IHasPendingDelete
 {
     private readonly IContainerReader _containerReader;
     private readonly IContainerImageLifecycle _imageLifecycle;

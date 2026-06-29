@@ -12,7 +12,7 @@ using Float.Core.Models.Results;
 
 namespace Float.UI.ViewModels;
 
-public partial class DashboardViewModel : ViewModelBase
+public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingDelete
 {
     private readonly IContainerReader _containerReader;
     private readonly IContainerLifecycle _containerLifecycle;

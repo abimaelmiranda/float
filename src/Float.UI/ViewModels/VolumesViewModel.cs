@@ -9,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI.ViewModels;
 
-public partial class VolumesViewModel : ViewModelBase
+public partial class VolumesViewModel : ViewModelBase, IHasError, IHasPendingDelete
 {
     private readonly IContainerReader _containerReader;
     private readonly IContainerVolumeLifecycle _volumeLifecycle;

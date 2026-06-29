@@ -11,7 +11,7 @@ using Float.Core.Models;
 
 namespace Float.UI.ViewModels.Wizards;
 
-public partial class CreateVolumeWizardViewModel : ViewModelBase
+public partial class CreateVolumeWizardViewModel : ViewModelBase, IHasError
 {
     private readonly IContainerVolumeCreator _creator;
     private CancellationTokenSource? _cts;
