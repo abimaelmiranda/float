@@ -179,4 +179,6 @@ public static class UiStrings
     public static string VolumeDescription => Get(nameof(VolumeDescription));
     public static string VolumeMounts => Get(nameof(VolumeMounts));
     public static string Volumes => Get(nameof(Volumes));
+    public static string ExportingVolumeFormat => Get(nameof(ExportingVolumeFormat));
+    public static string VolumeExportFailed => Get(nameof(VolumeExportFailed));
 }

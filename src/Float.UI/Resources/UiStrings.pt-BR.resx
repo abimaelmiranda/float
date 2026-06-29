@@ -111,6 +111,8 @@
   <data name="UsernamePlaceholder" xml:space="preserve"><value>Usuário</value></data>
   <data name="VolumeName" xml:space="preserve"><value>Nome do volume</value></data>
   <data name="Volumes" xml:space="preserve"><value>Volumes</value></data>
+  <data name="ExportingVolumeFormat" xml:space="preserve"><value>Exportando volume {0} de {1}...</value></data>
+  <data name="VolumeExportFailed" xml:space="preserve"><value>Falha ao exportar volume: {0}</value></data>
   <data name="Amd64Emulation" xml:space="preserve"><value>Emulação AMD64</value></data>
   <data name="AddPort" xml:space="preserve"><value>Adicionar porta</value></data>
   <data name="AddVariable" xml:space="preserve"><value>Adicionar variável</value></data>
