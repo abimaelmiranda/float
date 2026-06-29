@@ -24,6 +24,7 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IContainerVolumeLifecycle, AppleContainerVolumeLifecycle>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerImageLifecycle, AppleContainerImageLifecycle>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerLifecycle, AppleContainerLifecycle>(ContainerEngine.AppleContainers);
+        services.AddSingleton<IContainerLogReader, AppleContainerLogReader>();
 
         services.AddKeyedSingleton<IEngineProvisioner, DockerContainerEngineProvisioner>(ContainerEngine.Docker);
         services.AddKeyedSingleton<IContainerReader, DockerReader>(ContainerEngine.Docker);
