@@ -3,6 +3,7 @@ namespace Float.Core.Enums;
 public enum ContainerVolumeJournalMode
 {
     Default,
-    Enabled,
-    Disabled,
+    Ordered,
+    Writeback,
+    Journal,
 }

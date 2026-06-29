@@ -36,8 +36,9 @@ public partial class CreateVolumeWizardViewModel : ViewModelBase
     public ContainerVolumeJournalMode[] JournalModeOptions { get; } =
     [
         ContainerVolumeJournalMode.Default,
-        ContainerVolumeJournalMode.Enabled,
-        ContainerVolumeJournalMode.Disabled,
+        ContainerVolumeJournalMode.Ordered,
+        ContainerVolumeJournalMode.Writeback,
+        ContainerVolumeJournalMode.Journal,
     ];
 
     public ContainerVolumeSizeUnit[] SizeUnitOptions { get; } =
@@ -51,7 +52,7 @@ public partial class CreateVolumeWizardViewModel : ViewModelBase
 
     public bool IsDetailsStep => CurrentStep == 1;
     public bool IsCreatingStep => CurrentStep == 2;
-    public bool IsJournalSizeVisible => JournalMode == ContainerVolumeJournalMode.Enabled;
+    public bool IsJournalSizeVisible => JournalMode != ContainerVolumeJournalMode.Default;
     public bool HasVolumeSizeWarning => GetRequestedBytes(VolumeSizeValue, VolumeSizeUnit) is { } requested
                                         && _availableDiskBytes is { } available
                                         && requested > available;

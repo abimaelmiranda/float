@@ -38,8 +38,15 @@ public class AppleContainerVolumeCreator : IContainerVolumeCreator
 
         if (request.JournalMode != ContainerVolumeJournalMode.Default)
         {
-            var journal = request.JournalMode == ContainerVolumeJournalMode.Enabled ? "enabled" : "disabled";
-            if (request.JournalMode == ContainerVolumeJournalMode.Enabled && request.JournalSizeValue is not null)
+            var journal = request.JournalMode switch
+            {
+                ContainerVolumeJournalMode.Ordered => "ordered",
+                ContainerVolumeJournalMode.Writeback => "writeback",
+                ContainerVolumeJournalMode.Journal => "journal",
+                _ => "ordered",
+            };
+
+            if (request.JournalSizeValue is not null)
             {
                 if (request.JournalSizeValue <= 0)
                     return Result.WithFailure<string>(DomainErrors.Validation("Journal size must be greater than zero."));
@@ -67,5 +74,13 @@ public class AppleContainerVolumeCreator : IContainerVolumeCreator
     }
 
     private static string FormatSize(decimal value, ContainerVolumeSizeUnit unit)
-        => value.ToString("0.########", CultureInfo.InvariantCulture) + unit;
+        => value.ToString("0.########", CultureInfo.InvariantCulture) + unit switch
+        {
+            ContainerVolumeSizeUnit.B => "",
+            ContainerVolumeSizeUnit.KB => "K",
+            ContainerVolumeSizeUnit.MB => "M",
+            ContainerVolumeSizeUnit.GB => "G",
+            ContainerVolumeSizeUnit.TB => "T",
+            _ => "",
+        };
 }
