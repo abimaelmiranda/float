@@ -1,0 +1,41 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Class="Float.UI.Views.Shared.ConfirmDeleteDialog"
+             x:CompileBindings="False"
+             x:Name="Self">
+
+    <Border Background="#99000000"
+            IsVisible="{Binding HasPendingDelete}">
+        <Border Width="380"
+                Padding="18"
+                CornerRadius="10"
+                HorizontalAlignment="Center"
+                VerticalAlignment="Center"
+                Background="{DynamicResource FloatCardBackgroundBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="1">
+            <StackPanel Spacing="12">
+                <TextBlock Text="{Binding #Self.Title}"
+                           FontSize="15"
+                           FontWeight="SemiBold"/>
+                <TextBlock FontSize="13"
+                           TextWrapping="Wrap">
+                    Are you sure you want to delete
+                    <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
+                    This action cannot be undone.
+                </TextBlock>
+                <StackPanel Orientation="Horizontal"
+                            Spacing="8"
+                            HorizontalAlignment="Right">
+                    <Button Theme="{StaticResource ActionButtonTheme}"
+                            Content="Cancel"
+                            Command="{Binding CancelDeleteCommand}"/>
+                    <Button Theme="{StaticResource DangerButtonTheme}"
+                            Content="Delete"
+                            Command="{Binding ConfirmDeleteCommand}"/>
+                </StackPanel>
+            </StackPanel>
+        </Border>
+    </Border>
+
+</UserControl>
