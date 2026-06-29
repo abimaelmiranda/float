@@ -93,7 +93,9 @@
                     </StackPanel>
                 </Button>
 
-                <Button Theme="{StaticResource NavItemTheme}" IsEnabled="False">
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Classes.active="{Binding ShowingImages}"
+                        Command="{Binding ShowImagesCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
                         <Path Classes="icon icon-sm"
                               Data="{StaticResource IconImages}"

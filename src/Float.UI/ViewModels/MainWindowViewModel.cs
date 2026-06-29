@@ -15,6 +15,7 @@ namespace Float.UI.ViewModels;
 public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly DashboardViewModel _dashboardVm;
+    private readonly ImagesViewModel _imagesVm;
     private readonly MigrationWizardViewModel _migrationVm;
     private readonly CreateContainerWizardViewModel _createContainerVm;
     private readonly IEngineProvisioner _provisioner;
@@ -23,6 +24,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     [ObservableProperty] public partial ViewModelBase CurrentPageViewModel { get; set; }
     [ObservableProperty] public partial bool ShowingContainers { get; set; }
+    [ObservableProperty] public partial bool ShowingImages { get; set; }
     [ObservableProperty] public partial bool ShowingMigration { get; set; }
     [ObservableProperty] public partial bool IsSetupMode { get; set; }
     [ObservableProperty] public partial bool IsEngineRunning { get; set; }
@@ -40,18 +42,21 @@ public partial class MainWindowViewModel : ViewModelBase
     public MainWindowViewModel(
         IEngineProvisioner engineProvisioner,
         DashboardViewModel dashboardVm,
+        ImagesViewModel imagesVm,
         MigrationWizardViewModel migrationVm,
         EngineSetupViewModel engineSetupVm,
         CreateContainerWizardViewModel createContainerVm)
     {
         _provisioner = engineProvisioner;
         _dashboardVm = dashboardVm;
+        _imagesVm = imagesVm;
         _migrationVm = migrationVm;
         _createContainerVm = createContainerVm;
 
         dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
         dashboardVm.OperationFailed += OnDashboardOperationFailed;
         dashboardVm.OperationSucceeded += (_, msg) => ShowNotification("Done", msg);
+        imagesVm.OperationFailed += OnImagesOperationFailed;
         migrationVm.MigrationCompleted += OnMigrationCompleted;
         createContainerVm.ContainerCreated += OnContainerCreated;
         createContainerVm.Cancelled += OnCreateContainerCancelled;
@@ -77,6 +82,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         CurrentPageViewModel = _dashboardVm;
         ShowingContainers = true;
+        ShowingImages = false;
         _ = InitEngineAsync();
     }
 
@@ -123,6 +129,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         IsSetupMode = false;
         ShowingContainers = true;
+        ShowingImages = false;
         CurrentPageViewModel = _dashboardVm;
         _ = InitEngineAsync();
     }
@@ -140,6 +147,11 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnCreateContainerCancelled(object? sender, EventArgs e) => ReturnToDashboard();
 
+    private void OnImagesOperationFailed(object? sender, string message)
+    {
+        ShowNotification("Image refresh failed", message);
+    }
+
     private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
     {
         ReturnToDashboard();
@@ -156,6 +168,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ReturnToDashboard()
     {
         ShowingContainers = true;
+        ShowingImages = false;
         ShowingMigration = false;
         CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
@@ -183,9 +196,21 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ShowContainers()
     {
         ShowingContainers = true;
+        ShowingImages = false;
         ShowingMigration = false;
         CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
+    }
+
+    [RelayCommand]
+    private async Task ShowImagesAsync()
+    {
+        HideNotification();
+        ShowingContainers = false;
+        ShowingImages = true;
+        ShowingMigration = false;
+        CurrentPageViewModel = _imagesVm;
+        await _imagesVm.RefreshAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
@@ -193,6 +218,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         HideNotification();
         ShowingContainers = false;
+        ShowingImages = false;
         ShowingMigration = true;
         CurrentPageViewModel = _migrationVm;
         await _migrationVm.StartNewRunAsync().ConfigureAwait(false);

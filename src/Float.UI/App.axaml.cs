@@ -41,6 +41,7 @@ public partial class App : Application
             services.AddSingleton<IUserNotificationService>(notificationService);
 
             services.AddSingleton<DashboardViewModel>();
+            services.AddSingleton<ImagesViewModel>();
             services.AddSingleton<MigrationWizardViewModel>();
             services.AddSingleton<EngineSetupViewModel>();
             services.AddSingleton<CreateContainerWizardViewModel>();
