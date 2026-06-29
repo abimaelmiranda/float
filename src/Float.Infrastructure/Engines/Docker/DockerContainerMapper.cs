@@ -76,18 +76,9 @@ internal static class DockerContainerMapper
     }
 
     private static ContainerVolume[] MapVolumes(string containerName, DockerInspectContainer src)
-    {
-        var binds = src.HostConfig?.Binds?
-            .Select(bind => ParseBind(containerName, bind))
-            .ToArray();
-
-        if (binds is { Length: > 0 })
-            return binds;
-
-        return src.Mounts?
+        => src.Mounts?
             .Select(mount => MapMount(containerName, mount))
             .ToArray() ?? [];
-    }
 
     private static ContainerVolume MapMount(string containerName, DockerInspectMount mount)
     {
@@ -104,22 +95,6 @@ internal static class DockerContainerMapper
             mount.Name);
     }
 
-    private static ContainerVolume ParseBind(string containerName, string bind)
-    {
-        var parts = bind.Split(':', 3);
-        if (parts.Length < 2)
-            throw new InvalidOperationException($"Docker container '{containerName}' has invalid bind mount '{bind}'.");
-
-        var mode = parts.Length == 3 ? parts[2] : string.Empty;
-        var isNamedVolume = IsLikelyNamedVolume(parts[0]);
-        return new ContainerVolume(
-            isNamedVolume ? parts[0] : NormalizeDockerDesktopPath(parts[0]),
-            parts[1],
-            mode.Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Any(m => m.Equals("ro", StringComparison.OrdinalIgnoreCase)),
-            isNamedVolume,
-            isNamedVolume ? parts[0] : null);
-    }
 
     private static ContainerEnvironment[] MapEnvironment(string containerName, string[]? env)
         => env?
@@ -137,10 +112,6 @@ internal static class DockerContainerMapper
         return name.TrimStart('/');
     }
 
-    private static bool IsLikelyNamedVolume(string source)
-        => !source.StartsWith("/", StringComparison.Ordinal)
-            && !source.StartsWith("~", StringComparison.Ordinal)
-            && !source.Contains('\\', StringComparison.Ordinal);
 
     private static string NormalizeDockerDesktopPath(string path)
     {
