@@ -175,6 +175,21 @@
         </ResourceDictionary>
     </Styles.Resources>
 
+    <!-- ─── Section label (small caps heading in detail panels / forms) ── -->
+    <Style Selector="TextBlock.section-label">
+        <Setter Property="FontSize"      Value="10"/>
+        <Setter Property="FontWeight"    Value="SemiBold"/>
+        <Setter Property="Foreground"    Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="LetterSpacing" Value="1"/>
+    </Style>
+
+    <!-- ─── Footer bar (wizard / setup bottom action bar) ────────────── -->
+    <Style Selector="Border.footer-bar">
+        <Setter Property="Background"      Value="{DynamicResource FloatFooterBackgroundBrush}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource SidebarBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    </Style>
+
     <!-- ─── Console (read-only terminal output) ──────────────────────── -->
     <Style Selector="TextBox.console">
         <Setter Property="Background"       Value="#1C1C1E"/>
