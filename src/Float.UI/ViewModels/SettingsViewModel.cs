@@ -1,7 +1,9 @@
+using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
+using Float.UI.Platform;
 
 namespace Float.UI.ViewModels;
 
@@ -26,6 +28,7 @@ public partial class SettingsViewModel : ViewModelBase
     // Application
     [ObservableProperty] public partial bool CloseToTray { get; set; } = true;
     [ObservableProperty] public partial bool StopEngineOnQuit { get; set; } = true;
+    [ObservableProperty] public partial bool ShowInDock { get; set; }
 
     public string[] RegistryOptions { get; } = ["docker", "ghcr"];
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
@@ -52,7 +55,10 @@ public partial class SettingsViewModel : ViewModelBase
             StopTimeoutSeconds = timeout > 0 ? timeout : 5,
             CloseToTray = CloseToTray,
             StopEngineOnQuit = StopEngineOnQuit,
+            ShowInDock = ShowInDock,
         });
+        if (OperatingSystem.IsMacOS())
+            MacDockHelper.SetShowInDock(ShowInDock);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
@@ -72,5 +78,6 @@ public partial class SettingsViewModel : ViewModelBase
         StopTimeoutSeconds = s.StopTimeoutSeconds.ToString();
         CloseToTray = s.CloseToTray;
         StopEngineOnQuit = s.StopEngineOnQuit;
+        ShowInDock = s.ShowInDock;
     }
 }

@@ -17,4 +17,5 @@ public sealed record AppSettings
     // Application behavior
     public bool CloseToTray { get; init; } = true;
     public bool StopEngineOnQuit { get; init; } = true;
+    public bool ShowInDock { get; init; } = false;
 }

@@ -53,6 +53,8 @@ public partial class App : Application
             ViewLocator.Services = provider;
 
             _settingsService = provider.GetRequiredService<ISettingsService>();
+            if (OperatingSystem.IsMacOS())
+                Platform.MacDockHelper.SetShowInDock(_settingsService.Get().ShowInDock);
             _mainWindowVm = provider.GetRequiredService<MainWindowViewModel>();
             _mainWindow = new MainWindow { DataContext = _mainWindowVm };
             desktop.MainWindow = _mainWindow;

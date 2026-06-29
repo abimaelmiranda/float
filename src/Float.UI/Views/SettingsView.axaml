@@ -159,6 +159,18 @@
                         <CheckBox Grid.Column="1" IsChecked="{Binding StopEngineOnQuit}"/>
                     </Grid>
 
+                    <Border Height="1" Background="{DynamicResource SidebarBorderBrush}"/>
+
+                    <Grid ColumnDefinitions="*,Auto">
+                        <StackPanel Grid.Column="0" Spacing="2">
+                            <TextBlock Text="Show in Dock" FontSize="13" FontWeight="Medium"/>
+                            <TextBlock Text="Show Float in the Dock alongside other apps"
+                                       FontSize="11"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        </StackPanel>
+                        <CheckBox Grid.Column="1" IsChecked="{Binding ShowInDock}"/>
+                    </Grid>
+
                 </StackPanel>
             </Border>
 

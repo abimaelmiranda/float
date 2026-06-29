@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ApplicationManifest Condition="!$(RuntimeIdentifier.StartsWith('osx'))">app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
