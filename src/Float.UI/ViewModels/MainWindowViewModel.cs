@@ -251,6 +251,27 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private async Task StartEngineAsync()
+    {
+        if (IsEngineRunning || IsEngineStarting) return;
+        IsEngineStarting = true;
+        var result = await _provisioner.StartEngineAsync().ConfigureAwait(false);
+        if (result.IsFailure)
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                ShowNotification("Engine start failed", result.Failure.Message ?? "Unknown error"));
+        IsEngineStarting = false;
+        await RefreshEngineStatusAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task StopEngineAsync()
+    {
+        if (!IsEngineRunning) return;
+        await _provisioner.StopEngineAsync().ConfigureAwait(false);
+        await RefreshEngineStatusAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
     private void HideNotification()
     {
         _notificationTimer.Stop();

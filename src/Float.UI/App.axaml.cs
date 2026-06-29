@@ -95,6 +95,12 @@ public partial class App : Application
         _mainWindowVm?.ShowSettingsCommand.Execute(null);
     }
 
+    private void OnStartEngineClick(object? sender, EventArgs e) =>
+        _mainWindowVm?.StartEngineCommand.Execute(null);
+
+    private void OnStopEngineClick(object? sender, EventArgs e) =>
+        _mainWindowVm?.StopEngineCommand.Execute(null);
+
     private void OnQuitClick(object? sender, EventArgs e)
     {
         if (ApplicationLifetime is IClassicDesktopStyleApplicationLifetime desktop)
