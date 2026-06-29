@@ -16,6 +16,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
     private readonly IContainerLifecycle _appleLifecycle;
     private readonly IContainerLifecycle _dockerLifecycle;
     private bool _hasLoaded;
+    private CancellationTokenSource? _loadCts;
 
     public ObservableCollection<MigrationContainerItemViewModel> Containers { get; } = [];
     public ObservableCollection<MigrationContainerItemViewModel> CleanupCandidates { get; } = [];
@@ -94,6 +95,10 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
     public async Task StartNewRunAsync()
     {
+        _loadCts?.Cancel();
+        _loadCts?.Dispose();
+        _loadCts = new CancellationTokenSource();
+
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
             _hasLoaded = false;
@@ -113,21 +118,33 @@ public partial class MigrationWizardViewModel : ViewModelBase
             NotifyCleanupStateChanged();
         });
 
-        await LoadDockerContainersAsync().ConfigureAwait(false);
+        try
+        {
+            await LoadDockerContainersAsync(_loadCts.Token).ConfigureAwait(false);
+        }
+        catch (OperationCanceledException)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
+        }
+    }
+
+    public void CancelLoad()
+    {
+        _loadCts?.Cancel();
     }
 
     [RelayCommand]
-    private async Task LoadDockerContainersAsync()
+    private async Task LoadDockerContainersAsync(CancellationToken cancellationToken)
     {
         if (_hasLoaded)
             return;
 
         _hasLoaded = true;
-        await RefreshAsync().ConfigureAwait(false);
+        await RefreshAsync(cancellationToken).ConfigureAwait(false);
     }
 
     [RelayCommand]
-    private async Task RefreshAsync()
+    private async Task RefreshAsync(CancellationToken cancellationToken = default)
     {
         await Dispatcher.UIThread.InvokeAsync(() =>
         {
@@ -143,7 +160,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 .Select(container => container.Name)
                 .ToHashSet(StringComparer.Ordinal);
 
-            var result = await _dockerReader.ListContainersAsync(includeAll: true).ConfigureAwait(false);
+            var result = await _dockerReader.ListContainersAsync(includeAll: true, cancellationToken).ConfigureAwait(false);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -173,6 +190,12 @@ public partial class MigrationWizardViewModel : ViewModelBase
         }
         catch (Exception ex)
         {
+            if (ex is OperationCanceledException)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() => IsLoading = false);
+                return;
+            }
+
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 Containers.Clear();
