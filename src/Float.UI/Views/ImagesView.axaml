@@ -17,12 +17,12 @@
                                    FontWeight="SemiBold"
                                    VerticalAlignment="Center"/>
                         <Button Grid.Column="1"
-                                Theme="{StaticResource PrimaryButtonTheme}"
+                                Theme="{StaticResource ActionButtonTheme}"
                                 Command="{Binding RefreshImagesCommand}">
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconRefresh}"
-                                      Stroke="White"/>
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
                                 <TextBlock Text="Refresh" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
@@ -163,12 +163,61 @@
                                                    Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
+
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="ACTIONS"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                                Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Left">
+                                            <TextBlock Text="Delete Image"/>
+                                        </Button>
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </DockPanel>
                     </DataTemplate>
                 </ContentControl.ContentTemplate>
             </ContentControl>
+        </Border>
+
+        <Border Grid.ColumnSpan="2"
+                Background="#99000000"
+                IsVisible="{Binding HasPendingDelete}">
+            <Border Width="380"
+                    Padding="18"
+                    CornerRadius="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource FloatCardBackgroundBrush}"
+                    BorderBrush="{DynamicResource SidebarBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Delete image"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+                    <TextBlock FontSize="13"
+                               TextWrapping="Wrap">
+                        Are you sure you want to delete
+                        <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
+                        This action cannot be undone.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8"
+                                HorizontalAlignment="Right">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Content="Cancel"
+                                Command="{Binding CancelDeleteCommand}"/>
+                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                Content="Delete"
+                                Command="{Binding ConfirmDeleteCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Border>
     </Grid>
 </UserControl>

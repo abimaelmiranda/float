@@ -19,6 +19,7 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IContainerCreator, AppleContainerCreator>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerVolumeCreator, AppleContainerVolumeCreator>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerVolumeLifecycle, AppleContainerVolumeLifecycle>(ContainerEngine.AppleContainers);
+        services.AddKeyedSingleton<IContainerImageLifecycle, AppleContainerImageLifecycle>(ContainerEngine.AppleContainers);
         services.AddKeyedSingleton<IContainerLifecycle, AppleContainerLifecycle>(ContainerEngine.AppleContainers);
 
         services.AddKeyedSingleton<IEngineProvisioner, DockerContainerEngineProvisioner>(ContainerEngine.Docker);
@@ -36,6 +37,8 @@ public static class ServiceCollectionExtensions
             sp.GetRequiredKeyedService<IContainerVolumeCreator>(ContainerEngine.AppleContainers));
         services.AddSingleton<IContainerVolumeLifecycle>(sp =>
             sp.GetRequiredKeyedService<IContainerVolumeLifecycle>(ContainerEngine.AppleContainers));
+        services.AddSingleton<IContainerImageLifecycle>(sp =>
+            sp.GetRequiredKeyedService<IContainerImageLifecycle>(ContainerEngine.AppleContainers));
         services.AddSingleton<IContainerLifecycle>(sp =>
             sp.GetRequiredKeyedService<IContainerLifecycle>(ContainerEngine.AppleContainers));
 

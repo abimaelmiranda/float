@@ -13,19 +13,28 @@ namespace Float.UI.ViewModels;
 public partial class ImagesViewModel : ViewModelBase
 {
     private readonly IContainerReader _containerReader;
+    private readonly IContainerImageLifecycle _imageLifecycle;
 
     [ObservableProperty] public partial ImageItemViewModel? SelectedImage { get; set; }
+    [ObservableProperty] public partial ContainerImage? PendingDeleteImage { get; set; }
     [ObservableProperty] public partial bool HasError { get; set; }
     [ObservableProperty] public partial string ErrorMessage { get; set; } = "";
 
     public bool HasSelectedImage => SelectedImage is not null;
+    public bool HasPendingDelete => PendingDeleteImage is not null;
+    public string PendingDeleteName => string.IsNullOrWhiteSpace(PendingDeleteImage?.Tag)
+        ? PendingDeleteImage?.Id ?? ""
+        : PendingDeleteImage.Tag;
     public ObservableCollection<ImageItemViewModel> Images { get; } = [];
 
     public event EventHandler<string>? OperationFailed;
 
-    public ImagesViewModel([FromKeyedServices(ContainerEngine.AppleContainers)] IContainerReader containerReader)
+    public ImagesViewModel(
+        [FromKeyedServices(ContainerEngine.AppleContainers)] IContainerReader containerReader,
+        [FromKeyedServices(ContainerEngine.AppleContainers)] IContainerImageLifecycle imageLifecycle)
     {
         _containerReader = containerReader;
+        _imageLifecycle = imageLifecycle;
     }
 
     partial void OnSelectedImageChanged(ImageItemViewModel? value)
@@ -33,11 +42,53 @@ public partial class ImagesViewModel : ViewModelBase
         OnPropertyChanged(nameof(HasSelectedImage));
     }
 
+    partial void OnPendingDeleteImageChanged(ContainerImage? value)
+    {
+        OnPropertyChanged(nameof(HasPendingDelete));
+        OnPropertyChanged(nameof(PendingDeleteName));
+    }
+
     [RelayCommand]
     private Task RefreshImagesAsync() => RefreshAsync();
 
     [RelayCommand]
     private void CloseDetail() => SelectedImage = null;
+
+    [RelayCommand]
+    private void RequestDelete(ImageItemViewModel? image)
+    {
+        PendingDeleteImage = image?.Source;
+    }
+
+    [RelayCommand]
+    private void CancelDelete()
+    {
+        PendingDeleteImage = null;
+    }
+
+    [RelayCommand]
+    private async Task ConfirmDeleteAsync()
+    {
+        var image = PendingDeleteImage;
+        PendingDeleteImage = null;
+        if (image is null)
+            return;
+
+        var result = await _imageLifecycle.DeleteAsync(image).ConfigureAwait(false);
+        if (result.IsFailure)
+        {
+            await Dispatcher.UIThread.InvokeAsync(() =>
+            {
+                HasError = true;
+                ErrorMessage = result.Failure.Message ?? "Failed to delete image";
+                OperationFailed?.Invoke(this, ErrorMessage);
+            });
+            return;
+        }
+
+        await Dispatcher.UIThread.InvokeAsync(() => SelectedImage = null);
+        await RefreshAsync().ConfigureAwait(false);
+    }
 
     public async Task RefreshAsync()
     {
