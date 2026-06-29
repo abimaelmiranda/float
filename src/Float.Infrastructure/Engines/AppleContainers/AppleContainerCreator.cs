@@ -1,4 +1,5 @@
 using System.Globalization;
+using System.Runtime.InteropServices;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
@@ -56,7 +57,7 @@ public class AppleContainerCreator : IContainerCreator
         }
 
         args.Add("--arch");
-        args.Add(request.Architecture);
+        args.Add(request.Architecture.ToCliValue());
 
         if (request.EnableRosetta)
             args.Add("--rosetta");

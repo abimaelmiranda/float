@@ -1,10 +1,12 @@
+using Float.Core.Enums;
+
 namespace Float.Core.Models;
 
 public sealed record ContainerCreateRequest
 {
     public required string ImageTag { get; init; }
     public string? Name { get; init; }
-    public required string Architecture { get; init; }
+    public required ContainerArchitecture Architecture { get; init; }
     public bool EnableRosetta { get; init; }
     public double? CpuCount { get; init; }
     public string? Memory { get; init; }

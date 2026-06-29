@@ -247,7 +247,8 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         {
             ImageTag = ImageReference,
             Name = string.IsNullOrWhiteSpace(ContainerName) ? null : ContainerName.Trim(),
-            Architecture = Architecture,
+            Architecture = ContainerArchitectureExtensions.ParseContainerArchitectureOrNull(Architecture)
+                ?? throw new InvalidOperationException($"Unsupported architecture '{Architecture}'."),
             EnableRosetta = EnableRosetta,
             CpuCount = double.TryParse(CpuCount, out var cpu) ? cpu : null,
             Memory = string.IsNullOrWhiteSpace(Memory) ? null : Memory.Trim(),

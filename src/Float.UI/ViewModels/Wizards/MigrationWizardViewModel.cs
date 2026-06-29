@@ -143,7 +143,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 .Select(container => container.Name)
                 .ToHashSet(StringComparer.Ordinal);
 
-            var result = await _dockerReader.ListAsync(includeAll: true).ConfigureAwait(false);
+            var result = await _dockerReader.ListContainersAsync(includeAll: true).ConfigureAwait(false);
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
@@ -236,11 +236,12 @@ public partial class MigrationWizardViewModel : ViewModelBase
     [RelayCommand]
     private void ResolveArchitecture(string architecture)
     {
-        if (PendingArchitectureItem is null || !IsSupportedArchitecture(architecture))
+        var parsedArchitecture = ContainerArchitectureExtensions.ParseContainerArchitectureOrNull(architecture);
+        if (PendingArchitectureItem is null || parsedArchitecture is null)
             return;
 
         var item = PendingArchitectureItem;
-        item.ManualArchitecture = architecture.ToLowerInvariant();
+        item.ManualArchitecture = parsedArchitecture.Value.ToDisplayValue();
         item.AppendLogLine("Docker image architecture could not be detected automatically.");
         item.AppendLogLine($"Architecture provided manually: {item.ManualArchitecture}.");
         PendingArchitectureItem = null;
@@ -379,7 +380,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 item.CleanupFailed = false;
                 item.IsCleanupSelected = false;
                 item.ClearLog();
-                if (!IsSupportedArchitecture(item.Source.Architecture) && item.ManualArchitecture is not null)
+                if (item.Source.Architecture is null && item.ManualArchitecture is not null)
                 {
                     item.AppendLogLine("Docker image architecture could not be detected automatically.");
                     item.AppendLogLine($"Architecture provided manually: {item.ManualArchitecture}.");
@@ -516,7 +517,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
     {
         var source = item.Source;
         var architecture = item.EffectiveArchitecture;
-        if (!IsSupportedArchitecture(architecture))
+        if (architecture is null)
             throw new InvalidOperationException(
                 $"Could not detect Docker image architecture for '{source.Name}'. Open the image in Docker Desktop or pull it again, then retry migration.");
 
@@ -529,18 +530,14 @@ public partial class MigrationWizardViewModel : ViewModelBase
         {
             ImageTag = source.Image.Tag,
             Name = source.Name,
-            Architecture = architecture!,
-            EnableRosetta = architecture!.Equals("amd64", StringComparison.OrdinalIgnoreCase),
+            Architecture = architecture.Value,
+            EnableRosetta = architecture == ContainerArchitecture.Amd64,
             StartImmediately = false,
             Ports = source.Ports,
             Volumes = bindMounts,
             EnvironmentVariables = source.EnvironmentVariables
         };
     }
-
-    private static bool IsSupportedArchitecture(string? architecture)
-        => architecture?.Equals("arm64", StringComparison.OrdinalIgnoreCase) == true
-            || architecture?.Equals("amd64", StringComparison.OrdinalIgnoreCase) == true;
 
     private void RebuildCleanupCandidates()
     {

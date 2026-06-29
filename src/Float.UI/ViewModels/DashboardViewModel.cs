@@ -101,7 +101,7 @@ public partial class DashboardViewModel : ViewModelBase
 
     public async Task RefreshAsync()
     {
-        var result = await _containerReader.ListAsync().ConfigureAwait(false);
+        var result = await _containerReader.ListContainersAsync().ConfigureAwait(false);
 
         await Dispatcher.UIThread.InvokeAsync(() =>
         {

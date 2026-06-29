@@ -1,3 +1,5 @@
+using Float.Core.Enums;
+
 namespace Float.Core.Models;
 
 public sealed record Container
@@ -6,7 +8,7 @@ public sealed record Container
 
     public required ContainerImage Image { get; init; }
 
-    public string? Architecture { get; init; }
+    public ContainerArchitecture? Architecture { get; init; }
 
     public IReadOnlyList<ContainerEnvironment> EnvironmentVariables { get; init; } = [];
 

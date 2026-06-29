@@ -14,9 +14,10 @@ public partial class MigrationContainerItemViewModel : ObservableObject
     public string StatusLabel { get; }
     public string PortSummary { get; }
     public string VolumeSummary { get; }
-    public string ArchitectureLabel => EffectiveArchitecture ?? "Architecture not detected";
-    public string? EffectiveArchitecture => ManualArchitecture ?? Source.Architecture;
-    public bool NeedsArchitectureSelection => IsSelected && !HasSupportedArchitecture(EffectiveArchitecture);
+    public string ArchitectureLabel => EffectiveArchitecture?.ToDisplayValue() ?? "Architecture not detected";
+    public ContainerArchitecture? EffectiveArchitecture
+        => ContainerArchitectureExtensions.ParseContainerArchitectureOrNull(ManualArchitecture) ?? Source.Architecture;
+    public bool NeedsArchitectureSelection => IsSelected && EffectiveArchitecture is null;
     public bool HasNamedVolumes => Source.Volumes.Any(volume => volume.IsNamedVolume);
     public bool IsRunning => Source.Instance?.Status == ContainerStatus.Running;
     public bool CanCleanup => MigrationSucceeded;
@@ -143,7 +144,4 @@ public partial class MigrationContainerItemViewModel : ObservableObject
         OnPropertyChanged(nameof(HasLog));
     }
 
-    private static bool HasSupportedArchitecture(string? architecture)
-        => architecture?.Equals("arm64", StringComparison.OrdinalIgnoreCase) == true
-            || architecture?.Equals("amd64", StringComparison.OrdinalIgnoreCase) == true;
 }
