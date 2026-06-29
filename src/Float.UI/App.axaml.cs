@@ -42,9 +42,11 @@ public partial class App : Application
 
             services.AddSingleton<DashboardViewModel>();
             services.AddSingleton<ImagesViewModel>();
+            services.AddSingleton<VolumesViewModel>();
             services.AddSingleton<MigrationWizardViewModel>();
             services.AddSingleton<EngineSetupViewModel>();
             services.AddSingleton<CreateContainerWizardViewModel>();
+            services.AddSingleton<CreateVolumeWizardViewModel>();
             services.AddSingleton<MainWindowViewModel>();
 
             var provider = services.BuildServiceProvider();

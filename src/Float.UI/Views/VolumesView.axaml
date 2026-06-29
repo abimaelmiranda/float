@@ -1,0 +1,249 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels"
+             x:Name="Root"
+             x:Class="Float.UI.Views.VolumesView"
+             x:DataType="vm:VolumesViewModel">
+
+    <Grid ColumnDefinitions="*,Auto">
+        <DockPanel Grid.Column="0">
+            <Border DockPanel.Dock="Top"
+                    Padding="20,52,20,12">
+                <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                        <TextBlock Text="Volumes"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding RefreshVolumesCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconRefresh}"
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="Refresh" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Grid.Column="2"
+                                Theme="{StaticResource PrimaryButtonTheme}"
+                                Command="{Binding CreateVolumeCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconVolumes}"
+                                      Stroke="White"/>
+                                <TextBlock Text="Create" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <Border IsVisible="{Binding HasError}"
+                            Padding="10"
+                            CornerRadius="6"
+                            Background="{DynamicResource FloatCardBackgroundBrush}"
+                            BorderBrush="{DynamicResource StatusErrorBrush}"
+                            BorderThickness="1">
+                        <TextBlock Text="{Binding ErrorMessage}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource StatusErrorBrush}"
+                                   TextWrapping="Wrap"/>
+                    </Border>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Padding="16,0,16,16">
+                <ListBox Classes="container-list"
+                         ItemsSource="{Binding Volumes}"
+                         SelectedItem="{Binding SelectedVolume}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:VolumeItemViewModel">
+                            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                    CornerRadius="8"
+                                    Padding="14,10"
+                                    Classes.selected="{Binding $parent[ListBoxItem].IsSelected}">
+                                <Border.Styles>
+                                    <Style Selector="Border.selected">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource SystemControlHighlightListAccentLowBrush}"/>
+                                    </Style>
+                                    <Style Selector="Border:pointerover">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+                                    </Style>
+                                </Border.Styles>
+
+                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   FontWeight="Medium"/>
+                                        <TextBlock Text="{Binding DetailLabel}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding Driver}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="16,0,0,0"/>
+                                    <Button Grid.Column="2"
+                                            Theme="{StaticResource ActionButtonTheme}"
+                                            Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
+                                            CommandParameter="{Binding}"
+                                            ToolTip.Tip="Delete">
+                                        <Path Classes="icon icon-sm"
+                                              Data="{StaticResource IconDelete}"
+                                              Stroke="{Binding $parent[Button].Foreground}"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </DockPanel>
+
+        <Border Grid.Column="1"
+                Width="300"
+                IsVisible="{Binding HasSelectedVolume}"
+                Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="1,0,0,0">
+            <ContentControl Content="{Binding SelectedVolume}">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate x:DataType="vm:VolumeItemViewModel">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Top" Padding="16,52,16,12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding Name}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Theme="{StaticResource ActionButtonTheme}"
+                                            Command="{Binding DataContext.CloseDetailCommand, ElementName=Root}"
+                                            ToolTip.Tip="Close">
+                                        <Path Classes="icon icon-sm"
+                                              Data="{StaticResource IconClose}"
+                                              Stroke="{Binding $parent[Button].Foreground}"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Padding="16,0,16,16">
+                                <StackPanel Spacing="20">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="NAME"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="TYPE"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding Kind}"
+                                                   FontSize="13"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="DRIVER"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding Driver}"
+                                                   FontSize="13"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="SIZE"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding Size}"
+                                                   FontSize="13"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="FORMAT"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding Format}"
+                                                   FontSize="13"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Text="SOURCE"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <TextBlock Text="{Binding SourcePath}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <Button Theme="{StaticResource DangerButtonTheme}"
+                                            Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
+                                            CommandParameter="{Binding}"
+                                            HorizontalAlignment="Left">
+                                        <TextBlock Text="Delete Volume"/>
+                                    </Button>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
+        </Border>
+
+        <Border Grid.ColumnSpan="2"
+                Background="#99000000"
+                IsVisible="{Binding HasPendingDelete}">
+            <Border Width="380"
+                    Padding="18"
+                    CornerRadius="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource FloatCardBackgroundBrush}"
+                    BorderBrush="{DynamicResource SidebarBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <TextBlock Text="Delete volume"
+                               FontSize="15"
+                               FontWeight="SemiBold"/>
+                    <TextBlock FontSize="13"
+                               TextWrapping="Wrap">
+                        Are you sure you want to delete
+                        <Run Text="{Binding PendingDeleteName}" FontWeight="SemiBold"/>?
+                        This action cannot be undone.
+                    </TextBlock>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="8"
+                                HorizontalAlignment="Right">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Content="Cancel"
+                                Command="{Binding CancelDeleteCommand}"/>
+                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                Content="Delete"
+                                Command="{Binding ConfirmDeleteCommand}"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
+        </Border>
+    </Grid>
+</UserControl>

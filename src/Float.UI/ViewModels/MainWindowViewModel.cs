@@ -16,8 +16,10 @@ public partial class MainWindowViewModel : ViewModelBase
 {
     private readonly DashboardViewModel _dashboardVm;
     private readonly ImagesViewModel _imagesVm;
+    private readonly VolumesViewModel _volumesVm;
     private readonly MigrationWizardViewModel _migrationVm;
     private readonly CreateContainerWizardViewModel _createContainerVm;
+    private readonly CreateVolumeWizardViewModel _createVolumeVm;
     private readonly IEngineProvisioner _provisioner;
     private readonly DispatcherTimer _statusTimer;
     private readonly DispatcherTimer _notificationTimer;
@@ -25,6 +27,7 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public partial ViewModelBase CurrentPageViewModel { get; set; }
     [ObservableProperty] public partial bool ShowingContainers { get; set; }
     [ObservableProperty] public partial bool ShowingImages { get; set; }
+    [ObservableProperty] public partial bool ShowingVolumes { get; set; }
     [ObservableProperty] public partial bool ShowingMigration { get; set; }
     [ObservableProperty] public partial bool IsSetupMode { get; set; }
     [ObservableProperty] public partial bool IsEngineRunning { get; set; }
@@ -43,23 +46,31 @@ public partial class MainWindowViewModel : ViewModelBase
         IEngineProvisioner engineProvisioner,
         DashboardViewModel dashboardVm,
         ImagesViewModel imagesVm,
+        VolumesViewModel volumesVm,
         MigrationWizardViewModel migrationVm,
         EngineSetupViewModel engineSetupVm,
-        CreateContainerWizardViewModel createContainerVm)
+        CreateContainerWizardViewModel createContainerVm,
+        CreateVolumeWizardViewModel createVolumeVm)
     {
         _provisioner = engineProvisioner;
         _dashboardVm = dashboardVm;
         _imagesVm = imagesVm;
+        _volumesVm = volumesVm;
         _migrationVm = migrationVm;
         _createContainerVm = createContainerVm;
+        _createVolumeVm = createVolumeVm;
 
         dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
         dashboardVm.OperationFailed += OnDashboardOperationFailed;
         dashboardVm.OperationSucceeded += (_, msg) => ShowNotification("Done", msg);
         imagesVm.OperationFailed += OnImagesOperationFailed;
+        volumesVm.OperationFailed += OnVolumesOperationFailed;
+        volumesVm.RequestCreateVolume += OnRequestCreateVolume;
         migrationVm.MigrationCompleted += OnMigrationCompleted;
         createContainerVm.ContainerCreated += OnContainerCreated;
         createContainerVm.Cancelled += OnCreateContainerCancelled;
+        createVolumeVm.VolumeCreated += OnVolumeCreated;
+        createVolumeVm.Cancelled += OnCreateVolumeCancelled;
 
         IsDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
         if (Application.Current is { } app)
@@ -83,6 +94,7 @@ public partial class MainWindowViewModel : ViewModelBase
         CurrentPageViewModel = _dashboardVm;
         ShowingContainers = true;
         ShowingImages = false;
+        ShowingVolumes = false;
         _ = InitEngineAsync();
     }
 
@@ -130,6 +142,7 @@ public partial class MainWindowViewModel : ViewModelBase
         IsSetupMode = false;
         ShowingContainers = true;
         ShowingImages = false;
+        ShowingVolumes = false;
         CurrentPageViewModel = _dashboardVm;
         _ = InitEngineAsync();
     }
@@ -139,6 +152,8 @@ public partial class MainWindowViewModel : ViewModelBase
         HideNotification();
         _createContainerVm.StartNewRun();
         ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
         ShowingMigration = false;
         CurrentPageViewModel = _createContainerVm;
     }
@@ -147,9 +162,29 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnCreateContainerCancelled(object? sender, EventArgs e) => ReturnToDashboard();
 
+    private void OnRequestCreateVolume(object? sender, EventArgs e)
+    {
+        HideNotification();
+        _createVolumeVm.StartNewRun();
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
+        ShowingMigration = false;
+        CurrentPageViewModel = _createVolumeVm;
+    }
+
+    private void OnVolumeCreated(object? sender, EventArgs e) => ReturnToVolumes();
+
+    private void OnCreateVolumeCancelled(object? sender, EventArgs e) => ReturnToVolumes();
+
     private void OnImagesOperationFailed(object? sender, string message)
     {
         ShowNotification("Image refresh failed", message);
+    }
+
+    private void OnVolumesOperationFailed(object? sender, string message)
+    {
+        ShowNotification("Volume refresh failed", message);
     }
 
     private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
@@ -169,9 +204,20 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         ShowingContainers = true;
         ShowingImages = false;
+        ShowingVolumes = false;
         ShowingMigration = false;
         CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
+    }
+
+    private void ReturnToVolumes()
+    {
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = true;
+        ShowingMigration = false;
+        CurrentPageViewModel = _volumesVm;
+        _ = _volumesVm.RefreshAsync();
     }
 
     private void ShowNotification(string title, string message)
@@ -197,6 +243,7 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         ShowingContainers = true;
         ShowingImages = false;
+        ShowingVolumes = false;
         ShowingMigration = false;
         CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
@@ -208,9 +255,22 @@ public partial class MainWindowViewModel : ViewModelBase
         HideNotification();
         ShowingContainers = false;
         ShowingImages = true;
+        ShowingVolumes = false;
         ShowingMigration = false;
         CurrentPageViewModel = _imagesVm;
         await _imagesVm.RefreshAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task ShowVolumesAsync()
+    {
+        HideNotification();
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = true;
+        ShowingMigration = false;
+        CurrentPageViewModel = _volumesVm;
+        await _volumesVm.RefreshAsync().ConfigureAwait(false);
     }
 
     [RelayCommand]
@@ -219,6 +279,7 @@ public partial class MainWindowViewModel : ViewModelBase
         HideNotification();
         ShowingContainers = false;
         ShowingImages = false;
+        ShowingVolumes = false;
         ShowingMigration = true;
         CurrentPageViewModel = _migrationVm;
         await _migrationVm.StartNewRunAsync().ConfigureAwait(false);
