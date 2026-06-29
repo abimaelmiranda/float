@@ -22,7 +22,7 @@ public class AppleContainerImageLifecycle : IContainerImageLifecycle
         CancellationToken cancellationToken = default,
         IProgress<string>? progress = null)
     {
-        var target = string.IsNullOrWhiteSpace(image.Id) ? image.Tag : image.Id;
+        var target = string.IsNullOrWhiteSpace(image.Tag) ? image.Id : image.Tag;
         if (string.IsNullOrWhiteSpace(target))
             return Result.WithFailure(DomainErrors.Validation("Image id or tag is required."));
 
