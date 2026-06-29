@@ -124,6 +124,7 @@
   <data name="ContainerCreatedSuccessfully" xml:space="preserve"><value>Container created successfully.</value></data>
   <data name="ContainerImage" xml:space="preserve"><value>Container Image</value></data>
   <data name="ContainerName" xml:space="preserve"><value>CONTAINER NAME</value></data>
+  <data name="ContainerPath" xml:space="preserve"><value>CONTAINER PATH</value></data>
   <data name="ContainerPort" xml:space="preserve"><value>Container port</value></data>
   <data name="CopyDetails" xml:space="preserve"><value>Copy Details</value></data>
   <data name="CpuCores" xml:space="preserve"><value>CPU CORES</value></data>
@@ -136,7 +137,9 @@
   <data name="EnvironmentVariables" xml:space="preserve"><value>ENVIRONMENT VARIABLES</value></data>
   <data name="Enabled" xml:space="preserve"><value>Enabled</value></data>
   <data name="FinishCleanup" xml:space="preserve"><value>Finish cleanup</value></data>
+  <data name="HostPath" xml:space="preserve"><value>HOST PATH</value></data>
   <data name="HostPort" xml:space="preserve"><value>Host port</value></data>
+  <data name="Info" xml:space="preserve"><value>Info</value></data>
   <data name="ImageName" xml:space="preserve"><value>IMAGE NAME</value></data>
   <data name="ImagePreview" xml:space="preserve"><value>IMAGE PREVIEW</value></data>
   <data name="KeepContainerAlive" xml:space="preserve"><value>KEEP CONTAINER ALIVE</value></data>
@@ -202,6 +205,8 @@
   <data name="MigrationFailedFormat" xml:space="preserve"><value>Migration failed: {0}</value></data>
   <data name="Named" xml:space="preserve"><value>Named</value></data>
   <data name="NoPublishedPorts" xml:space="preserve"><value>No published ports</value></data>
+  <data name="NoLogs" xml:space="preserve"><value>No logs available</value></data>
+  <data name="NoMounts" xml:space="preserve"><value>No mounts</value></data>
   <data name="NoVolumes" xml:space="preserve"><value>No volumes</value></data>
   <data name="NotFoundFormat" xml:space="preserve"><value>Not Found: {0}</value></data>
   <data name="NotSelected" xml:space="preserve"><value>Not selected</value></data>

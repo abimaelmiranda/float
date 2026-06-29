@@ -30,6 +30,7 @@ public static class UiStrings
     public static string ContainerDefaults => Get(nameof(ContainerDefaults));
     public static string ContainerImage => Get(nameof(ContainerImage));
     public static string ContainerName => Get(nameof(ContainerName));
+    public static string ContainerPath => Get(nameof(ContainerPath));
     public static string ContainerPort => Get(nameof(ContainerPort));
     public static string Containers => Get(nameof(Containers));
     public static string Continue => Get(nameof(Continue));
@@ -76,7 +77,9 @@ public static class UiStrings
     public static string EnvironmentVariables => Get(nameof(EnvironmentVariables));
     public static string Enabled => Get(nameof(Enabled));
     public static string FinishCleanup => Get(nameof(FinishCleanup));
+    public static string HostPath => Get(nameof(HostPath));
     public static string HostPort => Get(nameof(HostPort));
+    public static string Info => Get(nameof(Info));
     public static string Image => Get(nameof(Image));
     public static string ImageName => Get(nameof(ImageName));
     public static string ImagePreview => Get(nameof(ImagePreview));
@@ -104,6 +107,8 @@ public static class UiStrings
     public static string MigrationProgress => Get(nameof(MigrationProgress));
     public static string Name => Get(nameof(Name));
     public static string NewContainer => Get(nameof(NewContainer));
+    public static string NoLogs => Get(nameof(NoLogs));
+    public static string NoMounts => Get(nameof(NoMounts));
     public static string NoRegistries => Get(nameof(NoRegistries));
     public static string NoRegistriesDescription => Get(nameof(NoRegistriesDescription));
     public static string NoDockerContainersFound => Get(nameof(NoDockerContainersFound));

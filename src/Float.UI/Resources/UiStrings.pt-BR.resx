@@ -124,6 +124,7 @@
   <data name="ContainerCreatedSuccessfully" xml:space="preserve"><value>Container criado com sucesso.</value></data>
   <data name="ContainerImage" xml:space="preserve"><value>Imagem do container</value></data>
   <data name="ContainerName" xml:space="preserve"><value>NOME DO CONTAINER</value></data>
+  <data name="ContainerPath" xml:space="preserve"><value>CAMINHO DO CONTAINER</value></data>
   <data name="ContainerPort" xml:space="preserve"><value>Porta do container</value></data>
   <data name="CopyDetails" xml:space="preserve"><value>Copiar detalhes</value></data>
   <data name="CpuCores" xml:space="preserve"><value>NÚCLEOS DE CPU</value></data>
@@ -136,7 +137,9 @@
   <data name="EnvironmentVariables" xml:space="preserve"><value>VARIÁVEIS DE AMBIENTE</value></data>
   <data name="Enabled" xml:space="preserve"><value>Ativado</value></data>
   <data name="FinishCleanup" xml:space="preserve"><value>Finalizar limpeza</value></data>
+  <data name="HostPath" xml:space="preserve"><value>CAMINHO DO HOST</value></data>
   <data name="HostPort" xml:space="preserve"><value>Porta do host</value></data>
+  <data name="Info" xml:space="preserve"><value>Info</value></data>
   <data name="ImageName" xml:space="preserve"><value>NOME DA IMAGEM</value></data>
   <data name="ImagePreview" xml:space="preserve"><value>PRÉVIA DA IMAGEM</value></data>
   <data name="KeepContainerAlive" xml:space="preserve"><value>MANTER CONTAINER ATIVO</value></data>
@@ -202,6 +205,8 @@
   <data name="MigrationFailedFormat" xml:space="preserve"><value>Falha na migração: {0}</value></data>
   <data name="Named" xml:space="preserve"><value>Nomeado</value></data>
   <data name="NoPublishedPorts" xml:space="preserve"><value>Nenhuma porta publicada</value></data>
+  <data name="NoLogs" xml:space="preserve"><value>Nenhum log disponível</value></data>
+  <data name="NoMounts" xml:space="preserve"><value>Nenhuma montagem</value></data>
   <data name="NoVolumes" xml:space="preserve"><value>Nenhum volume</value></data>
   <data name="NotFoundFormat" xml:space="preserve"><value>Não encontrado: {0}</value></data>
   <data name="NotSelected" xml:space="preserve"><value>Não selecionado</value></data>
