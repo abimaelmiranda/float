@@ -15,6 +15,7 @@ public partial class ContainerDetailViewModel : ViewModelBase
     private readonly IContainerLogReader _logReader;
     private readonly Action _goBack;
     private CancellationTokenSource? _logsCts;
+    private Task? _logsTask;
 
     public ContainerItemViewModel Container { get; }
     public IReadOnlyList<ContainerVolume> Volumes => Container.Source.Volumes;
@@ -34,12 +35,14 @@ public partial class ContainerDetailViewModel : ViewModelBase
 
     public void StartLogs()
     {
+        if (_logsTask is { IsCompleted: false }) return;
+
         StopLogs();
         LogLines.Clear();
         _logsCts = new CancellationTokenSource();
         var ct = _logsCts.Token;
         IsLoadingLogs = true;
-        _ = Task.Run(async () =>
+        _logsTask = Task.Run(async () =>
         {
             await _logReader.ReadLogsAsync(
                 Container.Name,
@@ -59,6 +62,7 @@ public partial class ContainerDetailViewModel : ViewModelBase
         _logsCts?.Cancel();
         _logsCts?.Dispose();
         _logsCts = null;
+        _logsTask = null;
         IsLoadingLogs = false;
     }
 }

@@ -22,8 +22,6 @@ public partial class ContainerDetailView : UserControl
         if (DataContext is not ContainerDetailViewModel vm) return;
         if (sender is TabControl tc && tc.SelectedIndex == LogsTabIndex)
             vm.StartLogs();
-        else
-            vm.StopLogs();
     }
 
     private void OnStartContainerClick(object? sender, RoutedEventArgs e) =>
