@@ -63,7 +63,7 @@ public partial class App : Application
 
             _mainWindow.Closing += (_, e) =>
             {
-                if (_settingsService.Get().CloseToTray)
+                if (_settingsService.Get().CloseToTray && e.CloseReason == WindowCloseReason.WindowClosing)
                 {
                     e.Cancel = true;
                     _mainWindow.Hide();
