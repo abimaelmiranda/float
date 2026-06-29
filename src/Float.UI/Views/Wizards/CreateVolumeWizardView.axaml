@@ -102,10 +102,12 @@
                 </Border>
 
                 <TextBox Text="{Binding Output}"
+                         x:Name="OutputBox"
+                         Classes="console"
                          IsReadOnly="True"
                          AcceptsReturn="True"
-                         MinHeight="180"
-                         FontFamily="Menlo,Consolas,monospace"/>
+                         TextWrapping="Wrap"
+                         MinHeight="180"/>
             </StackPanel>
         </Border>
 

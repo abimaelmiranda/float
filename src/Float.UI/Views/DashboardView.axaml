@@ -24,7 +24,7 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconNewContainer}"
-                                      Stroke="White"/>
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
                                 <TextBlock Text="New Container" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>

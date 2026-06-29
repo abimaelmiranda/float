@@ -31,8 +31,8 @@
                             <StackPanel Orientation="Horizontal" Spacing="6">
                                 <Path Classes="icon icon-sm"
                                       Data="{StaticResource IconVolumes}"
-                                      Stroke="White"/>
-                                <TextBlock Text="Create" VerticalAlignment="Center"/>
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="Create Volume" VerticalAlignment="Center"/>
                             </StackPanel>
                         </Button>
                     </Grid>
@@ -72,7 +72,7 @@
                                     </Style>
                                 </Border.Styles>
 
-                                <Grid ColumnDefinitions="*,Auto,Auto" ColumnSpacing="8">
+                                <Grid ColumnDefinitions="*,Auto" ColumnSpacing="8">
                                     <StackPanel Spacing="2">
                                         <TextBlock Text="{Binding Name}"
                                                    FontSize="13"
@@ -88,15 +88,6 @@
                                                Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
                                                VerticalAlignment="Center"
                                                Margin="16,0,0,0"/>
-                                    <Button Grid.Column="2"
-                                            Theme="{StaticResource ActionButtonTheme}"
-                                            Command="{Binding $parent[UserControl].DataContext.RequestDeleteCommand}"
-                                            CommandParameter="{Binding}"
-                                            ToolTip.Tip="Delete">
-                                        <Path Classes="icon icon-sm"
-                                              Data="{StaticResource IconDelete}"
-                                              Stroke="{Binding $parent[Button].Foreground}"/>
-                                    </Button>
                                 </Grid>
                             </Border>
                         </DataTemplate>
@@ -197,12 +188,19 @@
                                                    TextWrapping="Wrap"/>
                                     </StackPanel>
 
-                                    <Button Theme="{StaticResource DangerButtonTheme}"
-                                            Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
-                                            CommandParameter="{Binding}"
-                                            HorizontalAlignment="Left">
-                                        <TextBlock Text="Delete Volume"/>
-                                    </Button>
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Text="ACTIONS"
+                                                   FontSize="10"
+                                                   FontWeight="SemiBold"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                   LetterSpacing="1"/>
+                                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                                Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Left">
+                                            <TextBlock Text="Delete Volume"/>
+                                        </Button>
+                                    </StackPanel>
                                 </StackPanel>
                             </ScrollViewer>
                         </DockPanel>
