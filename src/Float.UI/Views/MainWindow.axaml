@@ -13,6 +13,42 @@
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="-1">
 
+    <!-- Window menus — appear after Float in the macOS menu bar -->
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="Containers">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="New Container…"       Command="{Binding NewContainerCommand}" Gesture="Ctrl+N"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Show Containers"      Command="{Binding ShowContainersCommand}"/>
+                        <NativeMenuItem Header="Refresh"              Command="{Binding ShowContainersCommand}" Gesture="Ctrl+R"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Migrate from Docker…" Command="{Binding ShowMigrationCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Images">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Show Images" Command="{Binding ShowImagesCommand}"/>
+                        <NativeMenuItem Header="Refresh"     Command="{Binding ShowImagesCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="Volumes">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="Create Volume…" Command="{Binding NewVolumeCommand}"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="Show Volumes"   Command="{Binding ShowVolumesCommand}"/>
+                        <NativeMenuItem Header="Refresh"        Command="{Binding ShowVolumesCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
+
     <DockPanel>
 
         <!-- ── Sidebar (hidden in setup mode) ───────────────────────── -->
@@ -25,10 +61,14 @@
                     Padding="16,52,16,8"
                     IsHitTestVisible="False">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="⬡"
-                               FontSize="18"
-                               Foreground="{DynamicResource FloatAccentBrush}"
-                               VerticalAlignment="Center"/>
+                    <Image Width="20"
+                           Height="20"
+                           Source="/Assets/float_tray_light.png"
+                           IsVisible="{Binding !IsDarkTheme}"/>
+                    <Image Width="20"
+                           Height="20"
+                           Source="/Assets/float_tray_dark.png"
+                           IsVisible="{Binding IsDarkTheme}"/>
                     <TextBlock Text="Float"
                                FontSize="14"
                                FontWeight="SemiBold"

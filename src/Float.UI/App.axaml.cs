@@ -1,11 +1,8 @@
 using System;
-using System.Linq;
 using Avalonia;
 using Avalonia.Controls;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using Avalonia.Platform;
-using Avalonia.Styling;
 using Float.Core.Abstractions.Services;
 using Float.Infrastructure;
 using Float.UI.Services;
@@ -21,7 +18,6 @@ public partial class App : Application
 {
     private MainWindow? _mainWindow;
     private MainWindowViewModel? _mainWindowVm;
-    private TrayIcon? _trayIcon;
     private UserNotificationService? _notificationService;
 
     public override void Initialize()
@@ -62,20 +58,6 @@ public partial class App : Application
         }
 
         base.OnFrameworkInitializationCompleted();
-
-        _trayIcon = TrayIcon.GetIcons(this)?.FirstOrDefault();
-        ActualThemeVariantChanged += (_, _) => UpdateTrayIcon();
-        UpdateTrayIcon();
-    }
-
-    private void UpdateTrayIcon()
-    {
-        if (_trayIcon is null) return;
-        var asset = ActualThemeVariant == ThemeVariant.Dark
-            ? "avares://Float.UI/Assets/float_tray_dark.png"
-            : "avares://Float.UI/Assets/float_tray_light.png";
-        using var stream = AssetLoader.Open(new Uri(asset));
-        _trayIcon.Icon = new WindowIcon(stream);
     }
 
     private void ShowMainWindow()
@@ -100,8 +82,5 @@ public partial class App : Application
             desktop.Shutdown();
     }
 
-    private void OnNewContainerClick(object? sender, EventArgs e) => ShowMainWindow();
-    private void OnMigrateClick(object? sender, EventArgs e)      => ShowMainWindow();
-    private void OnRefreshClick(object? sender, EventArgs e) { }
 
 }

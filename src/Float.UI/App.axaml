@@ -22,7 +22,7 @@
         <StyleInclude Source="avares://Float.UI/Resources/FloatStyles.axaml"/>
     </Application.Styles>
 
-    <!-- macOS application menu bar -->
+    <!-- macOS app menu (Float) — only app-level items go here -->
     <NativeMenu.Menu>
         <NativeMenu>
             <NativeMenuItem Header="Float">
@@ -30,20 +30,9 @@
                     <NativeMenu>
                         <NativeMenuItem Header="About Float"  Click="OnAboutClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Settings…"    Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
+                        <NativeMenuItem Header="Preferences…" Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
                         <NativeMenuItemSeparator/>
                         <NativeMenuItem Header="Quit Float"   Click="OnQuitClick"     Gesture="Ctrl+Q"/>
-                    </NativeMenu>
-                </NativeMenuItem.Menu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Containers">
-                <NativeMenuItem.Menu>
-                    <NativeMenu>
-                        <NativeMenuItem Header="New Container…"       Click="OnNewContainerClick" Gesture="Ctrl+N"/>
-                        <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Migrate from Docker…" Click="OnMigrateClick"/>
-                        <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Refresh"              Click="OnRefreshClick"     Gesture="Ctrl+R"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>

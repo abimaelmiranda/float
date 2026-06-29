@@ -150,6 +150,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnRequestCreateContainer(object? sender, EventArgs e)
     {
         HideNotification();
+        CancelMigrationLoad();
         _createContainerVm.StartNewRun();
         ShowingContainers = false;
         ShowingImages = false;
@@ -165,6 +166,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private void OnRequestCreateVolume(object? sender, EventArgs e)
     {
         HideNotification();
+        CancelMigrationLoad();
         _createVolumeVm.StartNewRun();
         ShowingContainers = false;
         ShowingImages = false;
@@ -189,6 +191,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
     {
+        CancelMigrationLoad();
         ReturnToDashboard();
         ShowNotification(
             e.Failed == 0 ? "Migration complete" : "Migration complete with cleanup issues",
@@ -202,6 +205,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ReturnToDashboard()
     {
+        CancelMigrationLoad();
         ShowingContainers = true;
         ShowingImages = false;
         ShowingVolumes = false;
@@ -212,6 +216,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void ReturnToVolumes()
     {
+        CancelMigrationLoad();
         ShowingContainers = false;
         ShowingImages = false;
         ShowingVolumes = true;
@@ -239,8 +244,15 @@ public partial class MainWindowViewModel : ViewModelBase
     }
 
     [RelayCommand]
+    private void NewContainer() => OnRequestCreateContainer(this, EventArgs.Empty);
+
+    [RelayCommand]
+    private void NewVolume() => OnRequestCreateVolume(this, EventArgs.Empty);
+
+    [RelayCommand]
     private void ShowContainers()
     {
+        CancelMigrationLoad();
         ShowingContainers = true;
         ShowingImages = false;
         ShowingVolumes = false;
@@ -253,6 +265,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task ShowImagesAsync()
     {
         HideNotification();
+        CancelMigrationLoad();
         ShowingContainers = false;
         ShowingImages = true;
         ShowingVolumes = false;
@@ -265,6 +278,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task ShowVolumesAsync()
     {
         HideNotification();
+        CancelMigrationLoad();
         ShowingContainers = false;
         ShowingImages = false;
         ShowingVolumes = true;
@@ -277,6 +291,7 @@ public partial class MainWindowViewModel : ViewModelBase
     private async Task ShowMigrationAsync()
     {
         HideNotification();
+        CancelMigrationLoad();
         ShowingContainers = false;
         ShowingImages = false;
         ShowingVolumes = false;
@@ -306,5 +321,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnIsDarkThemeChanged(bool value) =>
         OnPropertyChanged(nameof(ThemeToggleLabel));
+
+    private void CancelMigrationLoad() => _migrationVm.CancelLoad();
 
 }
