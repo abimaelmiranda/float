@@ -6,6 +6,8 @@ using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models.Results;
 using Float.Core.Models.Results.Errors;
+using Float.Infrastructure.Engines.AppleContainers.Json.Context;
+using Float.Infrastructure.Engines.AppleContainers.Json.Dtos.GitHub;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
 
@@ -119,28 +121,40 @@ public class AppleContainersEngineProvisioner : IEngineProvisioner
             return Result.WithFailure<string>(
                 DomainErrors.CommandFailed($"Failed to fetch latest release: {(int)response.StatusCode} {response.ReasonPhrase}."));
 
-        using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
-        using var jsonDoc = await JsonDocument.ParseAsync(contentStream).ConfigureAwait(false);
+        GitHubRelease? release;
+        try
+        {
+            using var contentStream = await response.Content.ReadAsStreamAsync().ConfigureAwait(false);
+            release = await JsonSerializer.DeserializeAsync(
+                contentStream,
+                AppleReleaseJsonContext.Default.GitHubRelease).ConfigureAwait(false);
+        }
+        catch (JsonException ex)
+        {
+            return Result.WithFailure<string>(
+                DomainErrors.ParseError($"GitHub latest release returned invalid JSON. {ex.Message}"));
+        }
+        if (release is null)
+            return Result.WithFailure<string>(DomainErrors.ParseError("GitHub latest release returned null JSON."));
 
-        var assets = jsonDoc.RootElement.GetProperty("assets").EnumerateArray()
-            .Select(asset => new
-            {
-                Name = asset.GetProperty("name").GetString(),
-                Url  = asset.GetProperty("browser_download_url").GetString(),
-            })
-            .Where(a => !string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(a.Url))
+        if (release.Assets is null)
+            return Result.WithFailure<string>(DomainErrors.ParseError("GitHub latest release is missing assets."));
+
+        var assets = release.Assets
+            .Where(a => !string.IsNullOrWhiteSpace(a.Name) && !string.IsNullOrWhiteSpace(a.BrowserDownloadUrl))
             .ToArray();
 
         if (assets.Length == 0)
             return Result.WithFailure<string>(DomainErrors.NotFound("No release assets found."));
 
-        var pkg = assets.FirstOrDefault(a => a.Name!.EndsWith(".pkg", StringComparison.OrdinalIgnoreCase))
-                  ?? assets[0];
+        var pkg = assets.FirstOrDefault(a => a.Name!.EndsWith(".pkg", StringComparison.OrdinalIgnoreCase));
+        if (pkg is null)
+            return Result.WithFailure<string>(DomainErrors.NotFound("No .pkg release asset found."));
 
-        if (pkg.Url is null)
+        if (pkg.BrowserDownloadUrl is null)
             return Result.WithFailure<string>(DomainErrors.NotFound("Download URL not found."));
 
-        return Result.WithSuccess(pkg.Url);
+        return Result.WithSuccess(pkg.BrowserDownloadUrl);
     }
 
     private static async Task<Result> DownloadFileAsync(string downloadUrl, string destinationPath, CancellationToken cancellationToken)

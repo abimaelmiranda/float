@@ -181,6 +181,13 @@ public class DockerReader : IContainerReader
 
     public Task<Result<IReadOnlyList<ContainerImage>>> ListImagesAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
-        throw new InvalidOperationException("Image listing is not yet supported for docker");
+        return Task.FromResult(Result.WithFailure<IReadOnlyList<ContainerImage>>(
+            DomainErrors.NotSupported("Image listing is not yet supported for Docker.")));
+    }
+
+    public Task<Result<IReadOnlyList<ContainerVolumeInfo>>> ListVolumesAsync(bool includeAll = true, CancellationToken cancellationToken = default)
+    {
+        return Task.FromResult(Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(
+            DomainErrors.NotSupported("Volume listing is not yet supported for Docker.")));
     }
 }
