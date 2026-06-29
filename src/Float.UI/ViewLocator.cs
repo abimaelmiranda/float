@@ -16,6 +16,7 @@ public class ViewLocator : IDataTemplate
     private static readonly Dictionary<Type, Func<Control>> _map = new()
     {
         [typeof(DashboardViewModel)]             = () => new Views.DashboardView(),
+        [typeof(ContainerDetailViewModel)]       = () => new Views.ContainerDetailView(),
         [typeof(ImagesViewModel)]                = () => new Views.ImagesView(),
         [typeof(VolumesViewModel)]               = () => new Views.VolumesView(),
         [typeof(MigrationWizardViewModel)]       = () => new Views.Wizards.MigrationWizardView(),

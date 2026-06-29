@@ -26,9 +26,6 @@ public partial class DashboardView : UserControl
     private void OnRequestDeleteClick(object? sender, RoutedEventArgs e) =>
         ExecuteContainerCommand(sender, container => ViewModel?.RequestDeleteCommand.Execute(container));
 
-    private void OnCloseDetailClick(object? sender, RoutedEventArgs e) =>
-        ViewModel?.CloseDetailCommand.Execute(null);
-
     private static void ExecuteContainerCommand(object? sender, Action<Container> execute)
     {
         if (sender is Button { Tag: Container container })

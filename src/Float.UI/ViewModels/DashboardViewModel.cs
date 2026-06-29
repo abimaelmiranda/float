@@ -10,6 +10,7 @@ using Float.Core.Abstractions.Services;
 using Float.Core.Models;
 using Float.Core.Models.Results;
 using Float.UI.Resources;
+using System;
 
 namespace Float.UI.ViewModels;
 
@@ -17,9 +18,16 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
 {
     private readonly IContainerReader _containerReader;
     private readonly IContainerLifecycle _containerLifecycle;
+    private readonly IContainerLogReader _logReader;
 
     [ObservableProperty]
     public partial ContainerItemViewModel? SelectedContainer { get; set; }
+
+    [ObservableProperty]
+    public partial ContainerDetailViewModel? Detail { get; set; }
+
+    public bool ShowDetail => Detail is not null;
+    public bool ShowList => Detail is null;
 
     [ObservableProperty] public partial bool HasError { get; set; }
     [ObservableProperty] public partial string ErrorMessage { get; set; } = "";
@@ -31,15 +39,31 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
 
     public ObservableCollection<ContainerItemViewModel> Containers { get; } = [];
 
-    public DashboardViewModel(IContainerReader containerReader, IContainerLifecycle containerLifecycle)
+    public DashboardViewModel(IContainerReader containerReader, IContainerLifecycle containerLifecycle, IContainerLogReader logReader)
     {
         _containerReader = containerReader;
         _containerLifecycle = containerLifecycle;
+        _logReader = logReader;
     }
 
     partial void OnSelectedContainerChanged(ContainerItemViewModel? value)
     {
         OnPropertyChanged(nameof(HasSelectedContainer));
+        if (value is not null)
+            Detail = new ContainerDetailViewModel(value, _logReader, CloseDetail);
+        else
+            Detail = null;
+    }
+
+    partial void OnDetailChanging(ContainerDetailViewModel? oldValue, ContainerDetailViewModel? newValue)
+    {
+        oldValue?.StopLogs();
+    }
+
+    partial void OnDetailChanged(ContainerDetailViewModel? value)
+    {
+        OnPropertyChanged(nameof(ShowDetail));
+        OnPropertyChanged(nameof(ShowList));
     }
 
     partial void OnPendingDeleteContainerChanged(Container? value)
@@ -59,7 +83,7 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
     private Task RefreshContainersAsync() => RefreshAsync();
 
     [RelayCommand]
-    private void CloseDetail() => SelectedContainer = null;
+    private void CloseDetail() => SelectedContainer = null; // clears Detail via OnSelectedContainerChanged
 
     [RelayCommand]
     private Task StartContainerAsync(Container? container)

@@ -6,10 +6,10 @@
              x:Class="Float.UI.Views.DashboardView"
              x:DataType="vm:DashboardViewModel">
 
-    <Grid ColumnDefinitions="*,Auto">
+    <Grid>
 
-        <!-- ── Left: container list ──────────────────────────────────── -->
-        <DockPanel Grid.Column="0">
+        <!-- ── Container list (shown when no detail open) ────────────── -->
+        <DockPanel IsVisible="{Binding ShowList}">
 
             <!-- Header bar -->
             <Border DockPanel.Dock="Top"
@@ -165,118 +165,11 @@
             </ScrollViewer>
         </DockPanel>
 
-        <!-- ── Right: detail panel ───────────────────────────────────── -->
-        <Border Grid.Column="1"
-                Width="300"
-                IsVisible="{Binding HasSelectedContainer}"
-                Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
-                BorderBrush="{DynamicResource SidebarBorderBrush}"
-                BorderThickness="1,0,0,0">
-            <ContentControl Content="{Binding SelectedContainer}">
-                <ContentControl.ContentTemplate>
-                    <DataTemplate x:DataType="vm:ContainerItemViewModel">
-                        <DockPanel>
+        <!-- ── Container detail (shown when container selected) ──────── -->
+        <ContentControl Content="{Binding Detail}" IsVisible="{Binding ShowDetail}"/>
 
-                            <!-- Detail header -->
-                            <Border DockPanel.Dock="Top" Padding="16,52,16,12">
-                                <Grid ColumnDefinitions="*,Auto">
-                                    <TextBlock Text="{Binding Name}"
-                                               FontSize="16"
-                                               FontWeight="SemiBold"
-                                               VerticalAlignment="Center"/>
-                                    <Button Grid.Column="1"
-                                            Theme="{StaticResource ActionButtonTheme}"
-                                            Click="OnCloseDetailClick"
-                                            ToolTip.Tip="{x:Static resx:UiStrings.Close}">
-                                        <Path Classes="icon icon-sm"
-                                              Data="{StaticResource IconClose}"
-                                              Stroke="{Binding $parent[Button].Foreground}"/>
-                                    </Button>
-                                </Grid>
-                            </Border>
-
-                            <!-- Detail body -->
-                            <ScrollViewer Padding="16,0,16,16">
-                                <StackPanel Spacing="20">
-
-                                    <!-- Status -->
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Status}"/>
-                                        <StackPanel Orientation="Horizontal" Spacing="6">
-                                            <Ellipse Classes="status-dot"
-                                                     Classes.running="{Binding IsRunning}"/>
-                                            <TextBlock Text="{Binding StatusLabel}"
-                                                       FontSize="13"
-                                                       VerticalAlignment="Center"/>
-                                        </StackPanel>
-                                        <TextBlock Text="{Binding BusyLabel}"
-                                                   IsVisible="{Binding IsBusy}"
-                                                   FontSize="12"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
-                                    </StackPanel>
-
-                                    <!-- Image -->
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Image}"/>
-                                        <TextBlock Text="{Binding ImageTag}"
-                                                   FontSize="13"
-                                                   TextWrapping="Wrap"/>
-                                    </StackPanel>
-
-                                    <!-- Ports -->
-                                    <StackPanel Spacing="4">
-                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Ports}"/>
-                                        <TextBlock Text="{Binding PortSummary}"
-                                                   FontSize="13"
-                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
-                                    </StackPanel>
-
-                                    <!-- Actions -->
-                                    <StackPanel Spacing="6">
-                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Actions}"/>
-
-                                        <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="{x:Static resx:UiStrings.StopContainer}"
-                                                Tag="{Binding Source}"
-                                                Click="OnStopContainerClick"
-                                                IsEnabled="{Binding !IsBusy}"
-                                                IsVisible="{Binding IsRunning}"
-                                                HorizontalAlignment="Left"/>
-
-                                        <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="{x:Static resx:UiStrings.StartContainer}"
-                                                Tag="{Binding Source}"
-                                                Click="OnStartContainerClick"
-                                                IsEnabled="{Binding !IsBusy}"
-                                                IsVisible="{Binding !IsRunning}"
-                                                HorizontalAlignment="Left"/>
-
-                                        <Button Theme="{StaticResource ActionButtonTheme}"
-                                                Content="{x:Static resx:UiStrings.Restart}"
-                                                Tag="{Binding Source}"
-                                                Click="OnRestartContainerClick"
-                                                IsEnabled="{Binding !IsBusy}"
-                                                HorizontalAlignment="Left"/>
-
-                                        <Button Theme="{StaticResource DangerButtonTheme}"
-                                                Content="{x:Static resx:UiStrings.DeleteContainer}"
-                                                Tag="{Binding Source}"
-                                                Click="OnRequestDeleteClick"
-                                                IsEnabled="{Binding !IsBusy}"
-                                                HorizontalAlignment="Left"/>
-                                    </StackPanel>
-
-                                </StackPanel>
-                            </ScrollViewer>
-
-                        </DockPanel>
-                    </DataTemplate>
-                </ContentControl.ContentTemplate>
-            </ContentControl>
-        </Border>
-
-        <!-- ── Delete confirmation overlay ─────────────────────────── -->
-        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="{x:Static resx:UiStrings.DeleteContainerTitle}"/>
+        <!-- ── Delete confirmation overlay (spans both views) ────────── -->
+        <shared:ConfirmDeleteDialog Title="{x:Static resx:UiStrings.DeleteContainerTitle}"/>
 
     </Grid>
 
