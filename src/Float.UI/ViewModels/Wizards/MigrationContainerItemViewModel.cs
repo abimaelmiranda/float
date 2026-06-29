@@ -3,6 +3,7 @@ using CommunityToolkit.Mvvm.Input;
 using Avalonia.Threading;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels.Wizards;
 
@@ -14,7 +15,7 @@ public partial class MigrationContainerItemViewModel : ObservableObject
     public string StatusLabel { get; }
     public string PortSummary { get; }
     public string VolumeSummary { get; }
-    public string ArchitectureLabel => EffectiveArchitecture?.ToDisplayValue() ?? "Architecture not detected";
+    public string ArchitectureLabel => EffectiveArchitecture?.ToDisplayValue() ?? UiStrings.ArchitectureNotDetected;
     public ContainerArchitecture? EffectiveArchitecture
         => ContainerArchitectureExtensions.ParseContainerArchitectureOrNull(ManualArchitecture) ?? Source.Architecture;
     public bool NeedsArchitectureSelection => IsSelected && EffectiveArchitecture is null;
@@ -22,7 +23,7 @@ public partial class MigrationContainerItemViewModel : ObservableObject
     public bool IsRunning => Source.Instance?.Status == ContainerStatus.Running;
     public bool CanCleanup => MigrationSucceeded;
     public bool HasLog => !string.IsNullOrWhiteSpace(LogText);
-    public string ToggleLogLabel => IsLogExpanded ? "Hide details" : "Show details";
+    public string ToggleLogLabel => IsLogExpanded ? UiStrings.Get("HideDetails") : UiStrings.Get("ShowDetails");
 
     [ObservableProperty] public partial bool IsSelected { get; set; }
     [ObservableProperty] public partial bool IsCleanupSelected { get; set; }
@@ -32,7 +33,7 @@ public partial class MigrationContainerItemViewModel : ObservableObject
     [ObservableProperty] public partial bool MigrationFailed { get; set; }
     [ObservableProperty] public partial bool CleanupSucceeded { get; set; }
     [ObservableProperty] public partial bool CleanupFailed { get; set; }
-    [ObservableProperty] public partial string MigrationStatus { get; set; } = "Waiting";
+    [ObservableProperty] public partial string MigrationStatus { get; set; } = UiStrings.Get("Waiting");
     [ObservableProperty] public partial string LogText { get; set; } = "";
     [ObservableProperty] public partial string? ManualArchitecture { get; set; }
 
@@ -56,20 +57,20 @@ public partial class MigrationContainerItemViewModel : ObservableObject
             return $"{port.HostPort}->{port.ContainerPort}{suffix}";
         }).ToArray();
 
-        return items.Length == 0 ? "No published ports" : string.Join(", ", items);
+        return items.Length == 0 ? UiStrings.Get("NoPublishedPorts") : string.Join(", ", items);
     }
 
     private static string BuildVolumeSummary(IReadOnlyCollection<ContainerVolume> volumes)
     {
         var summary = volumes.Count switch
         {
-            0 => "No volumes",
-            1 => "1 volume",
-            _ => $"{volumes.Count} volumes"
+            0 => UiStrings.Get("NoVolumes"),
+            1 => UiStrings.Get("OneVolume"),
+            _ => $"{volumes.Count} {UiStrings.Volumes.ToLowerInvariant()}"
         };
 
         return volumes.Any(volume => volume.IsNamedVolume)
-            ? $"{summary}, named volume skipped"
+            ? $"{summary}, {UiStrings.Get("NamedVolumeSkipped")}"
             : summary;
     }
 

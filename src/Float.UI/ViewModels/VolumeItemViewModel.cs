@@ -1,4 +1,5 @@
 using Float.Core.Models;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -10,7 +11,7 @@ public sealed class VolumeItemViewModel
     public string Format { get; }
     public string Size { get; }
     public string SourcePath { get; }
-    public string Kind => Source.IsAnonymous ? "Anonymous" : "Named";
+    public string Kind => Source.IsAnonymous ? UiStrings.Get("Anonymous") : UiStrings.Get("Named");
     public string DetailLabel => string.IsNullOrWhiteSpace(Size) ? Kind : $"{Kind} · {Size}";
 
     public VolumeItemViewModel(ContainerVolumeInfo source)

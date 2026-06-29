@@ -8,6 +8,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels.Wizards;
 
@@ -57,7 +58,7 @@ public partial class CreateVolumeWizardViewModel : ViewModelBase, IHasError
                                         && _availableDiskBytes is { } available
                                         && requested > available;
     public string VolumeSizeWarning => _availableDiskBytes is { } available
-        ? $"Requested size is larger than available disk space ({FormatBytes(available)})."
+        ? string.Format(UiStrings.Get("RequestedSizeTooLargeFormat"), FormatBytes(available))
         : "";
     public bool CanCreate => !string.IsNullOrWhiteSpace(VolumeName) && !IsCreating;
 
@@ -134,7 +135,7 @@ public partial class CreateVolumeWizardViewModel : ViewModelBase, IHasError
                     onFailure: error =>
                     {
                         HasError = true;
-                        ErrorMessage = error.Message ?? "Volume creation failed";
+                        ErrorMessage = error.Message ?? UiStrings.Get("VolumeCreationFailed");
                     });
             });
         }

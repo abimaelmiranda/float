@@ -1,6 +1,7 @@
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Models.Results.Errors;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -22,7 +23,7 @@ public partial class CrashHandlerViewModel : ObservableObject
         Message = message;
         Error = error;
         Details = error?.Code is { Length: > 0 }
-            ? $"Error Code: {error.Code}"
+            ? string.Format(UiStrings.Get("ErrorCodeFormat"), error.Code)
             : null;
     }
 }

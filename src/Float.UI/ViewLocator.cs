@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
+using Float.UI.Resources;
 using Float.UI.ViewModels;
 using Float.UI.ViewModels.Setup;
 using Float.UI.ViewModels.Wizards;
@@ -30,7 +31,7 @@ public class ViewLocator : IDataTemplate
         if (param is null) return null;
         return _map.TryGetValue(param.GetType(), out var factory)
             ? factory()
-            : new TextBlock { Text = "Not Found: " + param.GetType().Name };
+            : new TextBlock { Text = string.Format(UiStrings.Get("NotFoundFormat"), param.GetType().Name) };
     }
 
     public bool Match(object? data) => data is ViewModelBase;

@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.UI.Resources;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI.ViewModels.Wizards;
@@ -67,18 +68,18 @@ public partial class MigrationWizardViewModel : ViewModelBase
         ? CleanupSelectionSummary
         : SelectionSummary;
     public string SelectionSummary => SelectedCount == 1
-        ? "1 container selected"
-        : $"{SelectedCount} containers selected";
+        ? UiStrings.Get("OneContainerSelected")
+        : string.Format(UiStrings.Get("ContainersSelectedFormat"), SelectedCount);
     public string CleanupSelectionSummary => CleanupSelectedCount == 0
-        ? "Docker originals will be preserved"
+        ? UiStrings.Get("DockerOriginalsPreserved")
         : CleanupSelectedCount == 1
-            ? "1 Docker original selected for cleanup"
-            : $"{CleanupSelectedCount} Docker originals selected for cleanup";
+            ? UiStrings.Get("OneDockerCleanupSelected")
+            : string.Format(UiStrings.Get("DockerCleanupSelectedFormat"), CleanupSelectedCount);
     public string NextButtonText => CurrentStep switch
     {
-        1 => "Migrate",
-        2 => IsMigrating ? "Migrating..." : "Continue",
-        _ => "Done"
+        1 => UiStrings.Migrate,
+        2 => IsMigrating ? UiStrings.Get("Migrating") : UiStrings.Continue,
+        _ => UiStrings.Done
     };
 
     public MigrationWizardViewModel(
@@ -181,7 +182,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
                     onFailure: error =>
                     {
                         HasError = true;
-                        ErrorMessage = error.Message ?? "Failed to list Docker containers";
+                        ErrorMessage = error.Message ?? UiStrings.Get("FailedListDockerContainers");
                     });
 
                 IsLoading = false;
@@ -265,8 +266,8 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
         var item = PendingArchitectureItem;
         item.ManualArchitecture = parsedArchitecture.Value.ToDisplayValue();
-        item.AppendLogLine("Docker image architecture could not be detected automatically.");
-        item.AppendLogLine($"Architecture provided manually: {item.ManualArchitecture}.");
+        item.AppendLogLine(UiStrings.Get("DockerImageArchitectureUndetected"));
+        item.AppendLogLine(string.Format(UiStrings.Get("ArchitectureProvidedManuallyFormat"), item.ManualArchitecture));
         PendingArchitectureItem = null;
         SelectedArchitecture = null;
 
@@ -295,8 +296,8 @@ public partial class MigrationWizardViewModel : ViewModelBase
         {
             IsCleaningUp = true;
             CleanupSummary = selected.Length == 0
-                ? "Finishing migration..."
-                : "Cleaning up Docker originals...";
+                ? UiStrings.Get("FinishingMigration")
+                : UiStrings.Get("CleaningUpDockerOriginals");
         });
 
         var removed = 0;
@@ -314,19 +315,19 @@ public partial class MigrationWizardViewModel : ViewModelBase
                     item.CleanupSucceeded = true;
                     item.CleanupFailed = false;
                     item.IsCleanupSelected = false;
-                    item.MigrationStatus = "Docker original removed";
+                    item.MigrationStatus = UiStrings.Get("DockerOriginalRemoved");
                 });
             }
             else
             {
-                var errorMessage = result.Failure.Message ?? "Unknown error";
-                item.AppendLogLine($"Cleanup failed: {errorMessage}");
+                var errorMessage = result.Failure.Message ?? UiStrings.UnknownError;
+                item.AppendLogLine(string.Format(UiStrings.Get("CleanupFailedFormat"), errorMessage));
                 failed++;
                 await Dispatcher.UIThread.InvokeAsync(() =>
                 {
                     item.CleanupSucceeded = false;
                     item.CleanupFailed = true;
-                    item.MigrationStatus = $"Cleanup failed: {errorMessage}";
+                    item.MigrationStatus = string.Format(UiStrings.Get("CleanupFailedFormat"), errorMessage);
                 });
             }
         }
@@ -405,10 +406,10 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 item.ClearLog();
                 if (item.Source.Architecture is null && item.ManualArchitecture is not null)
                 {
-                    item.AppendLogLine("Docker image architecture could not be detected automatically.");
-                    item.AppendLogLine($"Architecture provided manually: {item.ManualArchitecture}.");
+                    item.AppendLogLine(UiStrings.Get("DockerImageArchitectureUndetected"));
+                    item.AppendLogLine(string.Format(UiStrings.Get("ArchitectureProvidedManuallyFormat"), item.ManualArchitecture));
                 }
-                item.MigrationStatus = item.IsSelected ? "Waiting" : "Not selected";
+                item.MigrationStatus = item.IsSelected ? UiStrings.Get("Waiting") : UiStrings.Get("NotSelected");
             }
         });
 
@@ -450,39 +451,39 @@ public partial class MigrationWizardViewModel : ViewModelBase
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 item.IsMigrating = true;
-                item.MigrationStatus = "Creating Apple container";
+                item.MigrationStatus = UiStrings.Get("CreatingAppleContainer");
             });
 
             appleCreateAttempted = true;
             var createResult = await _appleCreator.CreateAsync(createRequest, progress).ConfigureAwait(false);
             if (createResult.IsFailure)
-                throw new InvalidOperationException(createResult.Failure.Message ?? "Container creation failed");
+                throw new InvalidOperationException(createResult.Failure.Message ?? UiStrings.Get("ContainerCreationFailed"));
 
             if (dockerWasRunning)
             {
-                await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = "Stopping Docker original");
+                await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = UiStrings.Get("StoppingDockerOriginal"));
                 var stopResult = await _dockerLifecycle.StopAsync(item.Source, progress: progress).ConfigureAwait(false);
                 if (stopResult.IsFailure)
-                    throw new InvalidOperationException(stopResult.Failure.Message ?? "Failed to stop Docker container");
+                    throw new InvalidOperationException(stopResult.Failure.Message ?? UiStrings.Get("FailedStopDockerContainer"));
                 dockerStopped = true;
             }
 
-            await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = "Starting Apple container");
+            await Dispatcher.UIThread.InvokeAsync(() => item.MigrationStatus = UiStrings.Get("StartingAppleContainer"));
             var startResult = await _appleLifecycle.StartAsync(appleContainer, progress: progress).ConfigureAwait(false);
             if (startResult.IsFailure)
-                throw new InvalidOperationException(startResult.Failure.Message ?? "Failed to start Apple container");
+                throw new InvalidOperationException(startResult.Failure.Message ?? UiStrings.Get("FailedStartAppleContainer"));
 
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 item.IsMigrating = false;
                 item.MigrationSucceeded = true;
                 item.MigrationFailed = false;
-                item.MigrationStatus = "Migrated";
+                item.MigrationStatus = UiStrings.Get("Migrated");
             });
         }
         catch (Exception ex)
         {
-            item.AppendLogLine($"Migration failed: {ex.Message}");
+            item.AppendLogLine(string.Format(UiStrings.Get("MigrationFailedFormat"), ex.Message));
             var rollbackMessage = await RollbackAsync(
                 appleContainer,
                 item.Source,
@@ -497,8 +498,8 @@ public partial class MigrationWizardViewModel : ViewModelBase
                 item.MigrationSucceeded = false;
                 item.MigrationFailed = true;
                 item.MigrationStatus = string.IsNullOrWhiteSpace(rollbackMessage)
-                    ? $"Failed: {ex.Message}"
-                    : $"Failed: {ex.Message}. {rollbackMessage}";
+                    ? string.Format(UiStrings.Get("FailedFormat"), ex.Message)
+                    : string.Format(UiStrings.Get("FailedWithRollbackFormat"), ex.Message, rollbackMessage);
             });
         }
     }
@@ -516,18 +517,18 @@ public partial class MigrationWizardViewModel : ViewModelBase
         {
             var deleteResult = await _appleLifecycle.DeleteAsync(appleContainer, progress: progress).ConfigureAwait(false);
             if (deleteResult.IsSuccess)
-                messages.Add("Removed partial Apple container.");
+                messages.Add(UiStrings.Get("RemovedPartialAppleContainer"));
             else
-                messages.Add($"Could not remove partial Apple container: {deleteResult.Failure.Message}");
+                messages.Add(string.Format(UiStrings.Get("CouldNotRemovePartialAppleContainerFormat"), deleteResult.Failure.Message));
         }
 
         if (dockerStopped)
         {
             var startResult = await _dockerLifecycle.StartAsync(dockerContainer, progress: progress).ConfigureAwait(false);
             if (startResult.IsSuccess)
-                messages.Add("Docker original restarted.");
+                messages.Add(UiStrings.Get("DockerOriginalRestarted"));
             else
-                messages.Add($"Could not restart Docker original: {startResult.Failure.Message}");
+                messages.Add(string.Format(UiStrings.Get("CouldNotRestartDockerOriginalFormat"), startResult.Failure.Message));
         }
 
         return string.Join(" ", messages);
@@ -542,7 +543,7 @@ public partial class MigrationWizardViewModel : ViewModelBase
         var architecture = item.EffectiveArchitecture;
         if (architecture is null)
             throw new InvalidOperationException(
-                $"Could not detect Docker image architecture for '{source.Name}'. Open the image in Docker Desktop or pull it again, then retry migration.");
+                string.Format(UiStrings.Get("CouldNotDetectDockerArchitectureFormat"), source.Name));
 
         // TODO: export Docker named volume data to host path before migration.
         var bindMounts = source.Volumes
@@ -615,8 +616,8 @@ public partial class MigrationWizardViewModel : ViewModelBase
 
     private string BuildMigrationSummary()
         => FailedMigrationCount == 0
-            ? $"{MigratedCount} container(s) migrated."
-            : $"{MigratedCount} migrated, {FailedMigrationCount} failed.";
+            ? string.Format(UiStrings.Get("MigratedCountFormat"), MigratedCount)
+            : string.Format(UiStrings.Get("MigratedFailedCountFormat"), MigratedCount, FailedMigrationCount);
 
     partial void OnIsLoadingChanged(bool value)
     {
@@ -692,18 +693,18 @@ public sealed class MigrationCleanupCompletedEventArgs : EventArgs
         {
             var parts = new List<string>
             {
-                $"{Migrated} migrated",
-                $"{Removed} Docker original(s) removed"
+                string.Format(UiStrings.Get("MigratedPartFormat"), Migrated),
+                string.Format(UiStrings.Get("RemovedPartFormat"), Removed)
             };
 
             if (AlreadyRemoved > 0)
-                parts.Add($"{AlreadyRemoved} already removed");
+                parts.Add(string.Format(UiStrings.Get("AlreadyRemovedPartFormat"), AlreadyRemoved));
 
             if (Preserved > 0)
-                parts.Add($"{Preserved} preserved");
+                parts.Add(string.Format(UiStrings.Get("PreservedPartFormat"), Preserved));
 
             if (Failed > 0)
-                parts.Add($"{Failed} cleanup failed");
+                parts.Add(string.Format(UiStrings.Get("CleanupFailedPartFormat"), Failed));
 
             return string.Join(", ", parts) + ".";
         }

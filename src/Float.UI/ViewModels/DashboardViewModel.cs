@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
 using Float.Core.Models.Results;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -62,15 +63,15 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
 
     [RelayCommand]
     private Task StartContainerAsync(Container? container)
-        => RunLifecycleAsync(container, "Starting...", (c, ct) => _containerLifecycle.StartAsync(c, ct));
+        => RunLifecycleAsync(container, UiStrings.Starting, (c, ct) => _containerLifecycle.StartAsync(c, ct));
 
     [RelayCommand]
     private Task StopContainerAsync(Container? container)
-        => RunLifecycleAsync(container, "Stopping...", (c, ct) => _containerLifecycle.StopAsync(c, ct));
+        => RunLifecycleAsync(container, UiStrings.Get("Stopping"), (c, ct) => _containerLifecycle.StopAsync(c, ct));
 
     [RelayCommand]
     private Task RestartContainerAsync(Container? container)
-        => RunLifecycleAsync(container, "Restarting...", (c, ct) => _containerLifecycle.RestartAsync(c, ct));
+        => RunLifecycleAsync(container, UiStrings.Get("Restarting"), (c, ct) => _containerLifecycle.RestartAsync(c, ct));
 
     [RelayCommand]
     private void RequestDelete(Container? container)
@@ -93,10 +94,10 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
             return;
 
         var name = container.Name;
-        var deleted = await RunLifecycleAsync(container, "Deleting...", (c, ct) => _containerLifecycle.DeleteAsync(c, ct))
+        var deleted = await RunLifecycleAsync(container, UiStrings.Get("Deleting"), (c, ct) => _containerLifecycle.DeleteAsync(c, ct))
             .ConfigureAwait(false);
         if (deleted)
-            OperationSucceeded?.Invoke(this, $"Container '{name}' deleted.");
+            OperationSucceeded?.Invoke(this, string.Format(UiStrings.Get("ContainerDeletedFormat"), name));
     }
 
     public async Task RefreshAsync()
@@ -126,7 +127,7 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
                 onFailure: error =>
                 {
                     HasError = true;
-                    ErrorMessage = error.Message ?? "Failed to list containers";
+                    ErrorMessage = error.Message ?? UiStrings.Get("FailedListContainers");
                     OperationFailed?.Invoke(this, ErrorMessage);
                 });
         });
@@ -150,7 +151,7 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
             var result = await Task.Run(() => action(container, CancellationToken.None)).ConfigureAwait(false);
             if (result.IsFailure)
             {
-                await ShowErrorAsync(result.Failure.Message ?? "Container command failed.").ConfigureAwait(false);
+                await ShowErrorAsync(result.Failure.Message ?? UiStrings.Get("ContainerCommandFailed")).ConfigureAwait(false);
                 return false;
             }
 

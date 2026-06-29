@@ -7,6 +7,7 @@ using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
+using Float.UI.Resources;
 using Float.UI.ViewModels.Setup;
 using Float.UI.ViewModels.Wizards;
 
@@ -42,10 +43,10 @@ public partial class MainWindowViewModel : ViewModelBase
     [ObservableProperty] public partial string NotificationTitle { get; set; } = "";
     [ObservableProperty] public partial string NotificationMessage { get; set; } = "";
 
-    public string EngineStatusLabel => IsEngineStarting ? "Starting…"
-                                     : IsEngineRunning  ? "Engine running"
-                                                        : "Engine stopped";
-    public string ThemeToggleLabel => IsDarkTheme ? "Light mode" : "Dark mode";
+    public string EngineStatusLabel => IsEngineStarting ? UiStrings.Starting
+                                     : IsEngineRunning  ? UiStrings.EngineRunning
+                                                        : UiStrings.EngineStopped;
+    public string ThemeToggleLabel => IsDarkTheme ? UiStrings.LightMode : UiStrings.DarkMode;
 
     public MainWindowViewModel(
         IEngineProvisioner engineProvisioner,
@@ -74,7 +75,7 @@ public partial class MainWindowViewModel : ViewModelBase
 
         dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
         dashboardVm.OperationFailed += OnDashboardOperationFailed;
-        dashboardVm.OperationSucceeded += (_, msg) => ShowNotification("Done", msg);
+        dashboardVm.OperationSucceeded += (_, msg) => ShowNotification(UiStrings.Done, msg);
         imagesVm.OperationFailed += OnImagesOperationFailed;
         volumesVm.OperationFailed += OnVolumesOperationFailed;
         volumesVm.RequestCreateVolume += OnRequestCreateVolume;
@@ -121,7 +122,7 @@ public partial class MainWindowViewModel : ViewModelBase
             if (result.IsFailure)
             {
                 await Dispatcher.UIThread.InvokeAsync(() =>
-                    ShowNotification("Engine start failed", result.Failure.Message ?? "Unknown error"));
+                    ShowNotification(UiStrings.EngineStartFailed, result.Failure.Message ?? UiStrings.UnknownError));
             }
             IsEngineStarting = false;
 
@@ -193,12 +194,12 @@ public partial class MainWindowViewModel : ViewModelBase
 
     private void OnImagesOperationFailed(object? sender, string message)
     {
-        ShowNotification("Image refresh failed", message);
+        ShowNotification(UiStrings.Get("ImageRefreshFailed"), message);
     }
 
     private void OnVolumesOperationFailed(object? sender, string message)
     {
-        ShowNotification("Volume refresh failed", message);
+        ShowNotification(UiStrings.Get("VolumeRefreshFailed"), message);
     }
 
     private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
@@ -206,13 +207,13 @@ public partial class MainWindowViewModel : ViewModelBase
         CancelMigrationLoad();
         ReturnToDashboard();
         ShowNotification(
-            e.Failed == 0 ? "Migration complete" : "Migration complete with cleanup issues",
+            e.Failed == 0 ? UiStrings.Get("MigrationComplete") : UiStrings.Get("MigrationCompleteCleanupIssues"),
             e.Summary);
     }
 
     private void OnDashboardOperationFailed(object? sender, string message)
     {
-        ShowNotification("Container operation failed", message);
+        ShowNotification(UiStrings.Get("ContainerOperationFailed"), message);
     }
 
     private void ReturnToDashboard()
@@ -258,7 +259,7 @@ public partial class MainWindowViewModel : ViewModelBase
         var result = await _provisioner.StartEngineAsync().ConfigureAwait(false);
         if (result.IsFailure)
             await Dispatcher.UIThread.InvokeAsync(() =>
-                ShowNotification("Engine start failed", result.Failure.Message ?? "Unknown error"));
+                ShowNotification(UiStrings.EngineStartFailed, result.Failure.Message ?? UiStrings.UnknownError));
         IsEngineStarting = false;
         await RefreshEngineStatusAsync().ConfigureAwait(false);
     }

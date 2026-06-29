@@ -6,6 +6,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Models.Results;
 using Float.Core.Models.Results.Errors;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -56,7 +57,7 @@ public abstract partial class ProvisioningViewModelBase : ViewModelBase
                     onFailure: async error =>
                     {
                         HasError = true;
-                        ErrorMessage = error.Message ?? "An unknown error occurred";
+                        ErrorMessage = error.Message ?? UiStrings.Get("AnUnknownErrorOccurred");
                         await OnProvisioningFailedAsync(error).ConfigureAwait(false);
                     });
             });

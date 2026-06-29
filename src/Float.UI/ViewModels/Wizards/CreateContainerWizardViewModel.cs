@@ -9,6 +9,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels.Wizards;
 
@@ -42,12 +43,12 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
 
     public string StepTitle => CurrentStep switch
     {
-        1 => "Container Image",
-        2 => "Platform & Resources",
-        3 => "Ports & Volumes",
-        4 => "Environment",
-        5 => "Review & Create",
-        6 => "Creating Container",
+        1 => UiStrings.ContainerImage,
+        2 => UiStrings.PlatformResources,
+        3 => UiStrings.PortsVolumes,
+        4 => UiStrings.Environment,
+        5 => UiStrings.ReviewCreate,
+        6 => UiStrings.CreatingContainer,
         _ => ""
     };
 
@@ -293,7 +294,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
                     onFailure: error =>
                     {
                         HasError = true;
-                        ErrorMessage = error.Message ?? "Container creation failed";
+                        ErrorMessage = error.Message ?? UiStrings.Get("ContainerCreationFailed");
                     });
             });
         }

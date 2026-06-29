@@ -5,6 +5,7 @@ using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.UI.Resources;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI.ViewModels;
@@ -81,7 +82,7 @@ public partial class VolumesViewModel : ViewModelBase, IHasError, IHasPendingDel
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 HasError = true;
-                ErrorMessage = result.Failure.Message ?? "Failed to delete volume";
+                ErrorMessage = result.Failure.Message ?? UiStrings.Get("FailedToDeleteVolume");
                 OperationFailed?.Invoke(this, ErrorMessage);
             });
             return;
@@ -123,7 +124,7 @@ public partial class VolumesViewModel : ViewModelBase, IHasError, IHasPendingDel
                 onFailure: error =>
                 {
                     HasError = true;
-                    ErrorMessage = error.Message ?? "Failed to list volumes";
+                    ErrorMessage = error.Message ?? UiStrings.Get("FailedListVolumes");
                     OperationFailed?.Invoke(this, ErrorMessage);
                 });
         });

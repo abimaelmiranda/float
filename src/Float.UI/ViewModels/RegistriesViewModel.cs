@@ -4,6 +4,7 @@ using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
+using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
 
@@ -101,7 +102,7 @@ public partial class RegistriesViewModel : ViewModelBase, IHasError
             if (result.IsFailure)
             {
                 HasLoginError = true;
-                LoginError = result.Failure.Message ?? "Login failed";
+                LoginError = result.Failure.Message ?? UiStrings.Get("LoginFailed");
                 return;
             }
 
@@ -127,7 +128,7 @@ public partial class RegistriesViewModel : ViewModelBase, IHasError
             if (result.IsFailure)
             {
                 HasError = true;
-                ErrorMessage = result.Failure.Message ?? "Logout failed";
+                ErrorMessage = result.Failure.Message ?? UiStrings.Get("LogoutFailed");
                 return;
             }
 
@@ -145,7 +146,7 @@ public partial class RegistriesViewModel : ViewModelBase, IHasError
             if (result.IsFailure)
             {
                 HasError = true;
-                ErrorMessage = result.Failure.Message ?? "Failed to load registries";
+                ErrorMessage = result.Failure.Message ?? UiStrings.Get("FailedLoadRegistries");
                 return;
             }
 

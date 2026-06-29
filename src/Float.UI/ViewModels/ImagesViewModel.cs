@@ -6,6 +6,7 @@ using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
 using Float.Core.Models.Results;
+using Float.UI.Resources;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.UI.ViewModels;
@@ -80,7 +81,7 @@ public partial class ImagesViewModel : ViewModelBase, IHasError, IHasPendingDele
             await Dispatcher.UIThread.InvokeAsync(() =>
             {
                 HasError = true;
-                ErrorMessage = result.Failure.Message ?? "Failed to delete image";
+                ErrorMessage = result.Failure.Message ?? UiStrings.Get("FailedToDeleteImage");
                 OperationFailed?.Invoke(this, ErrorMessage);
             });
             return;
@@ -120,7 +121,7 @@ public partial class ImagesViewModel : ViewModelBase, IHasError, IHasPendingDele
                 onFailure: error =>
                 {
                     HasError = true;
-                    ErrorMessage = error.Message ?? "Failed to list images";
+                    ErrorMessage = error.Message ?? UiStrings.Get("FailedListImages");
                     OperationFailed?.Invoke(this, ErrorMessage);
                 });
         });
