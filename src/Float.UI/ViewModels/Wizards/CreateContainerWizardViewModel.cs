@@ -87,6 +87,10 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
 
     public ObservableCollection<EnvVarItem> EnvironmentVariables { get; } = [];
 
+    // ── Step 5 — Command preview ──────────────────────────────────────────
+
+    [ObservableProperty] public partial string GeneratedCommand { get; set; } = "";
+
     // ── Step 6 — Creation state ───────────────────────────────────────────
 
     [ObservableProperty] public partial bool IsCreating { get; set; }
@@ -208,6 +212,9 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         OnPropertyChanged(nameof(IsWizardStep));
         OnPropertyChanged(nameof(StepTitle));
         OnPropertyChanged(nameof(CanGoNext));
+
+        if (value == 5)
+            GeneratedCommand = _creator.BuildCommandPreview(BuildRequest());
     }
 
     partial void OnRegistryChanged(string value) => OnPropertyChanged(nameof(ImageReference));
@@ -256,6 +263,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
             Ports = ports,
             Volumes = volumes,
             EnvironmentVariables = envVars,
+            CommandOverride = string.IsNullOrWhiteSpace(GeneratedCommand) ? null : GeneratedCommand,
         };
     }
 
@@ -312,6 +320,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         PortMappings.Clear();
         Volumes.Clear();
         EnvironmentVariables.Clear();
+        GeneratedCommand = "";
         IsCreating = false;
         IsComplete = false;
         HasError = false;

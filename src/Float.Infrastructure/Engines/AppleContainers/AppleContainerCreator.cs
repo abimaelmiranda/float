@@ -24,20 +24,42 @@ public class AppleContainerCreator : IContainerCreator
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default)
     {
-        var args = BuildArgs(request);
-        progress?.Report("$ /usr/local/bin/container " + FormatArguments(args, redactEnvironment: true));
-        var result = await _processHost.RunWithResultAsync(
-            "/usr/local/bin/container",
-            args,
-            workingDirectory: null,
-            onOutput: line => progress?.Report(line),
-            onError: line => progress?.Report(line),
-            cancellationToken: cancellationToken).ConfigureAwait(false);
+        Result result;
+
+        if (request.CommandOverride is { } cmd)
+        {
+            progress?.Report("$ " + cmd);
+            result = await _processHost.RunWithResultAsync(
+                "/bin/sh",
+                ["-c", cmd],
+                workingDirectory: null,
+                onOutput: line => progress?.Report(line),
+                onError: line => progress?.Report(line),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
+        else
+        {
+            var args = BuildArgs(request);
+            progress?.Report("$ /usr/local/bin/container " + FormatArguments(args, redactEnvironment: true));
+            result = await _processHost.RunWithResultAsync(
+                "/usr/local/bin/container",
+                args,
+                workingDirectory: null,
+                onOutput: line => progress?.Report(line),
+                onError: line => progress?.Report(line),
+                cancellationToken: cancellationToken).ConfigureAwait(false);
+        }
 
         if (result.IsFailure)
             return Result.WithFailure<string>(result.Failure);
 
         return Result.WithSuccess(request.Name ?? string.Empty);
+    }
+
+    public string BuildCommandPreview(ContainerCreateRequest request)
+    {
+        var args = BuildArgs(request);
+        return "/usr/local/bin/container " + FormatArguments(args, redactEnvironment: false);
     }
 
     private static List<string> BuildArgs(ContainerCreateRequest request)

@@ -9,4 +9,6 @@ public interface IContainerCreator : IContainerEngineAware
         ContainerCreateRequest request,
         IProgress<string>? progress = null,
         CancellationToken cancellationToken = default);
+
+    string BuildCommandPreview(ContainerCreateRequest request);
 }

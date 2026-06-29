@@ -398,6 +398,16 @@
                             </Grid>
                         </StackPanel>
                     </Border>
+
+                    <StackPanel Spacing="6">
+                        <TextBlock Text="Command (Edit if needed)" FontSize="12"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                        <TextBox Text="{Binding GeneratedCommand}"
+                                 FontFamily="Menlo,Cascadia Code,Consolas,monospace"
+                                 FontSize="11"
+                                 AcceptsReturn="False"
+                                 TextWrapping="Wrap"/>
+                    </StackPanel>
                 </StackPanel>
 
                 <!-- ── Step 6: Creating (console) ─────────────────────── -->

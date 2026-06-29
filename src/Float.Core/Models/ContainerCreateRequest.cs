@@ -15,4 +15,5 @@ public sealed record ContainerCreateRequest
     public IReadOnlyList<ContainerPortMapping> Ports { get; init; } = [];
     public IReadOnlyList<ContainerVolume> Volumes { get; init; } = [];
     public IReadOnlyList<ContainerEnvironment> EnvironmentVariables { get; init; } = [];
+    public string? CommandOverride { get; init; }
 }
