@@ -14,7 +14,6 @@ public partial class SettingsViewModel : ViewModelBase
 
     public event EventHandler? CloseRequested;
 
-    // Container Defaults
     [ObservableProperty] public partial string DefaultRegistry { get; set; } = "docker";
     [ObservableProperty] public partial string DefaultArchitecture { get; set; } = "arm64";
     [ObservableProperty] public partial string DefaultCpuCount { get; set; } = "";
@@ -22,11 +21,9 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] public partial bool DefaultKeepAlive { get; set; }
     [ObservableProperty] public partial bool StartImmediately { get; set; } = true;
 
-    // Container Behavior
     [ObservableProperty] public partial bool ForceDeleteRunning { get; set; }
     [ObservableProperty] public partial string StopTimeoutSeconds { get; set; } = "5";
 
-    // Application
     [ObservableProperty] public partial string Language { get; set; } = "en";
     [ObservableProperty] public partial bool CloseToTray { get; set; } = true;
     [ObservableProperty] public partial bool StopEngineOnQuit { get; set; } = true;

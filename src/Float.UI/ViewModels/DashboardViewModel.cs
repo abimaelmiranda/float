@@ -83,7 +83,7 @@ public partial class DashboardViewModel : ViewModelBase, IHasError, IHasPendingD
     private Task RefreshContainersAsync() => RefreshAsync();
 
     [RelayCommand]
-    private void CloseDetail() => SelectedContainer = null; // clears Detail via OnSelectedContainerChanged
+    private void CloseDetail() => SelectedContainer = null;
 
     [RelayCommand]
     private Task StartContainerAsync(Container? container)

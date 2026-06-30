@@ -30,7 +30,6 @@ public static class ServiceCollectionExtensions
         services.AddKeyedSingleton<IContainerReader, DockerReader>(ContainerEngine.Docker);
         services.AddKeyedSingleton<IContainerLifecycle, DockerContainerLifecycle>(ContainerEngine.Docker);
 
-        // Active engine forwarding — change the key here to switch engines
         services.AddSingleton<IEngineProvisioner>(sp =>
             sp.GetRequiredKeyedService<IEngineProvisioner>(ContainerEngine.AppleContainers));
         services.AddSingleton<IContainerReader>(sp =>

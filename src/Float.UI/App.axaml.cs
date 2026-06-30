@@ -84,11 +84,9 @@ public partial class App : Application
         _mainWindow.Activate();
     }
 
-    // ── Tray icon ────────────────────────────────────────────────────────
     private void OnTrayIconClicked(object? sender, EventArgs e) => ShowMainWindow();
     private void OnShowFloatClick(object? sender, EventArgs e)  => ShowMainWindow();
 
-    // ── Native menu ──────────────────────────────────────────────────────
     private void OnAboutClick(object? sender, EventArgs e) { }
 
     private void OnSettingsClick(object? sender, EventArgs e)

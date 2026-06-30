@@ -24,11 +24,8 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     public event EventHandler? Cancelled;
     public event Action<VolumeItem>? RequestFolderPick;
 
-    // ── Navigation ───────────────────────────────────────────────────────
-
     [ObservableProperty] public partial int CurrentStep { get; set; } = 1;
 
-    // Steps 1-5 are the wizard; step 6 is the dedicated creating screen
     public int TotalSteps => 5;
 
     public bool IsStep1 => CurrentStep == 1;
@@ -38,7 +35,6 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     public bool IsStep5 => CurrentStep == 5;
     public bool IsStep6 => CurrentStep == 6;
 
-    // Used to show/hide the wizard header (progress bar hidden on step 6)
     public bool IsWizardStep => CurrentStep <= 5;
 
     public string StepTitle => CurrentStep switch
@@ -52,16 +48,10 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         _ => ""
     };
 
-    // ── Step 1 — Image ───────────────────────────────────────────────────
-
     [ObservableProperty] public partial string Registry { get; set; } = "docker";
     [ObservableProperty] public partial string ImageName { get; set; } = "";
     [ObservableProperty] public partial string Tag { get; set; } = "latest";
-
-    // TODO: validate — no spaces, no uppercase, max 63 chars, only [a-z0-9_.-]
     [ObservableProperty] public partial string ContainerName { get; set; } = "";
-
-    // ── Step 2 — Platform ────────────────────────────────────────────────
 
     [ObservableProperty] public partial bool EnableRosetta { get; set; }
     [ObservableProperty] public partial string Architecture { get; set; } = "arm64";
@@ -80,20 +70,12 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         if (value == "arm64") EnableRosetta = false;
     }
 
-    // ── Step 3 — Ports & Volumes ─────────────────────────────────────────
-
     public ObservableCollection<PortMappingItem> PortMappings { get; } = [];
     public ObservableCollection<VolumeItem> Volumes { get; } = [];
 
-    // ── Step 4 — Environment ─────────────────────────────────────────────
-
     public ObservableCollection<EnvVarItem> EnvironmentVariables { get; } = [];
 
-    // ── Step 5 — Command preview ──────────────────────────────────────────
-
     [ObservableProperty] public partial string GeneratedCommand { get; set; } = "";
-
-    // ── Step 6 — Creation state ───────────────────────────────────────────
 
     [ObservableProperty] public partial bool IsCreating { get; set; }
     [ObservableProperty] public partial bool IsComplete { get; set; }
@@ -101,20 +83,11 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     [ObservableProperty] public partial string Output { get; set; } = "";
     [ObservableProperty] public partial string ErrorMessage { get; set; } = "";
 
-    // ── Validation ───────────────────────────────────────────────────────
-
-    // TODO: step 1 — warn when ContainerName has spaces or invalid chars
-    // TODO: step 2 — validate CpuCount is a positive number when not empty
-    // TODO: step 2 — validate Memory format (e.g. 512m, 2g)
-    // TODO: step 3 — validate port numbers are 1-65535
-    // TODO: step 3 — validate host paths exist before submitting
     public bool CanGoNext => CurrentStep switch
     {
         1 => !string.IsNullOrWhiteSpace(ImageName),
         _ => true
     };
-
-    // ── Constructor ──────────────────────────────────────────────────────
 
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
     public string[] RegistryOptions { get; } = ["docker", "ghcr"];
@@ -131,8 +104,6 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         _cts?.Cancel();
         Reset();
     }
-
-    // ── Navigation commands ──────────────────────────────────────────────
 
     [RelayCommand]
     private void Next()
@@ -156,8 +127,6 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         Cancelled?.Invoke(this, EventArgs.Empty);
     }
 
-    // ── List management ──────────────────────────────────────────────────
-
     [RelayCommand] private void AddPort() => PortMappings.Add(new PortMappingItem());
     [RelayCommand] private void RemovePort(PortMappingItem item) => PortMappings.Remove(item);
 
@@ -168,12 +137,9 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     [RelayCommand] private void AddEnvVar() => EnvironmentVariables.Add(new EnvVarItem());
     [RelayCommand] private void RemoveEnvVar(EnvVarItem item) => EnvironmentVariables.Remove(item);
 
-    // ── Creation ─────────────────────────────────────────────────────────
-
     [RelayCommand]
     private async Task CreateContainerAsync()
     {
-        // Advance to the dedicated creating screen first
         CurrentStep = 6;
         OnCurrentStepChanged(CurrentStep);
 
@@ -195,15 +161,11 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         await RunCreationAsync(request, progress, _cts.Token);
     }
 
-    // Navigates back to the dashboard — called after a successful creation
     [RelayCommand]
     private void Done() => ContainerCreated?.Invoke(this, EventArgs.Empty);
 
-    // Resets and stays in the wizard to create another container
     [RelayCommand]
     private void CreateAnother() => Reset();
-
-    // ── Property change notifications ────────────────────────────────────
 
     partial void OnCurrentStepChanged(int value)
     {
@@ -229,8 +191,6 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     }
 
     partial void OnTagChanged(string value) => OnPropertyChanged(nameof(ImageReference));
-
-    // ── Helpers ──────────────────────────────────────────────────────────
 
     private ContainerCreateRequest BuildRequest()
     {
