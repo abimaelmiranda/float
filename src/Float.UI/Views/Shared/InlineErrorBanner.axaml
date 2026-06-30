@@ -1,8 +1,8 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:abs="using:Float.UI.Abstractions"
              x:Class="Float.UI.Views.Shared.InlineErrorBanner"
-             x:DataType="vm:IHasError">
+             x:DataType="abs:IHasError">
 
     <Border IsVisible="{Binding HasError}"
             Padding="10"

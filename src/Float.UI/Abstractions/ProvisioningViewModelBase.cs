@@ -8,7 +8,7 @@ using Float.Core.Models.Results;
 using Float.Core.Models.Results.Errors;
 using Float.UI.Resources;
 
-namespace Float.UI.ViewModels;
+namespace Float.UI.Abstractions;
 
 public abstract partial class ProvisioningViewModelBase : ViewModelBase
 {

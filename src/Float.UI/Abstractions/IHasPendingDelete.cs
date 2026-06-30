@@ -1,6 +1,6 @@
 using CommunityToolkit.Mvvm.Input;
 
-namespace Float.UI.ViewModels;
+namespace Float.UI.Abstractions;
 
 public interface IHasPendingDelete
 {

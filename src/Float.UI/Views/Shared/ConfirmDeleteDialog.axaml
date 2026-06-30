@@ -1,9 +1,9 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-             xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:abs="using:Float.UI.Abstractions"
              xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Shared.ConfirmDeleteDialog"
-             x:DataType="vm:IHasPendingDelete"
+             x:DataType="abs:IHasPendingDelete"
              x:Name="Self">
 
     <Border Background="#99000000"
