@@ -28,16 +28,21 @@
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
                         Command="{Binding BackCommand}"
+                        Width="24"
+                        Height="24"
+                        Padding="0"
+                        VerticalAlignment="Center"
                         Margin="0,0,12,0"
                         ToolTip.Tip="{x:Static resx:UiStrings.Back}">
                     <Path Classes="icon icon-sm"
-                          Data="{StaticResource IconClose}"
+                          Data="{StaticResource IconBack}"
                           Stroke="{Binding $parent[Button].Foreground}"/>
                 </Button>
                 <TextBlock Grid.Column="1"
                            Text="{Binding Container.Name}"
                            FontSize="20"
                            FontWeight="SemiBold"
+                           LineHeight="24"
                            VerticalAlignment="Center"/>
             </Grid>
         </Border>
