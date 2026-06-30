@@ -61,7 +61,7 @@
                         <StackPanel Grid.Row="0" Grid.Column="2" Spacing="6">
                             <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.ImageName}"/>
                             <TextBox Text="{Binding ImageName, Mode=TwoWay}"
-                                     PlaceholderText="e.g. ubuntu, org/image, library/node"
+                                     PlaceholderText="e.g. ubuntu, org/image, registry.io/org/image"
                                      FontSize="13"/>
                         </StackPanel>
 

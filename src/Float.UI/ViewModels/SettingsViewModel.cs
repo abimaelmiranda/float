@@ -27,7 +27,7 @@ public partial class SettingsViewModel : ViewModelBase
     [ObservableProperty] public partial bool StopEngineOnQuit { get; set; } = true;
     [ObservableProperty] public partial bool ShowInDock { get; set; }
 
-    public string[] RegistryOptions { get; } = ["docker", "ghcr"];
+    public string[] RegistryOptions { get; } = ["docker", "ghcr", "custom"];
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
     public string[] LanguageOptions { get; } = ["en", "pt-BR"];
     public string LanguageRestartMessage => UiStrings.LanguageRestartRequired;

@@ -90,7 +90,7 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
     };
 
     public string[] ArchitectureOptions { get; } = ["arm64", "amd64"];
-    public string[] RegistryOptions { get; } = ["docker", "ghcr"];
+    public string[] RegistryOptions { get; } = ["docker", "ghcr", "custom"];
 
     public CreateContainerWizardViewModel(IContainerCreator creator, ISettingsService settingsService)
     {
@@ -312,10 +312,14 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
         var registry = Registry switch
         {
             "ghcr" => "ghcr.io",
+            "custom" => "",
             _ => "docker.io",
         };
 
         var tag = string.IsNullOrWhiteSpace(Tag) ? "latest" : Tag.Trim();
+        if (registry == "")
+            return HasTag(image) ? image : $"{image}:{tag}";
+
         var normalizedImage = image.Contains('/')
             ? image
             : registry == "docker.io"
@@ -323,5 +327,12 @@ public partial class CreateContainerWizardViewModel : ViewModelBase
                 : image;
 
         return $"{registry}/{normalizedImage}:{tag}";
+    }
+
+    private static bool HasTag(string image)
+    {
+        var slash = image.LastIndexOf('/');
+        var colon = image.LastIndexOf(':');
+        return colon > slash;
     }
 }
