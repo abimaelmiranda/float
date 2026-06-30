@@ -1,5 +1,9 @@
 # Float
 
+<p align="center">
+  <img src="docs/float_readme_logo.png" alt="Float logo" width="160">
+</p>
+
 Float is a .NET container manager with an Avalonia UI, designed for the Apple Silicon ecosystem with Apple Containers.
 
 ## Features
