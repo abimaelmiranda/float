@@ -1,16 +1,54 @@
 <Window xmlns="https://github.com/avaloniaui"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:vm="using:Float.UI.ViewModels"
+        xmlns:resx="using:Float.UI.Resources"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         mc:Ignorable="d"
         x:Class="Float.UI.Views.MainWindow"
         x:DataType="vm:MainWindowViewModel"
         Title="Float"
+        Icon="/Assets/float_icon.png"
         Width="1100" Height="700"
         MinWidth="900" MinHeight="600"
         ExtendClientAreaToDecorationsHint="True"
         ExtendClientAreaTitleBarHeightHint="-1">
+
+    <!-- Window menus — appear after Float in the macOS menu bar -->
+    <NativeMenu.Menu>
+        <NativeMenu>
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Containers}">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.NewContainer}"       Command="{Binding NewContainerCommand}" Gesture="Ctrl+N"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Containers}"      Command="{Binding ShowContainersCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"              Command="{Binding ShowContainersCommand}" Gesture="Ctrl+R"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.MigrateFromDocker}" Command="{Binding ShowMigrationCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Images}">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Images}" Command="{Binding ShowImagesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"     Command="{Binding ShowImagesCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+            <NativeMenuItem Header="{x:Static resx:UiStrings.Volumes}">
+                <NativeMenuItem.Menu>
+                    <NativeMenu>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.CreateVolume}" Command="{Binding NewVolumeCommand}"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Volumes}"   Command="{Binding ShowVolumesCommand}"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Refresh}"        Command="{Binding ShowVolumesCommand}"/>
+                    </NativeMenu>
+                </NativeMenuItem.Menu>
+            </NativeMenuItem>
+        </NativeMenu>
+    </NativeMenu.Menu>
 
     <DockPanel>
 
@@ -24,10 +62,14 @@
                     Padding="16,52,16,8"
                     IsHitTestVisible="False">
                 <StackPanel Orientation="Horizontal" Spacing="8">
-                    <TextBlock Text="⬡"
-                               FontSize="18"
-                               Foreground="{DynamicResource FloatAccentBrush}"
-                               VerticalAlignment="Center"/>
+                    <Image Width="20"
+                           Height="20"
+                           Source="/Assets/float_tray_light.png"
+                           IsVisible="{Binding !IsDarkTheme}"/>
+                    <Image Width="20"
+                           Height="20"
+                           Source="/Assets/float_tray_dark.png"
+                           IsVisible="{Binding IsDarkTheme}"/>
                     <TextBlock Text="Float"
                                FontSize="14"
                                FontWeight="SemiBold"
@@ -40,25 +82,31 @@
                         Background="{DynamicResource SidebarBorderBrush}"
                         Margin="8,4"/>
 
-                <!-- Engine status indicator -->
-                <Border Margin="16,6,16,4">
-                    <StackPanel Orientation="Horizontal" Spacing="8" VerticalAlignment="Center">
-                        <Ellipse Classes="status-dot"
-                                 Classes.running="{Binding IsEngineRunning}"
-                                 Width="7" Height="7"/>
-                        <TextBlock Text="{Binding EngineStatusLabel}"
-                                   FontSize="11"
-                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
-                                   VerticalAlignment="Center"/>
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Margin="8,0,8,4"
+                        Command="{Binding ToggleThemeCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconSun}"
+                              IsVisible="{Binding IsDarkTheme}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconMoon}"
+                              IsVisible="{Binding !IsDarkTheme}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{Binding ThemeToggleLabel}" FontSize="13"/>
                     </StackPanel>
-                </Border>
+                </Button>
 
                 <Button Theme="{StaticResource NavItemTheme}"
                         Margin="8,0,8,12"
-                        IsEnabled="False">
+                        Classes.active="{Binding ShowingSettings}"
+                        Command="{Binding ShowSettingsCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⚙" FontSize="13"/>
-                        <TextBlock Text="Settings" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconSettings}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Settings}" FontSize="13"/>
                     </StackPanel>
                 </Button>
             </StackPanel>
@@ -69,8 +117,10 @@
                         Classes.active="{Binding ShowingContainers}"
                         Command="{Binding ShowContainersCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="▦" FontSize="13"/>
-                        <TextBlock Text="Containers" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconContainers}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Containers}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -78,22 +128,43 @@
                         Classes.active="{Binding ShowingMigration}"
                         Command="{Binding ShowMigrationCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⇒" FontSize="13"/>
-                        <TextBlock Text="Migrate" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconMigration}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Migrate}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
-                <Button Theme="{StaticResource NavItemTheme}" IsEnabled="False">
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Classes.active="{Binding ShowingImages}"
+                        Command="{Binding ShowImagesCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="⬚" FontSize="13"/>
-                        <TextBlock Text="Images" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconImages}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Images}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
-                <Button Theme="{StaticResource NavItemTheme}" IsEnabled="False">
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Classes.active="{Binding ShowingVolumes}"
+                        Command="{Binding ShowVolumesCommand}">
                     <StackPanel Orientation="Horizontal" Spacing="10">
-                        <TextBlock Text="◫" FontSize="13"/>
-                        <TextBlock Text="Volumes" FontSize="13"/>
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconVolumes}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Volumes}" FontSize="13"/>
+                    </StackPanel>
+                </Button>
+
+                <Button Theme="{StaticResource NavItemTheme}"
+                        Classes.active="{Binding ShowingRegistries}"
+                        Command="{Binding ShowRegistriesCommand}">
+                    <StackPanel Orientation="Horizontal" Spacing="10">
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconRegistry}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Registries}" FontSize="13"/>
                     </StackPanel>
                 </Button>
 
@@ -107,9 +178,67 @@
                 Background="{DynamicResource SidebarBorderBrush}"/>
 
         <!-- ── Content area (fills remaining space) ──────────────────── -->
-        <Border Background="{DynamicResource FloatWindowBackgroundBrush}">
-            <ContentControl Content="{Binding CurrentPageViewModel}"/>
-        </Border>
+        <DockPanel Background="{DynamicResource FloatWindowBackgroundBrush}">
+
+            <!-- Engine status is scoped to content, not the fixed sidebar. -->
+            <Border DockPanel.Dock="Bottom"
+                    Classes="engine-bottom-bar"
+                    IsHitTestVisible="False">
+                <Grid ColumnDefinitions="*,Auto,*">
+                    <StackPanel Grid.Column="1"
+                                Orientation="Horizontal"
+                                Spacing="7"
+                                VerticalAlignment="Center">
+                        <Ellipse Classes="status-dot bottom-bar-status-dot"
+                                 Classes.running="{Binding IsEngineRunning}"
+                                 Classes.starting="{Binding IsEngineStarting}"/>
+                        <TextBlock Text="{Binding EngineStatusLabel}"
+                                   Classes="bottom-bar-status-text"/>
+                    </StackPanel>
+                </Grid>
+            </Border>
+
+            <Grid>
+                <ContentControl Content="{Binding CurrentPageViewModel}"/>
+
+                <Border IsVisible="{Binding IsNotificationVisible}"
+                        HorizontalAlignment="Center"
+                        VerticalAlignment="Top"
+                        Margin="0,18,0,0"
+                        Padding="14,10"
+                        CornerRadius="8"
+                        MaxWidth="620"
+                        Background="{DynamicResource FloatCardBackgroundBrush}"
+                        BorderBrush="{DynamicResource SidebarBorderBrush}"
+                        BorderThickness="1">
+                    <Grid ColumnDefinitions="*,Auto"
+                          ColumnSpacing="12">
+                        <StackPanel Spacing="2">
+                            <TextBlock Text="{Binding NotificationTitle}"
+                                       FontSize="13"
+                                       FontWeight="SemiBold"/>
+                            <TextBlock Text="{Binding NotificationMessage}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding HideNotificationCommand}"
+                                VerticalAlignment="Center"
+                                Padding="4"
+                                ToolTip.Tip="{x:Static resx:UiStrings.Close}">
+                            <Path Classes="icon"
+                                  Width="12"
+                                  Height="12"
+                                  Data="{StaticResource IconClose}"
+                                  Stroke="{Binding $parent[Button].Foreground}"/>
+                        </Button>
+                    </Grid>
+                </Border>
+            </Grid>
+        </DockPanel>
 
     </DockPanel>
 

@@ -1,10 +1,13 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Avalonia;
+using Avalonia.Styling;
 using Avalonia.Threading;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
+using Float.UI.Resources;
 using Float.UI.ViewModels.Setup;
 using Float.UI.ViewModels.Wizards;
 
@@ -12,40 +15,101 @@ namespace Float.UI.ViewModels;
 
 public partial class MainWindowViewModel : ViewModelBase
 {
-    private readonly DashboardViewModel _dashboardVm = new();
-    private readonly MigrationWizardViewModel _migrationVm = new();
+    private readonly DashboardViewModel _dashboardVm;
+    private readonly ImagesViewModel _imagesVm;
+    private readonly VolumesViewModel _volumesVm;
+    private readonly MigrationWizardViewModel _migrationVm;
+    private readonly CreateContainerWizardViewModel _createContainerVm;
+    private readonly CreateVolumeWizardViewModel _createVolumeVm;
+    private readonly SettingsViewModel _settingsVm;
+    private readonly RegistriesViewModel _registriesVm;
     private readonly IEngineProvisioner _provisioner;
+    private readonly ISettingsService _settingsService;
     private readonly DispatcherTimer _statusTimer;
+    private readonly DispatcherTimer _notificationTimer;
 
     [ObservableProperty] public partial ViewModelBase CurrentPageViewModel { get; set; }
     [ObservableProperty] public partial bool ShowingContainers { get; set; }
+    [ObservableProperty] public partial bool ShowingImages { get; set; }
+    [ObservableProperty] public partial bool ShowingVolumes { get; set; }
     [ObservableProperty] public partial bool ShowingMigration { get; set; }
+    [ObservableProperty] public partial bool ShowingSettings { get; set; }
+    [ObservableProperty] public partial bool ShowingRegistries { get; set; }
     [ObservableProperty] public partial bool IsSetupMode { get; set; }
     [ObservableProperty] public partial bool IsEngineRunning { get; set; }
     [ObservableProperty] public partial bool IsEngineStarting { get; set; }
+    [ObservableProperty] public partial bool IsDarkTheme { get; set; }
+    [ObservableProperty] public partial bool IsNotificationVisible { get; set; }
+    [ObservableProperty] public partial string NotificationTitle { get; set; } = "";
+    [ObservableProperty] public partial string NotificationMessage { get; set; } = "";
 
-    public string EngineStatusLabel => IsEngineStarting ? "Starting…"
-                                     : IsEngineRunning  ? "Engine running"
-                                                        : "Engine stopped";
+    public string EngineStatusLabel => IsEngineStarting ? UiStrings.Starting
+                                     : IsEngineRunning  ? UiStrings.EngineRunning
+                                                        : UiStrings.EngineStopped;
+    public string ThemeToggleLabel => IsDarkTheme ? UiStrings.LightMode : UiStrings.DarkMode;
 
-    public MainWindowViewModel(IEngineProvisioner engineProvisioner)
+    public MainWindowViewModel(
+        IEngineProvisioner engineProvisioner,
+        ISettingsService settingsService,
+        DashboardViewModel dashboardVm,
+        ImagesViewModel imagesVm,
+        VolumesViewModel volumesVm,
+        MigrationWizardViewModel migrationVm,
+        EngineSetupViewModel engineSetupVm,
+        CreateContainerWizardViewModel createContainerVm,
+        CreateVolumeWizardViewModel createVolumeVm,
+        SettingsViewModel settingsVm,
+        RegistriesViewModel registriesVm)
     {
         _provisioner = engineProvisioner;
+        _settingsService = settingsService;
+        _settingsVm = settingsVm;
+        _registriesVm = registriesVm;
+        settingsVm.CloseRequested += (_, _) => ReturnToDashboard();
+        _dashboardVm = dashboardVm;
+        _imagesVm = imagesVm;
+        _volumesVm = volumesVm;
+        _migrationVm = migrationVm;
+        _createContainerVm = createContainerVm;
+        _createVolumeVm = createVolumeVm;
+
+        dashboardVm.RequestCreateContainer += OnRequestCreateContainer;
+        dashboardVm.OperationFailed += OnDashboardOperationFailed;
+        dashboardVm.OperationSucceeded += (_, msg) => ShowNotification(UiStrings.Done, msg);
+        imagesVm.OperationFailed += OnImagesOperationFailed;
+        volumesVm.OperationFailed += OnVolumesOperationFailed;
+        volumesVm.RequestCreateVolume += OnRequestCreateVolume;
+        migrationVm.MigrationCompleted += OnMigrationCompleted;
+        createContainerVm.ContainerCreated += OnContainerCreated;
+        createContainerVm.Cancelled += OnCreateContainerCancelled;
+        createVolumeVm.VolumeCreated += OnVolumeCreated;
+        createVolumeVm.Cancelled += OnCreateVolumeCancelled;
+
+        IsDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
+        if (Application.Current is { } app)
+            app.ActualThemeVariantChanged += (_, _) =>
+                IsDarkTheme = Application.Current?.ActualThemeVariant == ThemeVariant.Dark;
 
         _statusTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(15) };
         _statusTimer.Tick += async (_, _) => await RefreshEngineStatusAsync().ConfigureAwait(false);
 
-        if (!engineProvisioner.IsEngineInstalled())
+        _notificationTimer = new DispatcherTimer { Interval = TimeSpan.FromSeconds(8) };
+        _notificationTimer.Tick += (_, _) => HideNotification();
+
+        if (!engineProvisioner.IsEngineInstalled().GetAwaiter().GetResult())
         {
             IsSetupMode = true;
-            var setupVm = new EngineSetupViewModel(engineProvisioner);
-            setupVm.SetupCompleted += OnSetupCompleted;
-            CurrentPageViewModel = setupVm;
+            engineSetupVm.SetupCompleted += OnSetupCompleted;
+            CurrentPageViewModel = engineSetupVm;
+            ShowSettingsLoadWarning();
             return;
         }
 
         CurrentPageViewModel = _dashboardVm;
         ShowingContainers = true;
+        ShowingImages = false;
+        ShowingVolumes = false;
+        ShowSettingsLoadWarning();
         _ = InitEngineAsync();
     }
 
@@ -56,13 +120,19 @@ public partial class MainWindowViewModel : ViewModelBase
         if (!IsEngineRunning)
         {
             IsEngineStarting = true;
-            try   { await _provisioner.StartEngineAsync().ConfigureAwait(false); }
-            catch (Exception) { /* start failed; status refreshed below */ }
-            finally { IsEngineStarting = false; }
+            var result = await _provisioner.StartEngineAsync().ConfigureAwait(false);
+            if (result.IsFailure)
+            {
+                await Dispatcher.UIThread.InvokeAsync(() =>
+                    ShowNotification(UiStrings.EngineStartFailed, result.Failure.Message ?? UiStrings.UnknownError));
+            }
+            IsEngineStarting = false;
+
             await RefreshEngineStatusAsync().ConfigureAwait(false);
         }
 
         _statusTimer.Start();
+        _ = _dashboardVm.RefreshAsync();
     }
 
     private async Task RefreshEngineStatusAsync()
@@ -78,7 +148,7 @@ public partial class MainWindowViewModel : ViewModelBase
     public async Task ShutdownAsync()
     {
         _statusTimer.Stop();
-        if (IsEngineRunning)
+        if (IsEngineRunning && _settingsService.Get().StopEngineOnQuit)
             await _provisioner.StopEngineAsync().ConfigureAwait(false);
     }
 
@@ -86,24 +156,199 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         IsSetupMode = false;
         ShowingContainers = true;
+        ShowingImages = false;
+        ShowingVolumes = false;
         CurrentPageViewModel = _dashboardVm;
         _ = InitEngineAsync();
     }
 
-    [RelayCommand]
-    private void ShowContainers()
+    private void OnRequestCreateContainer(object? sender, EventArgs e)
     {
-        ShowingContainers = true;
+        HideNotification();
+        CancelMigrationLoad();
+        _createContainerVm.StartNewRun();
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
         ShowingMigration = false;
-        CurrentPageViewModel = _dashboardVm;
+        CurrentPageViewModel = _createContainerVm;
+    }
+
+    private void OnContainerCreated(object? sender, EventArgs e) => ReturnToDashboard();
+
+    private void OnCreateContainerCancelled(object? sender, EventArgs e) => ReturnToDashboard();
+
+    private void OnRequestCreateVolume(object? sender, EventArgs e)
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        _createVolumeVm.StartNewRun();
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
+        ShowingMigration = false;
+        CurrentPageViewModel = _createVolumeVm;
+    }
+
+    private void OnVolumeCreated(object? sender, EventArgs e) => ReturnToVolumes();
+
+    private void OnCreateVolumeCancelled(object? sender, EventArgs e) => ReturnToVolumes();
+
+    private void OnImagesOperationFailed(object? sender, string message)
+    {
+        ShowNotification(UiStrings.Get("ImageRefreshFailed"), message);
+    }
+
+    private void OnVolumesOperationFailed(object? sender, string message)
+    {
+        ShowNotification(UiStrings.Get("VolumeRefreshFailed"), message);
+    }
+
+    private void OnMigrationCompleted(object? sender, MigrationCleanupCompletedEventArgs e)
+    {
+        CancelMigrationLoad();
+        ReturnToDashboard();
+        ShowNotification(
+            e.Failed == 0 ? UiStrings.Get("MigrationComplete") : UiStrings.Get("MigrationCompleteCleanupIssues"),
+            e.Summary);
+    }
+
+    private void OnDashboardOperationFailed(object? sender, string message)
+    {
+        ShowNotification(UiStrings.Get("ContainerOperationFailed"), message);
+    }
+
+    private void ReturnToDashboard()
+    {
+        CancelMigrationLoad();
+        ShowPage(_dashboardVm);
+        ShowingContainers = true;
+        _ = _dashboardVm.RefreshAsync();
+    }
+
+    private void ReturnToVolumes()
+    {
+        CancelMigrationLoad();
+        ShowPage(_volumesVm);
+        ShowingVolumes = true;
+        _ = _volumesVm.RefreshAsync();
+    }
+
+    private void ShowNotification(string title, string message)
+    {
+        _notificationTimer.Stop();
+        NotificationTitle = title;
+        NotificationMessage = message;
+        IsNotificationVisible = true;
+        _notificationTimer.Start();
     }
 
     [RelayCommand]
-    private void ShowMigration()
+    private async Task StartEngineAsync()
     {
-        ShowingContainers = false;
+        if (IsEngineRunning || IsEngineStarting) return;
+        IsEngineStarting = true;
+        var result = await _provisioner.StartEngineAsync().ConfigureAwait(false);
+        if (result.IsFailure)
+            await Dispatcher.UIThread.InvokeAsync(() =>
+                ShowNotification(UiStrings.EngineStartFailed, result.Failure.Message ?? UiStrings.UnknownError));
+        IsEngineStarting = false;
+        await RefreshEngineStatusAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task StopEngineAsync()
+    {
+        if (!IsEngineRunning) return;
+        await _provisioner.StopEngineAsync().ConfigureAwait(false);
+        await RefreshEngineStatusAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private void HideNotification()
+    {
+        _notificationTimer.Stop();
+        IsNotificationVisible = false;
+        NotificationTitle = "";
+        NotificationMessage = "";
+    }
+
+    [RelayCommand]
+    private void NewContainer() => OnRequestCreateContainer(this, EventArgs.Empty);
+
+    [RelayCommand]
+    private void NewVolume() => OnRequestCreateVolume(this, EventArgs.Empty);
+
+    [RelayCommand]
+    private void ShowContainers()
+    {
+        CancelMigrationLoad();
+        ShowPage(_dashboardVm);
+        ShowingContainers = true;
+        _ = _dashboardVm.RefreshAsync();
+    }
+
+    [RelayCommand]
+    private async Task ShowImagesAsync()
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        ShowPage(_imagesVm);
+        ShowingImages = true;
+        await _imagesVm.RefreshAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task ShowVolumesAsync()
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        ShowPage(_volumesVm);
+        ShowingVolumes = true;
+        await _volumesVm.RefreshAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task ShowMigrationAsync()
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        ShowPage(_migrationVm);
         ShowingMigration = true;
-        CurrentPageViewModel = _migrationVm;
+        await _migrationVm.StartNewRunAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private async Task ShowRegistriesAsync()
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        ShowPage(_registriesVm);
+        ShowingRegistries = true;
+        await _registriesVm.RefreshAsync().ConfigureAwait(false);
+    }
+
+    [RelayCommand]
+    private void ShowSettings()
+    {
+        HideNotification();
+        CancelMigrationLoad();
+        _settingsVm.Load();
+        ShowPage(_settingsVm);
+        ShowingSettings = true;
+    }
+
+    [RelayCommand]
+    private void ToggleTheme()
+    {
+        var nextTheme = IsDarkTheme ? ThemeVariant.Light : ThemeVariant.Dark;
+        if (Application.Current is null)
+        {
+            return;
+        }
+
+        Application.Current.RequestedThemeVariant = nextTheme;
+        IsDarkTheme = nextTheme == ThemeVariant.Dark;
     }
 
     partial void OnIsEngineRunningChanged(bool value) =>
@@ -111,4 +356,27 @@ public partial class MainWindowViewModel : ViewModelBase
 
     partial void OnIsEngineStartingChanged(bool value) =>
         OnPropertyChanged(nameof(EngineStatusLabel));
+
+    partial void OnIsDarkThemeChanged(bool value) =>
+        OnPropertyChanged(nameof(ThemeToggleLabel));
+
+    private void CancelMigrationLoad() => _migrationVm.CancelLoad();
+
+    private void ShowPage(ViewModelBase page)
+    {
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
+        ShowingMigration = false;
+        ShowingSettings = false;
+        ShowingRegistries = false;
+        CurrentPageViewModel = page;
+    }
+
+    private void ShowSettingsLoadWarning()
+    {
+        if (_settingsService.LoadWarning is { Length: > 0 } warning)
+            ShowNotification(UiStrings.SettingsResetTitle, string.Format(UiStrings.SettingsResetMessageFormat, warning));
+    }
+
 }

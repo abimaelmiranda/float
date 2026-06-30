@@ -1,0 +1,162 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:shared="using:Float.UI.Views.Shared"
+             xmlns:resx="using:Float.UI.Resources"
+             x:Name="Root"
+             x:Class="Float.UI.Views.ImagesView"
+             x:DataType="vm:ImagesViewModel">
+
+    <Grid ColumnDefinitions="*,Auto">
+
+        <DockPanel Grid.Column="0">
+            <Border DockPanel.Dock="Top"
+                    Padding="20,52,20,12">
+                <StackPanel Spacing="10">
+                    <Grid ColumnDefinitions="*,Auto">
+                        <TextBlock Text="{x:Static resx:UiStrings.Images}"
+                                   FontSize="20"
+                                   FontWeight="SemiBold"
+                                   VerticalAlignment="Center"/>
+                        <Button Grid.Column="1"
+                                Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding RefreshImagesCommand}">
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Path Classes="icon icon-sm"
+                                      Data="{StaticResource IconRefresh}"
+                                      Stroke="{Binding $parent[Button].Foreground}"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.Refresh}" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </Grid>
+
+                    <shared:InlineErrorBanner/>
+                </StackPanel>
+            </Border>
+
+            <ScrollViewer Padding="16,0,16,16">
+                <ListBox Classes="container-list"
+                         ItemsSource="{Binding Images}"
+                         SelectedItem="{Binding SelectedImage}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate x:DataType="vm:ImageItemViewModel">
+                            <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                    CornerRadius="8"
+                                    Padding="14,10"
+                                    Classes.selected="{Binding $parent[ListBoxItem].IsSelected}">
+                                <Border.Styles>
+                                    <Style Selector="Border.selected">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource SystemControlHighlightListAccentLowBrush}"/>
+                                    </Style>
+                                    <Style Selector="Border:pointerover">
+                                        <Setter Property="Background"
+                                                Value="{DynamicResource SystemControlHighlightListLowBrush}"/>
+                                    </Style>
+                                </Border.Styles>
+
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <StackPanel Spacing="2">
+                                        <TextBlock Text="{Binding Tag}"
+                                                   FontSize="13"
+                                                   FontWeight="Medium"/>
+                                        <TextBlock Text="{Binding PlatformLabel}"
+                                                   FontSize="11"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                    </StackPanel>
+
+                                    <TextBlock Grid.Column="1"
+                                               Text="{Binding IdShort}"
+                                               FontSize="11"
+                                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                               VerticalAlignment="Center"
+                                               Margin="16,0,0,0"/>
+                                </Grid>
+                            </Border>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </ScrollViewer>
+        </DockPanel>
+
+        <Border Grid.Column="1"
+                Width="300"
+                IsVisible="{Binding HasSelectedImage}"
+                Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
+                BorderBrush="{DynamicResource SidebarBorderBrush}"
+                BorderThickness="1,0,0,0">
+            <ContentControl Content="{Binding SelectedImage}">
+                <ContentControl.ContentTemplate>
+                    <DataTemplate x:DataType="vm:ImageItemViewModel">
+                        <DockPanel>
+                            <Border DockPanel.Dock="Top" Padding="16,52,16,12">
+                                <Grid ColumnDefinitions="*,Auto">
+                                    <TextBlock Text="{Binding Tag}"
+                                               FontSize="16"
+                                               FontWeight="SemiBold"
+                                               TextWrapping="Wrap"
+                                               VerticalAlignment="Center"/>
+                                    <Button Grid.Column="1"
+                                            Theme="{StaticResource ActionButtonTheme}"
+                                            Command="{Binding DataContext.CloseDetailCommand, ElementName=Root}"
+                                            ToolTip.Tip="{x:Static resx:UiStrings.Close}">
+                                        <Path Classes="icon icon-sm"
+                                              Data="{StaticResource IconClose}"
+                                              Stroke="{Binding $parent[Button].Foreground}"/>
+                                    </Button>
+                                </Grid>
+                            </Border>
+
+                            <ScrollViewer Padding="16,0,16,16">
+                                <StackPanel Spacing="20">
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Tag}"/>
+                                        <TextBlock Text="{Binding Tag}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Name}"/>
+                                        <TextBlock Text="{Binding Name}"
+                                                   FontSize="13"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Classes="section-label" Text="ID"/>
+                                        <TextBlock Text="{Binding IdShort}"
+                                                   FontSize="13"
+                                                   TextWrapping="NoWrap"
+                                                   TextTrimming="CharacterEllipsis"
+                                                   ToolTip.Tip="{Binding Id}"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="4">
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Platform}"/>
+                                        <TextBlock Text="{Binding PlatformLabel}"
+                                                   FontSize="13"
+                                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"
+                                                   TextWrapping="Wrap"/>
+                                    </StackPanel>
+
+                                    <StackPanel Spacing="8">
+                                        <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Actions}"/>
+                                        <Button Theme="{StaticResource DangerButtonTheme}"
+                                                Command="{Binding DataContext.RequestDeleteCommand, ElementName=Root}"
+                                                CommandParameter="{Binding}"
+                                                HorizontalAlignment="Left">
+                                            <TextBlock Text="{x:Static resx:UiStrings.DeleteImage}"/>
+                                        </Button>
+                                    </StackPanel>
+                                </StackPanel>
+                            </ScrollViewer>
+                        </DockPanel>
+                    </DataTemplate>
+                </ContentControl.ContentTemplate>
+            </ContentControl>
+        </Border>
+
+        <shared:ConfirmDeleteDialog Grid.ColumnSpan="2" Title="{x:Static resx:UiStrings.DeleteImageTitle}"/>
+    </Grid>
+</UserControl>

@@ -1,0 +1,92 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:vm="using:Float.UI.ViewModels"
+        xmlns:resx="using:Float.UI.Resources"
+        x:Class="Float.UI.Views.CrashHandlerWindow"
+        x:DataType="vm:CrashHandlerViewModel"
+        Title="Float"
+        Width="480"
+        Height="320"
+        MinHeight="200"
+        MaxHeight="520"
+        CanResize="False"
+        WindowStartupLocation="CenterOwner"
+        Background="{DynamicResource FloatCardBackgroundBrush}"
+        ExtendClientAreaToDecorationsHint="False">
+
+    <Border Padding="24">
+        <Grid RowDefinitions="Auto,*,Auto,Auto">
+
+            <!-- Header: icon + title -->
+            <StackPanel Grid.Row="0"
+                        Orientation="Horizontal"
+                        Spacing="12"
+                        Margin="0,0,0,16">
+                <Border Width="40"
+                        Height="40"
+                        CornerRadius="10"
+                        Background="{DynamicResource StatusErrorBrush}"
+                        Opacity="0.15"
+                        VerticalAlignment="Center">
+                    <TextBlock Text="!"
+                               FontSize="20"
+                               FontWeight="Bold"
+                               Foreground="{DynamicResource StatusErrorBrush}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"/>
+                </Border>
+                <TextBlock Text="{Binding Title}"
+                           FontSize="18"
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"
+                           TextWrapping="Wrap"/>
+            </StackPanel>
+
+            <!-- Message -->
+            <Border Grid.Row="1"
+                    Background="{DynamicResource FloatWindowBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="14,12"
+                    Margin="0,0,0,16">
+                <TextBlock Text="{Binding Message}"
+                           FontSize="13"
+                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                           TextWrapping="Wrap"
+                           MaxWidth="420"/>
+            </Border>
+
+            <!-- Details (expandable) -->
+            <Border Grid.Row="2"
+                    IsVisible="{Binding HasDetails}"
+                    Background="{DynamicResource FloatWindowBackgroundBrush}"
+                    CornerRadius="8"
+                    Padding="14,12"
+                    Margin="0,0,0,16">
+                <TextBlock Text="{Binding Details}"
+                           FontFamily="Courier New, Courier, monospace"
+                           FontSize="11"
+                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                           TextWrapping="Wrap"/>
+            </Border>
+
+            <!-- Footer: buttons -->
+            <StackPanel Grid.Row="3"
+                        Orientation="Horizontal"
+                        HorizontalAlignment="Right"
+                        Spacing="8">
+                <Button Theme="{StaticResource ActionButtonTheme}"
+                        Content="{x:Static resx:UiStrings.CopyDetails}"
+                        Click="OnCopyDetails"
+                        Padding="12,6"
+                        FontSize="12"/>
+                <Button Theme="{StaticResource PrimaryButtonTheme}"
+                        Content="{x:Static resx:UiStrings.Close}"
+                        Click="OnClose"
+                        Padding="16,6"
+                        FontSize="12"/>
+            </StackPanel>
+
+        </Grid>
+    </Border>
+
+</Window>

@@ -2,7 +2,17 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              x:Class="Float.UI.App"
              xmlns:local="using:Float.UI"
-             RequestedThemeVariant="Default">
+             xmlns:resx="using:Float.UI.Resources"
+             RequestedThemeVariant="Default"
+             Name="Float">
+
+    <Application.Resources>
+        <ResourceDictionary>
+            <ResourceDictionary.MergedDictionaries>
+                <ResourceInclude Source="avares://Float.UI/Resources/Icons.axaml"/>
+            </ResourceDictionary.MergedDictionaries>
+        </ResourceDictionary>
+    </Application.Resources>
 
     <Application.DataTemplates>
         <local:ViewLocator/>
@@ -13,25 +23,17 @@
         <StyleInclude Source="avares://Float.UI/Resources/FloatStyles.axaml"/>
     </Application.Styles>
 
-    <!-- macOS application menu bar -->
+    <!-- macOS app menu (Float) — only app-level items go here -->
     <NativeMenu.Menu>
         <NativeMenu>
             <NativeMenuItem Header="Float">
                 <NativeMenuItem.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="About Float"    Click="OnAboutClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.AboutFloat}"  Click="OnAboutClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Quit Float"     Click="OnQuitClick" Gesture="Ctrl+Q"/>
-                    </NativeMenu>
-                </NativeMenuItem.Menu>
-            </NativeMenuItem>
-            <NativeMenuItem Header="Containers">
-                <NativeMenuItem.Menu>
-                    <NativeMenu>
-                        <NativeMenuItem Header="New Container…"        Click="OnNewContainerClick" Gesture="Ctrl+N"/>
-                        <NativeMenuItem Header="Migrate from Docker…"  Click="OnMigrateClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Preferences}" Click="OnSettingsClick" Gesture="Ctrl+OemComma"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Refresh"               Click="OnRefreshClick"     Gesture="Ctrl+R"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.QuitFloat}"   Click="OnQuitClick"     Gesture="Ctrl+Q"/>
                     </NativeMenu>
                 </NativeMenuItem.Menu>
             </NativeMenuItem>
@@ -41,14 +43,19 @@
     <!-- System tray icon -->
     <TrayIcon.Icons>
         <TrayIcons>
-            <TrayIcon Icon="/Assets/avalonia-logo.ico"
+            <TrayIcon Icon="/Assets/float_tray_dark.png"
                       ToolTipText="Float"
                       Clicked="OnTrayIconClicked">
                 <TrayIcon.Menu>
                     <NativeMenu>
-                        <NativeMenuItem Header="Show Float" Click="OnShowFloatClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.ShowFloat}" Click="OnShowFloatClick"/>
                         <NativeMenuItemSeparator/>
-                        <NativeMenuItem Header="Quit Float" Click="OnQuitClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.StartEngine}" Click="OnStartEngineClick"/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.StopEngine}"  Click="OnStopEngineClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.Preferences}" Click="OnSettingsClick"/>
+                        <NativeMenuItemSeparator/>
+                        <NativeMenuItem Header="{x:Static resx:UiStrings.QuitFloat}" Click="OnQuitClick"/>
                     </NativeMenu>
                 </TrayIcon.Menu>
             </TrayIcon>

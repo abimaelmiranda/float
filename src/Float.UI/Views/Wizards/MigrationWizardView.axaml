@@ -1,70 +1,472 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels.Wizards"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Wizards.MigrationWizardView"
              x:DataType="vm:MigrationWizardViewModel">
 
     <Grid RowDefinitions="Auto,*,Auto">
 
         <!-- Header -->
-        <Border Grid.Row="0" Padding="24,52,24,16">
-            <StackPanel Spacing="4">
-                <TextBlock Text="Migrate from Docker"
+        <Border Grid.Row="0" Padding="24,52,24,12">
+            <Grid ColumnDefinitions="*,Auto,Auto"
+                  ColumnSpacing="12">
+                <TextBlock Text="{x:Static resx:UiStrings.MigrateFromDocker}"
                            FontSize="20"
-                           FontWeight="SemiBold"/>
-                <TextBlock FontSize="13"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}">
-                    <Run Text="Step "/>
+                           FontWeight="SemiBold"
+                           VerticalAlignment="Center"/>
+
+                <TextBlock Grid.Column="1"
+                           FontSize="13"
+                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                           VerticalAlignment="Center">
+                    <Run Text="{x:Static resx:UiStrings.Step}"/>
+                    <Run Text=" "/>
                     <Run Text="{Binding CurrentStep}"/>
-                    <Run Text=" of "/>
+                    <Run Text=" "/>
+                    <Run Text="{x:Static resx:UiStrings.StepOf}"/>
+                    <Run Text=" "/>
                     <Run Text="{Binding TotalSteps}"/>
                 </TextBlock>
-            </StackPanel>
+
+                <Button Grid.Column="2"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Command="{Binding RefreshCommand}"
+                        IsEnabled="{Binding !IsLoading}"
+                        IsVisible="{Binding ShowRefresh}"
+                        VerticalAlignment="Center">
+                    <StackPanel Orientation="Horizontal" Spacing="6">
+                        <Path Classes="icon icon-sm"
+                              Data="{StaticResource IconRefresh}"
+                              Stroke="{Binding $parent[Button].Foreground}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Refresh}"/>
+                    </StackPanel>
+                </Button>
+            </Grid>
         </Border>
 
-        <!-- Step content placeholder -->
+        <!-- Step 1: Docker container selection -->
         <Border Grid.Row="1"
                 Margin="24,0"
                 CornerRadius="10"
                 Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
-                Padding="24">
-            <StackPanel VerticalAlignment="Center"
-                        HorizontalAlignment="Center"
-                        Spacing="12">
-                <TextBlock Text="🚧"
-                           FontSize="40"
-                           HorizontalAlignment="Center"/>
-                <TextBlock Text="Migration Wizard"
-                           FontSize="17"
-                           FontWeight="SemiBold"
-                           HorizontalAlignment="Center"/>
-                <TextBlock Text="This flow will guide you through importing Docker containers into Float."
-                           FontSize="13"
-                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
-                           TextWrapping="Wrap"
-                           MaxWidth="320"
-                           TextAlignment="Center"
-                           HorizontalAlignment="Center"/>
-            </StackPanel>
+                Padding="18"
+                IsVisible="{Binding IsSelectionStep}">
+
+            <Grid>
+
+                <!-- Loading -->
+                <StackPanel IsVisible="{Binding IsLoading}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="12">
+                    <ProgressBar IsIndeterminate="True"
+                                 Width="180"
+                                 Height="4"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.ScanningDockerContainers}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               HorizontalAlignment="Center"/>
+                </StackPanel>
+
+                <!-- Error -->
+                <StackPanel IsVisible="{Binding HasError}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="12">
+                    <Path Classes="icon icon-lg"
+                          Data="{StaticResource IconMigration}"
+                          Stroke="{DynamicResource StatusErrorBrush}"
+                          HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.DockerUnavailable}"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding ErrorMessage}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="380"
+                               TextAlignment="Center"/>
+                    <Button Theme="{StaticResource PrimaryButtonTheme}"
+                            Command="{Binding RefreshCommand}"
+                            Content="{x:Static resx:UiStrings.TryAgain}"/>
+                </StackPanel>
+
+                <!-- Empty -->
+                <StackPanel IsVisible="{Binding IsEmpty}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="12">
+                    <Path Classes="icon icon-lg"
+                          Data="{StaticResource IconMigration}"
+                          Stroke="{DynamicResource FloatAccentBrush}"
+                          HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.NoDockerContainersFound}"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.NoDockerContainersFoundDescription}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="360"
+                               TextAlignment="Center"/>
+                </StackPanel>
+
+                <!-- List -->
+                <DockPanel IsVisible="{Binding ShowContainerList}">
+                    <Border DockPanel.Dock="Top"
+                            MinHeight="44"
+                            Padding="4,0,4,10">
+                        <Grid ColumnDefinitions="*,Auto">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="{x:Static resx:UiStrings.ChooseContainers}"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{x:Static resx:UiStrings.SelectDockerContainers}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+
+                            <Button Grid.Column="1"
+                                    Theme="{StaticResource ActionButtonTheme}"
+                                    Command="{Binding ToggleSelectAllCommand}"
+                                    VerticalAlignment="Center"
+                                    Content="{x:Static resx:UiStrings.SelectAll}"/>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding Containers}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
+                                    <Border Background="{DynamicResource FloatCardBackgroundBrush}"
+                                            CornerRadius="8"
+                                            Padding="14,10"
+                                            Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto,Auto"
+                                              ColumnSpacing="12">
+                                            <CheckBox Grid.Column="0"
+                                                      IsChecked="{Binding IsSelected}"
+                                                      VerticalAlignment="Center"/>
+
+                                            <StackPanel Grid.Column="1"
+                                                        Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="13"
+                                                           FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding ImageTag}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="2"
+                                                        Orientation="Horizontal"
+                                                        Spacing="12"
+                                                        VerticalAlignment="Center">
+                                                <StackPanel Orientation="Horizontal"
+                                                            Spacing="5"
+                                                            VerticalAlignment="Center">
+                                                    <Ellipse Classes="status-dot"
+                                                             Classes.running="{Binding IsRunning}"
+                                                             Width="7"
+                                                             Height="7"/>
+                                                    <TextBlock Text="{Binding StatusLabel}"
+                                                               FontSize="11"
+                                                               Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding PortSummary}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                                <TextBlock Text="{Binding VolumeSummary}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                                <TextBlock Text="{Binding ArchitectureLabel}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"/>
+                                            </StackPanel>
+
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+
+            </Grid>
+        </Border>
+
+        <!-- Step 2: Atomic migration progress -->
+        <Border Grid.Row="1"
+                Margin="24,0"
+                CornerRadius="10"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="18"
+                IsVisible="{Binding IsMigrationStep}">
+            <DockPanel>
+                <Border DockPanel.Dock="Top"
+                        MinHeight="44"
+                        Padding="4,0,4,10">
+                    <StackPanel Spacing="3">
+                        <TextBlock Text="{x:Static resx:UiStrings.MigrationProgress}"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding MigrationSummary}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer>
+                    <ItemsControl ItemsSource="{Binding Containers}">
+                        <ItemsControl.ItemTemplate>
+                            <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
+                                <Border Background="{DynamicResource FloatCardBackgroundBrush}"
+                                        CornerRadius="8"
+                                        Padding="14,10"
+                                        Margin="0,0,0,8"
+                                        IsVisible="{Binding IsSelected}">
+                                    <StackPanel Spacing="8">
+                                        <Grid ColumnDefinitions="*,Auto"
+                                              ColumnSpacing="12">
+                                            <StackPanel Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="13"
+                                                           FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding ImageTag}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                                <TextBlock Text="{Binding MigrationStatus}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                                           TextWrapping="Wrap"/>
+                                            </StackPanel>
+
+                                            <StackPanel Grid.Column="1"
+                                                        Spacing="8"
+                                                        VerticalAlignment="Center"
+                                                        HorizontalAlignment="Right">
+                                                <ProgressBar Width="90"
+                                                             Height="4"
+                                                             IsIndeterminate="True"
+                                                             IsVisible="{Binding IsMigrating}"/>
+                                                <Button Theme="{StaticResource ActionButtonTheme}"
+                                                        Command="{Binding ToggleLogCommand}"
+                                                        IsVisible="{Binding HasLog}">
+                                                    <TextBlock Text="{Binding ToggleLogLabel}"/>
+                                                </Button>
+                                            </StackPanel>
+                                        </Grid>
+
+                                        <TextBox Classes="console"
+                                                 Text="{Binding LogText}"
+                                                 IsReadOnly="True"
+                                                 MinHeight="120"
+                                                 MaxHeight="220"
+                                                 IsVisible="{Binding IsLogExpanded}"/>
+                                    </StackPanel>
+                                </Border>
+                            </DataTemplate>
+                        </ItemsControl.ItemTemplate>
+                    </ItemsControl>
+                </ScrollViewer>
+            </DockPanel>
+        </Border>
+
+        <!-- Step 3: Cleanup Docker originals -->
+        <Border Grid.Row="1"
+                Margin="24,0"
+                CornerRadius="10"
+                Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                Padding="18"
+                IsVisible="{Binding IsCleanupStep}">
+            <Grid>
+                <StackPanel IsVisible="{Binding !HasCleanupCandidates}"
+                            VerticalAlignment="Center"
+                            HorizontalAlignment="Center"
+                            Spacing="12">
+                    <Path Classes="icon icon-lg"
+                          Data="{StaticResource IconMigration}"
+                          Stroke="{DynamicResource FloatAccentBrush}"
+                          HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.NoSuccessfulMigrationsCleanup}"
+                               FontSize="17"
+                               FontWeight="SemiBold"
+                               HorizontalAlignment="Center"/>
+                    <TextBlock Text="{Binding MigrationSummary}"
+                               FontSize="13"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               TextWrapping="Wrap"
+                               MaxWidth="360"
+                               TextAlignment="Center"/>
+                </StackPanel>
+
+                <DockPanel IsVisible="{Binding HasCleanupCandidates}">
+                    <Border DockPanel.Dock="Top"
+                            MinHeight="44"
+                            Padding="4,0,4,10">
+                        <Grid ColumnDefinitions="*,Auto"
+                              ColumnSpacing="12">
+                            <StackPanel Spacing="3">
+                                <TextBlock Text="{x:Static resx:UiStrings.CleanupDockerOriginals}"
+                                           FontSize="15"
+                                           FontWeight="SemiBold"/>
+                                <TextBlock Text="{Binding MigrationSummary}"
+                                           FontSize="12"
+                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                            </StackPanel>
+                            <TextBlock Grid.Column="1"
+                                       Text="{Binding CleanupSummary}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                       VerticalAlignment="Center"
+                                       TextTrimming="CharacterEllipsis"
+                                       MaxWidth="260"/>
+                        </Grid>
+                    </Border>
+
+                    <ScrollViewer>
+                        <ItemsControl ItemsSource="{Binding CleanupCandidates}"
+                                      IsEnabled="{Binding !IsCleaningUp}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate x:DataType="vm:MigrationContainerItemViewModel">
+                                    <Border Background="{DynamicResource FloatCardBackgroundBrush}"
+                                            CornerRadius="8"
+                                            Padding="14,10"
+                                            Margin="0,0,0,8">
+                                        <Grid ColumnDefinitions="Auto,*,Auto"
+                                              ColumnSpacing="12">
+                                            <CheckBox Grid.Column="0"
+                                                      IsChecked="{Binding IsCleanupSelected}"
+                                                      VerticalAlignment="Center"/>
+
+                                            <StackPanel Grid.Column="1"
+                                                        Spacing="1"
+                                                        Margin="0,0,16,0"
+                                                        VerticalAlignment="Center">
+                                                <TextBlock Text="{Binding Name}"
+                                                           FontSize="13"
+                                                           FontWeight="Medium"/>
+                                                <TextBlock Text="{Binding ImageTag}"
+                                                           FontSize="11"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                                           TextTrimming="CharacterEllipsis"/>
+                                            </StackPanel>
+
+                                            <TextBlock Grid.Column="2"
+                                                       Text="{Binding MigrationStatus}"
+                                                       FontSize="11"
+                                                       Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                                       VerticalAlignment="Center"
+                                                       TextWrapping="Wrap"/>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </DockPanel>
+            </Grid>
         </Border>
 
         <!-- Step footer -->
-        <Border Grid.Row="2" Padding="24,16">
-            <Grid ColumnDefinitions="Auto,*,Auto">
-                <Button Grid.Column="0"
-                        Theme="{StaticResource ActionButtonTheme}"
-                        Content="← Back"
-                        Command="{Binding BackCommand}"
-                        IsVisible="{Binding CurrentStep, Converter={x:Static ObjectConverters.IsNotNull}}"/>
+        <Border Grid.Row="2"
+                Classes="footer-bar"
+                Padding="24,16">
+            <Grid ColumnDefinitions="140,*,140">
+
+                <TextBlock Grid.Column="1"
+                           Text="{Binding FooterSummary}"
+                           FontSize="12"
+                           Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                           VerticalAlignment="Center"
+                           HorizontalAlignment="Center"
+                           IsVisible="{Binding HasContainers}"/>
 
                 <Button Grid.Column="2"
                         Theme="{StaticResource PrimaryButtonTheme}"
-                        Command="{Binding NextCommand}">
-                    <TextBlock>
-                        <Run Text="{Binding CurrentStep, StringFormat='Step {0}: Continue →'}"/>
-                    </TextBlock>
+                        Command="{Binding NextCommand}"
+                        IsVisible="{Binding !IsCleanupStep}"
+                        IsEnabled="{Binding CanUseNext}"
+                        HorizontalAlignment="Stretch">
+                    <TextBlock Text="{Binding NextButtonText}"/>
+                </Button>
+
+                <Button Grid.Column="2"
+                        Theme="{StaticResource PrimaryButtonTheme}"
+                        Command="{Binding ConfirmCleanupCommand}"
+                        IsVisible="{Binding IsCleanupStep}"
+                        IsEnabled="{Binding CanFinishCleanup}"
+                        HorizontalAlignment="Stretch">
+                    <TextBlock Text="{x:Static resx:UiStrings.FinishCleanup}"/>
                 </Button>
             </Grid>
+        </Border>
+
+        <Border Grid.RowSpan="3"
+                Background="#99000000"
+                IsVisible="{Binding HasPendingArchitecturePrompt}">
+            <Border Width="380"
+                    MaxHeight="260"
+                    Padding="18"
+                    CornerRadius="10"
+                    HorizontalAlignment="Center"
+                    VerticalAlignment="Center"
+                    Background="{DynamicResource FloatCardBackgroundBrush}"
+                    BorderBrush="{DynamicResource SidebarBorderBrush}"
+                    BorderThickness="1">
+                <StackPanel Spacing="12">
+                    <StackPanel Spacing="4">
+                        <TextBlock Text="{x:Static resx:UiStrings.ChooseImageArchitecture}"
+                                   FontSize="15"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.DockerArchitectureMissing}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   TextWrapping="Wrap"/>
+                    </StackPanel>
+
+                    <StackPanel Spacing="2">
+                        <TextBlock Text="{Binding PendingArchitectureName}"
+                                   FontSize="13"
+                                   FontWeight="SemiBold"/>
+                        <TextBlock Text="{Binding PendingArchitectureImageTag}"
+                                   FontSize="12"
+                                   Foreground="{DynamicResource FloatSecondaryTextBrush}"
+                                   TextTrimming="CharacterEllipsis"/>
+                    </StackPanel>
+
+                    <ComboBox ItemsSource="{Binding ArchitectureOptions}"
+                              SelectedItem="{Binding SelectedArchitecture}"
+                              FontSize="13"
+                              HorizontalAlignment="Stretch"/>
+                    <StackPanel Orientation="Horizontal"
+                                Spacing="12"
+                                HorizontalAlignment="Right"
+                                Margin="0,12,0,0">
+                        <Button Theme="{StaticResource ActionButtonTheme}"
+                                Command="{Binding CancelArchitecturePromptCommand}"
+                                Content="{x:Static resx:UiStrings.Cancel}"
+                                HorizontalAlignment="Right"/>
+                        <Button Theme="{StaticResource PrimaryButtonTheme}"
+                                Content="{x:Static resx:UiStrings.Confirm}"
+                                IsEnabled="{Binding CanConfirmArchitecture}"
+                                Command="{Binding ResolveArchitectureCommand}"
+                                CommandParameter="{Binding SelectedArchitecture}"
+                                HorizontalAlignment="Right"
+                                Padding="16,6"
+                                FontSize="12"/>
+                    </StackPanel>
+                </StackPanel>
+            </Border>
         </Border>
 
     </Grid>

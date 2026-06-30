@@ -2,14 +2,25 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net10.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationManifest Condition="!$(RuntimeIdentifier.StartsWith('osx'))">app.manifest</ApplicationManifest>
     <AvaloniaUseCompiledBindingsByDefault>true</AvaloniaUseCompiledBindingsByDefault>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <ItemGroup>
-    <AvaloniaResource Include="Assets\**" />
-    <AvaloniaResource Include="Resources\**" />
+    <AvaloniaResource Include="Assets\**"
+                      Exclude="Assets\Info.plist;Assets\trimroots.xml;Assets\float.icns"/>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="Assets\Info.plist"/>
+    <None Include="Assets\float.icns"/>
+  </ItemGroup>
+
+  <ItemGroup Condition="'$(PublishAot)' == 'true'">
+    <TrimmerRootDescriptor Include="Assets\trimroots.xml"/>
   </ItemGroup>
 
   <ItemGroup>
@@ -22,10 +33,39 @@
       <PrivateAssets Condition="'$(Configuration)' != 'Debug'">All</PrivateAssets>
     </PackageReference>
     <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.1" />
+    <PackageReference Include="Microsoft.Extensions.DependencyInjection" Version="10.0.9" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="../Float.Core/Float.Core/Float.Core.csproj" />
+    <ProjectReference Include="../Float.Core/Float.Core.csproj" />
     <ProjectReference Include="../Float.Infrastructure/Float.Infrastructure.csproj" />
   </ItemGroup>
+
+  <Target Name="BundleMacApp"
+          AfterTargets="Publish"
+          Condition="'$(PublishAot)' == 'true' AND $(RuntimeIdentifier.StartsWith('osx'))">
+    <PropertyGroup>
+      <_BundleRoot>$(MSBuildProjectDirectory)/../../publish/Float.app</_BundleRoot>
+      <_BundleMacOS>$(_BundleRoot)/Contents/MacOS</_BundleMacOS>
+      <_BundleResources>$(_BundleRoot)/Contents/Resources</_BundleResources>
+      <_StagingDir>$(MSBuildProjectDirectory)/../../publish/_staging/</_StagingDir>
+    </PropertyGroup>
+
+    <RemoveDir Directories="$(_BundleRoot)"/>
+    <MakeDir Directories="$(_BundleMacOS);$(_BundleResources)"/>
+
+    <Exec Command="cp -R '$(_StagingDir).' '$(_BundleMacOS)/'"/>
+    <Exec Command="mv '$(_BundleMacOS)/Float.UI' '$(_BundleMacOS)/Float'"/>
+
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/Assets/Info.plist"
+          DestinationFolder="$(_BundleRoot)/Contents"/>
+    <Copy SourceFiles="$(MSBuildProjectDirectory)/Assets/float.icns"
+          DestinationFolder="$(_BundleResources)"/>
+
+    <Exec Command="chmod +x '$(_BundleMacOS)/Float'"/>
+    <RemoveDir Directories="$(_StagingDir)"/>
+
+    <Message Text="==> Float.app gerado em: $(_BundleRoot)" Importance="high"/>
+  </Target>
+
 </Project>

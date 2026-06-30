@@ -1,0 +1,247 @@
+<?xml version="1.0" encoding="utf-8"?>
+<root>
+  <resheader name="resmimetype"><value>text/microsoft-resx</value></resheader>
+  <resheader name="version"><value>2.0</value></resheader>
+  <resheader name="reader"><value>System.Resources.ResXResourceReader, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <resheader name="writer"><value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value></resheader>
+  <data name="AboutFloat" xml:space="preserve"><value>Sobre o Float</value></data>
+  <data name="Actions" xml:space="preserve"><value>AÇÕES</value></data>
+  <data name="AddRegistry" xml:space="preserve"><value>Adicionar registro</value></data>
+  <data name="Application" xml:space="preserve"><value>APLICATIVO</value></data>
+  <data name="Architecture" xml:space="preserve"><value>Arquitetura</value></data>
+  <data name="ArchitectureNotDetected" xml:space="preserve"><value>Arquitetura não detectada</value></data>
+  <data name="Back" xml:space="preserve"><value>Voltar</value></data>
+  <data name="Cancel" xml:space="preserve"><value>Cancelar</value></data>
+  <data name="Close" xml:space="preserve"><value>Fechar</value></data>
+  <data name="CloseToTray" xml:space="preserve"><value>Fechar para a bandeja</value></data>
+  <data name="CloseToTrayDescription" xml:space="preserve"><value>Fechar a janela mantém o Float em execução na barra de menus</value></data>
+  <data name="ContainerDefaults" xml:space="preserve"><value>PADRÕES DE CONTAINER</value></data>
+  <data name="ContainerBehavior" xml:space="preserve"><value>COMPORTAMENTO DO CONTAINER</value></data>
+  <data name="Containers" xml:space="preserve"><value>Containers</value></data>
+  <data name="Continue" xml:space="preserve"><value>Continuar</value></data>
+  <data name="Create" xml:space="preserve"><value>Criar</value></data>
+  <data name="CreateAnother" xml:space="preserve"><value>Criar outro</value></data>
+  <data name="CreateContainer" xml:space="preserve"><value>Criar container</value></data>
+  <data name="CreateVolume" xml:space="preserve"><value>Criar volume</value></data>
+  <data name="CreatingVolume" xml:space="preserve"><value>Criando volume</value></data>
+  <data name="DarkMode" xml:space="preserve"><value>Modo escuro</value></data>
+  <data name="DefaultArchitecture" xml:space="preserve"><value>Arquitetura padrão</value></data>
+  <data name="DefaultCpuCores" xml:space="preserve"><value>Núcleos de CPU padrão</value></data>
+  <data name="DefaultMemory" xml:space="preserve"><value>Memória padrão</value></data>
+  <data name="DefaultRegistry" xml:space="preserve"><value>Registro padrão</value></data>
+  <data name="Delete" xml:space="preserve"><value>Excluir</value></data>
+  <data name="DeleteContainer" xml:space="preserve"><value>Excluir container</value></data>
+  <data name="DeleteContainerTitle" xml:space="preserve"><value>Excluir container</value></data>
+  <data name="DeleteImage" xml:space="preserve"><value>Excluir imagem</value></data>
+  <data name="DeleteImageTitle" xml:space="preserve"><value>Excluir imagem</value></data>
+  <data name="DeleteVolume" xml:space="preserve"><value>Excluir volume</value></data>
+  <data name="DeleteVolumeTitle" xml:space="preserve"><value>Excluir volume</value></data>
+  <data name="DeletePromptPrefix" xml:space="preserve"><value>Tem certeza de que deseja excluir</value></data>
+  <data name="DeletePromptSuffix" xml:space="preserve"><value>Esta ação não pode ser desfeita.</value></data>
+  <data name="Done" xml:space="preserve"><value>Concluído</value></data>
+  <data name="Driver" xml:space="preserve"><value>DRIVER</value></data>
+  <data name="EngineRunning" xml:space="preserve"><value>Engine em execução</value></data>
+  <data name="EngineStartFailed" xml:space="preserve"><value>Falha ao iniciar a engine</value></data>
+  <data name="EngineStopped" xml:space="preserve"><value>Engine parada</value></data>
+  <data name="ForceDeleteRunningContainers" xml:space="preserve"><value>Forçar exclusão de containers em execução</value></data>
+  <data name="ForceDeleteRunningContainersDescription" xml:space="preserve"><value>Usa a flag --force, pulando a etapa de parada</value></data>
+  <data name="Format" xml:space="preserve"><value>FORMATO</value></data>
+  <data name="Images" xml:space="preserve"><value>Imagens</value></data>
+  <data name="Image" xml:space="preserve"><value>IMAGEM</value></data>
+  <data name="InstallEngine" xml:space="preserve"><value>Instalar engine</value></data>
+  <data name="InstallEngineDescription" xml:space="preserve"><value>O Float precisa do apple/container para executar containers nativamente no Apple Silicon. Isso instala a engine pelo GitHub - leva só um momento.</value></data>
+  <data name="InstallEngineSuccess" xml:space="preserve"><value>apple/container instalado com sucesso. Abrindo o Float...</value></data>
+  <data name="Installing" xml:space="preserve"><value>Instalando...</value></data>
+  <data name="Journaling" xml:space="preserve"><value>Journaling</value></data>
+  <data name="JournalSize" xml:space="preserve"><value>Tamanho do journal</value></data>
+  <data name="KeepAlive" xml:space="preserve"><value>Manter ativo</value></data>
+  <data name="KeepAliveDescription" xml:space="preserve"><value>Adiciona 'sleep infinity' para manter o container em execução</value></data>
+  <data name="Language" xml:space="preserve"><value>Idioma</value></data>
+  <data name="LanguageRestartRequired" xml:space="preserve"><value>Reinicie o Float para aplicar o idioma selecionado.</value></data>
+  <data name="LightMode" xml:space="preserve"><value>Modo claro</value></data>
+  <data name="Login" xml:space="preserve"><value>Entrar</value></data>
+  <data name="Logout" xml:space="preserve"><value>Sair</value></data>
+  <data name="LogoutConfirmTitle" xml:space="preserve"><value>Sair do registro</value></data>
+  <data name="LogoutPromptPrefix" xml:space="preserve"><value>Remover credenciais salvas de</value></data>
+  <data name="Migrate" xml:space="preserve"><value>Migrar</value></data>
+  <data name="MigrateFromDocker" xml:space="preserve"><value>Migrar do Docker</value></data>
+  <data name="Name" xml:space="preserve"><value>NOME</value></data>
+  <data name="NewContainer" xml:space="preserve"><value>Novo container</value></data>
+  <data name="NoRegistries" xml:space="preserve"><value>Nenhum registro</value></data>
+  <data name="NoRegistriesDescription" xml:space="preserve"><value>Adicione um registro para baixar imagens privadas</value></data>
+  <data name="OptionalPlaceholder" xml:space="preserve"><value>Opcional</value></data>
+  <data name="Password" xml:space="preserve"><value>SENHA</value></data>
+  <data name="PasswordPlaceholder" xml:space="preserve"><value>Senha</value></data>
+  <data name="Platform" xml:space="preserve"><value>PLATAFORMA</value></data>
+  <data name="Ports" xml:space="preserve"><value>PORTAS</value></data>
+  <data name="Preferences" xml:space="preserve"><value>Preferências</value></data>
+  <data name="QuitFloat" xml:space="preserve"><value>Encerrar Float</value></data>
+  <data name="Refresh" xml:space="preserve"><value>Atualizar</value></data>
+  <data name="Registries" xml:space="preserve"><value>Registros</value></data>
+  <data name="Restart" xml:space="preserve"><value>Reiniciar</value></data>
+  <data name="Retry" xml:space="preserve"><value>Tentar novamente</value></data>
+  <data name="Save" xml:space="preserve"><value>Salvar</value></data>
+  <data name="Scheme" xml:space="preserve"><value>ESQUEMA</value></data>
+  <data name="Server" xml:space="preserve"><value>SERVIDOR</value></data>
+  <data name="Settings" xml:space="preserve"><value>Ajustes</value></data>
+  <data name="SettingsResetMessageFormat" xml:space="preserve"><value>O Float não conseguiu ler seus ajustes e iniciou com os padrões. {0}</value></data>
+  <data name="SettingsResetTitle" xml:space="preserve"><value>Ajustes redefinidos</value></data>
+  <data name="SettingUpFloat" xml:space="preserve"><value>Configurando o Float</value></data>
+  <data name="ShowFloat" xml:space="preserve"><value>Mostrar Float</value></data>
+  <data name="ShowInDock" xml:space="preserve"><value>Mostrar no Dock</value></data>
+  <data name="ShowInDockDescription" xml:space="preserve"><value>Mostra o Float no Dock junto com outros apps</value></data>
+  <data name="Size" xml:space="preserve"><value>TAMANHO</value></data>
+  <data name="Source" xml:space="preserve"><value>ORIGEM</value></data>
+  <data name="Start" xml:space="preserve"><value>Iniciar</value></data>
+  <data name="StartContainer" xml:space="preserve"><value>Iniciar container</value></data>
+  <data name="StartEngine" xml:space="preserve"><value>Iniciar engine</value></data>
+  <data name="Starting" xml:space="preserve"><value>Iniciando...</value></data>
+  <data name="StartImmediately" xml:space="preserve"><value>Iniciar imediatamente</value></data>
+  <data name="StartImmediatelyDescription" xml:space="preserve"><value>Usa 'container run' em vez de 'container create'</value></data>
+  <data name="Status" xml:space="preserve"><value>STATUS</value></data>
+  <data name="Stop" xml:space="preserve"><value>Parar</value></data>
+  <data name="StopContainer" xml:space="preserve"><value>Parar container</value></data>
+  <data name="StopEngine" xml:space="preserve"><value>Parar engine</value></data>
+  <data name="StopEngineOnQuit" xml:space="preserve"><value>Parar engine ao encerrar</value></data>
+  <data name="StopEngineOnQuitDescription" xml:space="preserve"><value>Para a engine de containers quando o Float encerra</value></data>
+  <data name="StopTimeoutSeconds" xml:space="preserve"><value>Timeout de parada (segundos)</value></data>
+  <data name="StopTimeoutSecondsDescription" xml:space="preserve"><value>Segundos antes do SIGKILL ao parar um container</value></data>
+  <data name="Tag" xml:space="preserve"><value>TAG</value></data>
+  <data name="Type" xml:space="preserve"><value>TIPO</value></data>
+  <data name="UnknownError" xml:space="preserve"><value>Erro desconhecido</value></data>
+  <data name="Username" xml:space="preserve"><value>USUÁRIO</value></data>
+  <data name="UsernamePlaceholder" xml:space="preserve"><value>Usuário</value></data>
+  <data name="VolumeName" xml:space="preserve"><value>Nome do volume</value></data>
+  <data name="Volumes" xml:space="preserve"><value>Volumes</value></data>
+  <data name="ExportingVolumeFormat" xml:space="preserve"><value>Exportando volume {0} de {1}...</value></data>
+  <data name="VolumeExportFailed" xml:space="preserve"><value>Falha ao exportar volume: {0}</value></data>
+  <data name="Amd64Emulation" xml:space="preserve"><value>Emulação AMD64</value></data>
+  <data name="AddPort" xml:space="preserve"><value>Adicionar porta</value></data>
+  <data name="AddVariable" xml:space="preserve"><value>Adicionar variável</value></data>
+  <data name="AddVolume" xml:space="preserve"><value>Adicionar volume</value></data>
+  <data name="Browse" xml:space="preserve"><value>Procurar...</value></data>
+  <data name="ChooseContainers" xml:space="preserve"><value>Escolher containers</value></data>
+  <data name="ChooseImageArchitecture" xml:space="preserve"><value>Escolher arquitetura da imagem</value></data>
+  <data name="CleanupDockerOriginals" xml:space="preserve"><value>Limpar originais do Docker</value></data>
+  <data name="CommandEditIfNeeded" xml:space="preserve"><value>Comando (edite se necessário)</value></data>
+  <data name="Confirm" xml:space="preserve"><value>Confirmar</value></data>
+  <data name="ContainerCreatedSuccessfully" xml:space="preserve"><value>Container criado com sucesso.</value></data>
+  <data name="ContainerImage" xml:space="preserve"><value>Imagem do container</value></data>
+  <data name="ContainerName" xml:space="preserve"><value>NOME DO CONTAINER</value></data>
+  <data name="ContainerPath" xml:space="preserve"><value>CAMINHO DO CONTAINER</value></data>
+  <data name="ContainerPort" xml:space="preserve"><value>Porta do container</value></data>
+  <data name="CopyDetails" xml:space="preserve"><value>Copiar detalhes</value></data>
+  <data name="CpuCores" xml:space="preserve"><value>NÚCLEOS DE CPU</value></data>
+  <data name="CreatingContainer" xml:space="preserve"><value>Criando container</value></data>
+  <data name="CreationFailed" xml:space="preserve"><value>Falha na criação</value></data>
+  <data name="DockerArchitectureMissing" xml:space="preserve"><value>O Docker não expôs a arquitetura da imagem deste container.</value></data>
+  <data name="DockerUnavailable" xml:space="preserve"><value>Docker não está disponível</value></data>
+  <data name="EnableRosetta" xml:space="preserve"><value>ATIVAR ROSETTA</value></data>
+  <data name="Environment" xml:space="preserve"><value>Ambiente</value></data>
+  <data name="EnvironmentVariables" xml:space="preserve"><value>VARIÁVEIS DE AMBIENTE</value></data>
+  <data name="Enabled" xml:space="preserve"><value>Ativado</value></data>
+  <data name="FinishCleanup" xml:space="preserve"><value>Finalizar limpeza</value></data>
+  <data name="HostPath" xml:space="preserve"><value>CAMINHO DO HOST</value></data>
+  <data name="HostPort" xml:space="preserve"><value>Porta do host</value></data>
+  <data name="Info" xml:space="preserve"><value>Info</value></data>
+  <data name="ImageName" xml:space="preserve"><value>NOME DA IMAGEM</value></data>
+  <data name="ImagePreview" xml:space="preserve"><value>PRÉVIA DA IMAGEM</value></data>
+  <data name="KeepContainerAlive" xml:space="preserve"><value>MANTER CONTAINER ATIVO</value></data>
+  <data name="KeepContainerAliveDescription" xml:space="preserve"><value>Para casos em que a imagem encerra imediatamente, como containers de teste ou imagens base mínimas.</value></data>
+  <data name="Memory" xml:space="preserve"><value>MEMÓRIA</value></data>
+  <data name="MigrationProgress" xml:space="preserve"><value>Progresso da migração</value></data>
+  <data name="NoDockerContainersFound" xml:space="preserve"><value>Nenhum container Docker encontrado</value></data>
+  <data name="NoDockerContainersFoundDescription" xml:space="preserve"><value>Crie ou inicie containers Docker e atualize esta lista.</value></data>
+  <data name="NoSuccessfulMigrationsCleanup" xml:space="preserve"><value>Nenhuma migração bem-sucedida para limpar</value></data>
+  <data name="PersistentCommand" xml:space="preserve"><value>Comando persistente</value></data>
+  <data name="PlatformResources" xml:space="preserve"><value>Plataforma e recursos</value></data>
+  <data name="PortMappings" xml:space="preserve"><value>MAPEAMENTOS DE PORTA</value></data>
+  <data name="PortsVolumes" xml:space="preserve"><value>Portas e volumes</value></data>
+  <data name="ReadOnly" xml:space="preserve"><value>Somente leitura</value></data>
+  <data name="ReadOnlyDescription" xml:space="preserve"><value>Monta este volume sem acesso de escrita</value></data>
+  <data name="Registry" xml:space="preserve"><value>REGISTRO</value></data>
+  <data name="Remove" xml:space="preserve"><value>Remover</value></data>
+  <data name="Resources" xml:space="preserve"><value>RECURSOS</value></data>
+  <data name="ReviewCreate" xml:space="preserve"><value>Revisar e criar</value></data>
+  <data name="Rosetta" xml:space="preserve"><value>Rosetta</value></data>
+  <data name="RosettaDescription" xml:space="preserve"><value>Necessário para imagens apenas x86_64/amd64. Usa Apple Rosetta 2 para traduzir instruções com velocidade quase nativa.</value></data>
+  <data name="ScanningDockerContainers" xml:space="preserve"><value>Procurando containers Docker...</value></data>
+  <data name="SelectAll" xml:space="preserve"><value>Selecionar todos</value></data>
+  <data name="SelectDockerContainers" xml:space="preserve"><value>Selecione os containers Docker que deseja migrar.</value></data>
+  <data name="SelectHostDirectory" xml:space="preserve"><value>Selecionar diretório do host</value></data>
+  <data name="SetAutomaticallyRosetta" xml:space="preserve"><value>Definido automaticamente ao alternar Rosetta abaixo.</value></data>
+  <data name="Step" xml:space="preserve"><value>Etapa</value></data>
+  <data name="StepOf" xml:space="preserve"><value>de</value></data>
+  <data name="TryAgain" xml:space="preserve"><value>Tentar novamente</value></data>
+  <data name="VolumeCreated" xml:space="preserve"><value>Volume criado.</value></data>
+  <data name="VolumeDescription" xml:space="preserve"><value>Volumes são armazenamento gerenciado dentro do Apple Container. Use bind mounts quando precisar expor uma pasta do macOS para um container.</value></data>
+  <data name="VolumeMounts" xml:space="preserve"><value>MONTAGENS DE VOLUME</value></data>
+  <data name="AnUnknownErrorOccurred" xml:space="preserve"><value>Ocorreu um erro desconhecido</value></data>
+  <data name="Anonymous" xml:space="preserve"><value>Anônimo</value></data>
+  <data name="CleanupFailedFormat" xml:space="preserve"><value>Falha na limpeza: {0}</value></data>
+  <data name="ContainerCommandFailed" xml:space="preserve"><value>Falha no comando do container.</value></data>
+  <data name="ContainerCreationFailed" xml:space="preserve"><value>Falha ao criar container</value></data>
+  <data name="ContainerDeletedFormat" xml:space="preserve"><value>Container '{0}' excluído.</value></data>
+  <data name="ContainerOperationFailed" xml:space="preserve"><value>Falha na operação do container</value></data>
+  <data name="CouldNotDetectDockerArchitectureFormat" xml:space="preserve"><value>Não foi possível detectar a arquitetura da imagem Docker de '{0}'. Abra a imagem no Docker Desktop ou baixe-a novamente e tente migrar de novo.</value></data>
+  <data name="CouldNotRemovePartialAppleContainerFormat" xml:space="preserve"><value>Não foi possível remover o container Apple parcial: {0}</value></data>
+  <data name="CouldNotRestartDockerOriginalFormat" xml:space="preserve"><value>Não foi possível reiniciar o Docker original: {0}</value></data>
+  <data name="Deleting" xml:space="preserve"><value>Excluindo...</value></data>
+  <data name="DockerImageArchitectureUndetected" xml:space="preserve"><value>A arquitetura da imagem Docker não pôde ser detectada automaticamente.</value></data>
+  <data name="DockerOriginalRestarted" xml:space="preserve"><value>Docker original reiniciado.</value></data>
+  <data name="ErrorCodeFormat" xml:space="preserve"><value>Código do erro: {0}</value></data>
+  <data name="FailedListContainers" xml:space="preserve"><value>Falha ao listar containers</value></data>
+  <data name="FailedListDockerContainers" xml:space="preserve"><value>Falha ao listar containers Docker</value></data>
+  <data name="FailedListImages" xml:space="preserve"><value>Falha ao listar imagens</value></data>
+  <data name="FailedListVolumes" xml:space="preserve"><value>Falha ao listar volumes</value></data>
+  <data name="FailedLoadRegistries" xml:space="preserve"><value>Falha ao carregar registros</value></data>
+  <data name="FailedStartAppleContainer" xml:space="preserve"><value>Falha ao iniciar container Apple</value></data>
+  <data name="FailedStopDockerContainer" xml:space="preserve"><value>Falha ao parar container Docker</value></data>
+  <data name="FailedToDeleteImage" xml:space="preserve"><value>Falha ao excluir imagem</value></data>
+  <data name="FailedToDeleteVolume" xml:space="preserve"><value>Falha ao excluir volume</value></data>
+  <data name="FinishingMigration" xml:space="preserve"><value>Finalizando migração...</value></data>
+  <data name="HideDetails" xml:space="preserve"><value>Ocultar detalhes</value></data>
+  <data name="ImageRefreshFailed" xml:space="preserve"><value>Falha ao atualizar imagens</value></data>
+  <data name="LoginFailed" xml:space="preserve"><value>Falha ao entrar</value></data>
+  <data name="LogoutFailed" xml:space="preserve"><value>Falha ao sair</value></data>
+  <data name="MigrationComplete" xml:space="preserve"><value>Migração concluída</value></data>
+  <data name="MigrationCompleteCleanupIssues" xml:space="preserve"><value>Migração concluída com problemas na limpeza</value></data>
+  <data name="MigrationFailedFormat" xml:space="preserve"><value>Falha na migração: {0}</value></data>
+  <data name="Named" xml:space="preserve"><value>Nomeado</value></data>
+  <data name="NoPublishedPorts" xml:space="preserve"><value>Nenhuma porta publicada</value></data>
+  <data name="NoMounts" xml:space="preserve"><value>Nenhuma montagem</value></data>
+  <data name="NoVolumes" xml:space="preserve"><value>Nenhum volume</value></data>
+  <data name="NotFoundFormat" xml:space="preserve"><value>Não encontrado: {0}</value></data>
+  <data name="NotSelected" xml:space="preserve"><value>Não selecionado</value></data>
+  <data name="OneContainerSelected" xml:space="preserve"><value>1 container selecionado</value></data>
+  <data name="OneDockerCleanupSelected" xml:space="preserve"><value>1 Docker original selecionado para limpeza</value></data>
+  <data name="OneVolume" xml:space="preserve"><value>1 volume</value></data>
+  <data name="RemovedPartialAppleContainer" xml:space="preserve"><value>Container Apple parcial removido.</value></data>
+  <data name="RequestedSizeTooLargeFormat" xml:space="preserve"><value>O tamanho solicitado é maior que o espaço disponível em disco ({0}).</value></data>
+  <data name="Restarting" xml:space="preserve"><value>Reiniciando...</value></data>
+  <data name="ShowDetails" xml:space="preserve"><value>Mostrar detalhes</value></data>
+  <data name="Stopping" xml:space="preserve"><value>Parando...</value></data>
+  <data name="VolumeCreationFailed" xml:space="preserve"><value>Falha ao criar volume</value></data>
+  <data name="VolumeRefreshFailed" xml:space="preserve"><value>Falha ao atualizar volumes</value></data>
+  <data name="Waiting" xml:space="preserve"><value>Aguardando</value></data>
+  <data name="AlreadyRemovedPartFormat" xml:space="preserve"><value>{0} já removidos</value></data>
+  <data name="ArchitectureProvidedManuallyFormat" xml:space="preserve"><value>Arquitetura informada manualmente: {0}.</value></data>
+  <data name="CleaningUpDockerOriginals" xml:space="preserve"><value>Limpando originais do Docker...</value></data>
+  <data name="ContainersSelectedFormat" xml:space="preserve"><value>{0} containers selecionados</value></data>
+  <data name="CreatingAppleContainer" xml:space="preserve"><value>Criando container Apple</value></data>
+  <data name="DockerCleanupSelectedFormat" xml:space="preserve"><value>{0} Docker originais selecionados para limpeza</value></data>
+  <data name="DockerOriginalRemoved" xml:space="preserve"><value>Docker original removido</value></data>
+  <data name="DockerOriginalsPreserved" xml:space="preserve"><value>Originais do Docker serão preservados</value></data>
+  <data name="FailedFormat" xml:space="preserve"><value>Falhou: {0}</value></data>
+  <data name="FailedWithRollbackFormat" xml:space="preserve"><value>Falhou: {0}. {1}</value></data>
+  <data name="Migrated" xml:space="preserve"><value>Migrado</value></data>
+  <data name="MigratedCountFormat" xml:space="preserve"><value>{0} container(s) migrados.</value></data>
+  <data name="MigratedFailedCountFormat" xml:space="preserve"><value>{0} migrados, {1} falharam.</value></data>
+  <data name="MigratedPartFormat" xml:space="preserve"><value>{0} migrados</value></data>
+  <data name="Migrating" xml:space="preserve"><value>Migrando...</value></data>
+  <data name="PreservedPartFormat" xml:space="preserve"><value>{0} preservados</value></data>
+  <data name="RemovedPartFormat" xml:space="preserve"><value>{0} Docker original(is) removidos</value></data>
+  <data name="CleanupFailedPartFormat" xml:space="preserve"><value>{0} falhas na limpeza</value></data>
+  <data name="StartingAppleContainer" xml:space="preserve"><value>Iniciando container Apple</value></data>
+  <data name="StoppingDockerOriginal" xml:space="preserve"><value>Parando Docker original</value></data>
+</root>

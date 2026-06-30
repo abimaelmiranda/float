@@ -1,0 +1,222 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:vm="using:Float.UI.ViewModels"
+             xmlns:shared="using:Float.UI.Views.Shared"
+             xmlns:resx="using:Float.UI.Resources"
+             x:Class="Float.UI.Views.ContainerDetailView"
+             x:DataType="vm:ContainerDetailViewModel">
+
+    <UserControl.Styles>
+        <Style Selector="TabControl">
+            <Setter Property="Padding" Value="0"/>
+        </Style>
+        <Style Selector="TabItem">
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="Padding" Value="14,8"/>
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        </Style>
+        <Style Selector="TabItem:selected">
+            <Setter Property="Foreground" Value="{DynamicResource SystemControlForegroundBaseHighBrush}"/>
+        </Style>
+    </UserControl.Styles>
+
+    <DockPanel>
+
+        <!-- Header -->
+        <Border DockPanel.Dock="Top" Padding="20,52,20,0">
+            <Grid ColumnDefinitions="Auto,*">
+                <Button Grid.Column="0"
+                        Theme="{StaticResource ActionButtonTheme}"
+                        Command="{Binding BackCommand}"
+                        Width="24"
+                        Height="24"
+                        Padding="0"
+                        VerticalAlignment="Center"
+                        Margin="0,0,12,0"
+                        ToolTip.Tip="{x:Static resx:UiStrings.Back}">
+                    <Path Classes="icon icon-sm"
+                          Data="{StaticResource IconBack}"
+                          Stroke="{Binding $parent[Button].Foreground}"/>
+                </Button>
+                <TextBlock Grid.Column="1"
+                           Text="{Binding Container.Name}"
+                           FontSize="20"
+                           FontWeight="SemiBold"
+                           LineHeight="24"
+                           VerticalAlignment="Center"/>
+            </Grid>
+        </Border>
+
+        <!-- Tab control -->
+        <TabControl Margin="0,12,0,0"
+                    SelectionChanged="OnTabSelectionChanged">
+
+            <!-- Info tab -->
+            <TabItem Header="{x:Static resx:UiStrings.Info}">
+                <ScrollViewer Padding="20,16,20,16">
+                    <StackPanel Spacing="20">
+
+                        <!-- Status -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Status}"/>
+                            <StackPanel Orientation="Horizontal" Spacing="6">
+                                <Ellipse Classes="status-dot"
+                                         Classes.running="{Binding Container.IsRunning}"/>
+                                <TextBlock Text="{Binding Container.StatusLabel}"
+                                           FontSize="13"
+                                           VerticalAlignment="Center"/>
+                            </StackPanel>
+                            <TextBlock Text="{Binding Container.BusyLabel}"
+                                       IsVisible="{Binding Container.IsBusy}"
+                                       FontSize="12"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                        </StackPanel>
+
+                        <!-- Image -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Image}"/>
+                            <TextBlock Text="{Binding Container.ImageTag}"
+                                       FontSize="13"
+                                       TextWrapping="Wrap"/>
+                        </StackPanel>
+
+                        <!-- Ports -->
+                        <StackPanel Spacing="4">
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Ports}"/>
+                            <TextBlock Text="{Binding Container.PortSummary}"
+                                       FontSize="13"
+                                       Foreground="{DynamicResource SystemControlForegroundBaseMediumHighBrush}"/>
+                        </StackPanel>
+
+                        <!-- Actions -->
+                        <StackPanel Spacing="6">
+                            <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.Actions}"/>
+
+                            <Button Theme="{StaticResource ActionButtonTheme}"
+                                    Content="{x:Static resx:UiStrings.StopContainer}"
+                                    Tag="{Binding Container.Source}"
+                                    Click="OnStopContainerClick"
+                                    IsEnabled="{Binding !Container.IsBusy}"
+                                    IsVisible="{Binding Container.IsRunning}"
+                                    HorizontalAlignment="Left"/>
+
+                            <Button Theme="{StaticResource ActionButtonTheme}"
+                                    Content="{x:Static resx:UiStrings.StartContainer}"
+                                    Tag="{Binding Container.Source}"
+                                    Click="OnStartContainerClick"
+                                    IsEnabled="{Binding !Container.IsBusy}"
+                                    IsVisible="{Binding !Container.IsRunning}"
+                                    HorizontalAlignment="Left"/>
+
+                            <Button Theme="{StaticResource ActionButtonTheme}"
+                                    Content="{x:Static resx:UiStrings.Restart}"
+                                    Tag="{Binding Container.Source}"
+                                    Click="OnRestartContainerClick"
+                                    IsEnabled="{Binding !Container.IsBusy}"
+                                    HorizontalAlignment="Left"/>
+
+                            <Button Theme="{StaticResource DangerButtonTheme}"
+                                    Content="{x:Static resx:UiStrings.DeleteContainer}"
+                                    Tag="{Binding Container.Source}"
+                                    Click="OnRequestDeleteClick"
+                                    IsEnabled="{Binding !Container.IsBusy}"
+                                    HorizontalAlignment="Left"/>
+                        </StackPanel>
+
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+
+            <!-- Mounts tab -->
+            <TabItem Header="{x:Static resx:UiStrings.Volumes}">
+                <Grid>
+                    <!-- Empty state -->
+                    <TextBlock Text="{x:Static resx:UiStrings.NoMounts}"
+                               IsVisible="{Binding !Volumes.Count}"
+                               HorizontalAlignment="Center"
+                               VerticalAlignment="Center"
+                               Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                               FontSize="13"/>
+
+                    <!-- Mount list -->
+                    <ScrollViewer IsVisible="{Binding !!Volumes.Count}" Padding="20,16,20,16">
+                        <ItemsControl ItemsSource="{Binding Volumes}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <Border Background="{DynamicResource SystemControlBackgroundChromeMediumBrush}"
+                                            CornerRadius="8"
+                                            Padding="14,10"
+                                            Margin="0,0,0,6">
+                                        <Grid ColumnDefinitions="*,Auto">
+                                            <StackPanel Spacing="2">
+                                                <StackPanel Orientation="Horizontal" Spacing="4">
+                                                    <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.HostPath}"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding HostPath}"
+                                                           FontSize="12"
+                                                           TextWrapping="Wrap"/>
+                                                <StackPanel Orientation="Horizontal" Spacing="4" Margin="0,6,0,0">
+                                                    <TextBlock Classes="section-label" Text="{x:Static resx:UiStrings.ContainerPath}"/>
+                                                </StackPanel>
+                                                <TextBlock Text="{Binding ContainerPath}"
+                                                           FontSize="12"
+                                                           TextWrapping="Wrap"/>
+                                            </StackPanel>
+                                            <Border Grid.Column="1"
+                                                    IsVisible="{Binding ReadOnly}"
+                                                    Background="{DynamicResource SystemControlBackgroundChromeLowBrush}"
+                                                    CornerRadius="4"
+                                                    Padding="6,2"
+                                                    VerticalAlignment="Top">
+                                                <TextBlock Text="{x:Static resx:UiStrings.ReadOnly}"
+                                                           FontSize="10"
+                                                           Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+                                            </Border>
+                                        </Grid>
+                                    </Border>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+                </Grid>
+            </TabItem>
+
+            <!-- Logs tab -->
+            <TabItem Header="Logs">
+                <Grid RowDefinitions="*,Auto">
+                    <!-- Log lines -->
+                    <ScrollViewer Grid.Row="0"
+                                  x:Name="LogScrollViewer"
+                                  Padding="20,16,20,16">
+                        <ItemsControl ItemsSource="{Binding LogLines}">
+                            <ItemsControl.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding}"
+                                               FontSize="11"
+                                               FontFamily="Courier New, Courier, monospace"
+                                               TextWrapping="Wrap"/>
+                                </DataTemplate>
+                            </ItemsControl.ItemTemplate>
+                        </ItemsControl>
+                    </ScrollViewer>
+
+                    <!-- Loading indicator -->
+                    <StackPanel Grid.Row="1"
+                                Orientation="Horizontal"
+                                Spacing="8"
+                                Margin="20,0,20,12"
+                                IsVisible="{Binding IsLoadingLogs}">
+                        <ProgressBar Width="60" Height="3" IsIndeterminate="True" VerticalAlignment="Center"/>
+                        <TextBlock FontSize="11"
+                                   Foreground="{DynamicResource SystemControlForegroundBaseMediumBrush}"
+                                   VerticalAlignment="Center"
+                                   Text="Streaming..."/>
+                    </StackPanel>
+                </Grid>
+            </TabItem>
+
+        </TabControl>
+
+    </DockPanel>
+
+</UserControl>

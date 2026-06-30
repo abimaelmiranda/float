@@ -1,0 +1,3 @@
+<linker>
+  <assembly fullname="Float.UI" preserve="all"/>
+</linker>

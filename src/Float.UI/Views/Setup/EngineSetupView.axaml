@@ -1,6 +1,7 @@
 <UserControl xmlns="https://github.com/avaloniaui"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:vm="using:Float.UI.ViewModels.Setup"
+             xmlns:resx="using:Float.UI.Resources"
              x:Class="Float.UI.Views.Setup.EngineSetupView"
              x:DataType="vm:EngineSetupViewModel">
 
@@ -16,15 +17,15 @@
 
                 <!-- Icon + title -->
                 <StackPanel HorizontalAlignment="Center" Spacing="12">
-                    <TextBlock Text="⬡"
-                               FontSize="48"
-                               Foreground="{DynamicResource FloatAccentBrush}"
-                               HorizontalAlignment="Center"/>
-                    <TextBlock Text="Setting Up Float"
+                    <Path Classes="icon icon-lg"
+                          Data="{StaticResource IconEngine}"
+                          Stroke="{DynamicResource FloatAccentBrush}"
+                          HorizontalAlignment="Center"/>
+                    <TextBlock Text="{x:Static resx:UiStrings.SettingUpFloat}"
                                FontSize="22"
                                FontWeight="SemiBold"
                                HorizontalAlignment="Center"/>
-                    <TextBlock Text="Float needs apple/container to run containers natively on Apple Silicon. This installs the engine from GitHub — it only takes a moment."
+                    <TextBlock Text="{x:Static resx:UiStrings.InstallEngineDescription}"
                                FontSize="13"
                                Foreground="{DynamicResource FloatSecondaryTextBrush}"
                                TextWrapping="Wrap"
@@ -81,7 +82,7 @@
                                    VerticalAlignment="Center"
                                    FontWeight="SemiBold"
                                    FontSize="15"/>
-                        <TextBlock Text="apple/container installed successfully. Launching Float…"
+                        <TextBlock Text="{x:Static resx:UiStrings.InstallEngineSuccess}"
                                    Foreground="{DynamicResource StatusRunningBrush}"
                                    FontSize="13"
                                    VerticalAlignment="Center"/>
@@ -93,21 +94,19 @@
 
         <!-- Footer -->
         <Border Grid.Row="1"
-                Padding="40,16"
-                Background="{DynamicResource FloatFooterBackgroundBrush}"
-                BorderBrush="{DynamicResource SidebarBorderBrush}"
-                BorderThickness="0,1,0,0">
+                Classes="footer-bar"
+                Padding="40,16">
             <Grid ColumnDefinitions="Auto,*,Auto">
 
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Cancel"
+                        Content="{x:Static resx:UiStrings.Cancel}"
                         Command="{Binding CancelCommand}"
                         IsVisible="{Binding IsRunning}"/>
 
                 <Button Grid.Column="0"
                         Theme="{StaticResource ActionButtonTheme}"
-                        Content="Retry"
+                        Content="{x:Static resx:UiStrings.Retry}"
                         Command="{Binding RetryCommand}"
                         IsVisible="{Binding HasError}"/>
 
@@ -117,15 +116,15 @@
                         Command="{Binding InstallCommand}"
                         IsVisible="{Binding !IsComplete}">
                     <StackPanel Orientation="Horizontal" Spacing="8">
-                        <TextBlock Text="Install Engine" IsVisible="{Binding !IsRunning}"/>
-                        <TextBlock Text="Installing…"    IsVisible="{Binding IsRunning}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.InstallEngine}" IsVisible="{Binding !IsRunning}"/>
+                        <TextBlock Text="{x:Static resx:UiStrings.Installing}"    IsVisible="{Binding IsRunning}"/>
                     </StackPanel>
                 </Button>
 
                 <!-- Continue (shown only after successful install) -->
                 <Button Grid.Column="2"
                         Theme="{StaticResource PrimaryButtonTheme}"
-                        Content="Continue →"
+                        Content="{x:Static resx:UiStrings.Continue}"
                         Command="{Binding ContinueCommand}"
                         IsVisible="{Binding IsComplete}"/>
 

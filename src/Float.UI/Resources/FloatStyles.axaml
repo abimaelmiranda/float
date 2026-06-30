@@ -8,12 +8,12 @@
             <ResourceDictionary.ThemeDictionaries>
                 <ResourceDictionary x:Key="Light">
                     <!-- Window / content area -->
-                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#F5F5F7"/>
+                    <SolidColorBrush x:Key="FloatWindowBackgroundBrush"  Color="#E8E8ED"/>
                     <SolidColorBrush x:Key="FloatCardBackgroundBrush"    Color="#FFFFFF"/>
-                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#EFEFEF"/>
+                    <SolidColorBrush x:Key="FloatFooterBackgroundBrush"  Color="#D8D8DE"/>
                     <!-- Sidebar -->
-                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#EBEBEB"/>
-                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#D1D1D6"/>
+                    <SolidColorBrush x:Key="SidebarBackgroundBrush"      Color="#D5D5DB"/>
+                    <SolidColorBrush x:Key="SidebarBorderBrush"          Color="#B8B8C0"/>
                     <!-- Muted text -->
                     <SolidColorBrush x:Key="FloatSecondaryTextBrush"     Color="#6C6C70"/>
                 </ResourceDictionary>
@@ -175,6 +175,21 @@
         </ResourceDictionary>
     </Styles.Resources>
 
+    <!-- ─── Section label (small caps heading in detail panels / forms) ── -->
+    <Style Selector="TextBlock.section-label">
+        <Setter Property="FontSize"      Value="10"/>
+        <Setter Property="FontWeight"    Value="SemiBold"/>
+        <Setter Property="Foreground"    Value="{DynamicResource SystemControlForegroundBaseMediumBrush}"/>
+        <Setter Property="LetterSpacing" Value="1"/>
+    </Style>
+
+    <!-- ─── Footer bar (wizard / setup bottom action bar) ────────────── -->
+    <Style Selector="Border.footer-bar">
+        <Setter Property="Background"      Value="{DynamicResource FloatFooterBackgroundBrush}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource SidebarBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    </Style>
+
     <!-- ─── Console (read-only terminal output) ──────────────────────── -->
     <Style Selector="TextBox.console">
         <Setter Property="Background"       Value="#1C1C1E"/>
@@ -190,6 +205,30 @@
     <Style Selector="TextBox.console /template/ ScrollViewer">
         <Setter Property="VerticalScrollBarVisibility"   Value="Auto"/>
         <Setter Property="HorizontalScrollBarVisibility" Value="Disabled"/>
+    </Style>
+
+    <!-- ─── Engine bottom bar ────────────────────────────────────────── -->
+    <Style Selector="Border.engine-bottom-bar">
+        <Setter Property="Height"          Value="30"/>
+        <Setter Property="Padding"         Value="12,0"/>
+        <Setter Property="Background"      Value="{DynamicResource FloatFooterBackgroundBrush}"/>
+        <Setter Property="BorderBrush"     Value="{DynamicResource SidebarBorderBrush}"/>
+        <Setter Property="BorderThickness" Value="0,1,0,0"/>
+    </Style>
+
+    <Style Selector="Ellipse.bottom-bar-status-dot">
+        <Setter Property="Width"  Value="7"/>
+        <Setter Property="Height" Value="7"/>
+    </Style>
+
+    <Style Selector="Ellipse.bottom-bar-status-dot.starting">
+        <Setter Property="Fill" Value="{DynamicResource StatusWarningBrush}"/>
+    </Style>
+
+    <Style Selector="TextBlock.bottom-bar-status-text">
+        <Setter Property="FontSize"          Value="11"/>
+        <Setter Property="Foreground"        Value="{DynamicResource FloatSecondaryTextBrush}"/>
+        <Setter Property="VerticalAlignment" Value="Center"/>
     </Style>
 
     <!-- ─── Status dot ────────────────────────────────────────────────── -->
@@ -215,6 +254,27 @@
                 </KeyFrame>
             </Animation>
         </Style.Animations>
+    </Style>
+
+    <!-- ─── Icon paths (Iconoir stroke-based) ───────────────────────── -->
+    <Style Selector="Path.icon">
+        <Setter Property="StrokeThickness" Value="1.5"/>
+        <Setter Property="StrokeLineCap"   Value="Round"/>
+        <Setter Property="StrokeJoin"      Value="Round"/>
+        <Setter Property="Stretch"         Value="Uniform"/>
+        <Setter Property="Fill"            Value="Transparent"/>
+    </Style>
+    <Style Selector="Path.icon-sm">
+        <Setter Property="Width"  Value="15"/>
+        <Setter Property="Height" Value="15"/>
+    </Style>
+    <Style Selector="Path.icon-md">
+        <Setter Property="Width"  Value="20"/>
+        <Setter Property="Height" Value="20"/>
+    </Style>
+    <Style Selector="Path.icon-lg">
+        <Setter Property="Width"  Value="44"/>
+        <Setter Property="Height" Value="44"/>
     </Style>
 
     <!-- ─── Container list ────────────────────────────────────────────── -->

@@ -1,12 +1,10 @@
-using System.Collections.Generic;
-using System.Linq;
 using System.Text;
-using System.Text.Json;
-using System.Threading;
-using System.Threading.Tasks;
 using Float.Core.Abstractions.Services;
 using Float.Core.Enums;
 using Float.Core.Models;
+using Float.Core.Models.Results;
+using Float.Core.Models.Results.Errors;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Float.Infrastructure.Engines.AppleContainers;
 
@@ -17,111 +15,127 @@ public class AppleContainerReader : IContainerReader
     private readonly IEngineProvisioner _engineProvisioner;
     private readonly IProcessHost _processHost;
 
-    public AppleContainerReader(IEngineProvisioner engineProvisioner, IProcessHost processHost)
+    public AppleContainerReader(
+        [FromKeyedServices(ContainerEngine.AppleContainers)] IEngineProvisioner engineProvisioner,
+        IProcessHost processHost)
     {
         _engineProvisioner = engineProvisioner;
         _processHost = processHost;
     }
 
-    public async Task<IReadOnlyList<Container>> ListAsync(CancellationToken cancellationToken = default)
+    public async Task<Result<IReadOnlyList<Container>>> ListContainersAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
-        if (!_engineProvisioner.IsEngineInstalled())
-            throw new InvalidOperationException("Apple Container is not available.");
+        if (!await _engineProvisioner.IsEngineInstalled())
+            return Result.WithFailure<IReadOnlyList<Container>>(
+                DomainErrors.EngineNotAvailable("Apple Container is not available."));
 
         var output = new StringBuilder();
+        var args = new List<string> { "ls", "--format", "json" };
 
-        await _processHost.RunWithResultAsync(
+        if (includeAll)
+        {
+            args.Insert(1, "--all");
+        }
+
+        var errors = new StringBuilder();
+        var result = await _processHost.RunWithResultAsync(
             "/usr/local/bin/container",
-            ["ls", "--all", "--format", "json"],
+            args,
             workingDirectory: null,
             onOutput: line => output.AppendLine(line),
-            onError:  _ => { },
+            onError: line => errors.AppendLine(line),
             cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        return ParseJson(output.ToString());
-    }
+        if (result.IsFailure)
+            return Result.WithFailure<IReadOnlyList<Container>>(result.Failure);
 
-    private static IReadOnlyList<Container> ParseJson(string output)
-    {
-        if (string.IsNullOrWhiteSpace(output))
-            return [];
+        var outputStr = output.ToString();
+        if (string.IsNullOrWhiteSpace(outputStr))
+            return Result.WithSuccess<IReadOnlyList<Container>>([]);
 
-        // Try JSON array first; fall back to NDJSON (one object per line)
         try
         {
-            var items = JsonSerializer.Deserialize<AppleManagedContainer[]>(output, JsonOptions);
-            return items?.Select(Map).ToArray() ?? [];
+            var containers = AppleContainerJsonParser.ParseContainers(outputStr);
+            return Result.WithSuccess<IReadOnlyList<Container>>(containers);
         }
-        catch (JsonException)
+        catch (InvalidOperationException ex)
         {
-            return output
-                .Split('\n', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries)
-                .Select(line => JsonSerializer.Deserialize<AppleManagedContainer>(line, JsonOptions))
-                .Where(c => c is not null)
-                .Select(c => Map(c!))
-                .ToArray();
+            return Result.WithFailure<IReadOnlyList<Container>>(
+                DomainErrors.ParseError(ex.Message));
         }
     }
 
-    private static Container Map(AppleManagedContainer src)
+    public async Task<Result<IReadOnlyList<ContainerImage>>> ListImagesAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
-        var config = src.Configuration;
-        var status = src.Status;
+        if (!await _engineProvisioner.IsEngineInstalled())
+            return Result.WithFailure<IReadOnlyList<ContainerImage>>(
+                DomainErrors.EngineNotAvailable("Apple Container is not available."));
 
-        // id IS the name — apple/container has no separate name field
-        var name = src.Id ?? string.Empty;
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
+        var args = new List<string> { "image", "ls", "--format", "json" };
 
-        var image = new ContainerImage(config?.Image?.Reference ?? string.Empty);
+        var result = await _processHost.RunWithResultAsync(
+            "/usr/local/bin/container",
+            args,
+            workingDirectory: null,
+            onOutput: line => output.AppendLine(line),
+            onError: line => errors.AppendLine(line),
+            cancellationToken: cancellationToken).ConfigureAwait(false);
 
-        var ports = config?.PublishedPorts?.Select(p => new ContainerPortMapping(
-            p.HostPort,
-            p.ContainerPort,
-            p.Proto?.Equals("udp", StringComparison.OrdinalIgnoreCase) is true
-                ? NetworkProtocol.Udp
-                : NetworkProtocol.Tcp
-        )).ToArray() ?? [];
+        if (result.IsFailure)
+            return Result.WithFailure<IReadOnlyList<ContainerImage>>(result.Failure);
 
-        var envVars = config?.InitProcess?.Environment
-            ?.Select(e => e.Split('=', 2))
-            .Where(parts => parts.Length == 2)
-            .Select(parts => new ContainerEnvironment(parts[0], parts[1]))
-            .ToArray() ?? [];
+        var outputStr = output.ToString();
+        if (string.IsNullOrWhiteSpace(outputStr))
+            return Result.WithSuccess<IReadOnlyList<ContainerImage>>([]);
 
-        var volumes = config?.Mounts?.Select(m => new ContainerVolume(
-            m.Source ?? string.Empty,
-            m.Destination ?? string.Empty,
-            m.ReadOnly
-        )).ToArray() ?? [];
-
-        DateTimeOffset.TryParse(config?.CreationDate, out var createdAt);
-
-        var containerStatus = status?.State?.ToLowerInvariant() switch
+        try
         {
-            "running"  => ContainerStatus.Running,
-            "stopping" => ContainerStatus.Exited,
-            "stopped"  => ContainerStatus.Exited,
-            "created"  => ContainerStatus.Created,
-            _          => ContainerStatus.Unknown
-        };
-
-        return new Container
+            var images = AppleContainerJsonParser.ParseImages(outputStr);
+            return Result.WithSuccess<IReadOnlyList<ContainerImage>>(images);
+        }
+        catch (InvalidOperationException ex)
         {
-            Name                 = name,
-            Image                = image,
-            Ports                = ports,
-            EnvironmentVariables = envVars,
-            Volumes              = volumes,
-            Instance             = new ContainerInstance
-            {
-                Status    = containerStatus,
-                Health    = ContainerHealth.Unknown,
-                CreatedAt = createdAt
-            }
-        };
+            return Result.WithFailure<IReadOnlyList<ContainerImage>>(
+                DomainErrors.ParseError(ex.Message));
+        }
     }
 
-    private static readonly JsonSerializerOptions JsonOptions = new()
+    public async Task<Result<IReadOnlyList<ContainerVolumeInfo>>> ListVolumesAsync(bool includeAll = true, CancellationToken cancellationToken = default)
     {
-        PropertyNameCaseInsensitive = true
-    };
+        if (!await _engineProvisioner.IsEngineInstalled())
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(
+                DomainErrors.EngineNotAvailable("Apple Container is not available."));
+
+        var output = new StringBuilder();
+        var errors = new StringBuilder();
+        var args = new List<string> { "volume", "list", "--format", "json" };
+
+        var result = await _processHost.RunWithResultAsync(
+            "/usr/local/bin/container",
+            args,
+            workingDirectory: null,
+            onOutput: line => output.AppendLine(line),
+            onError: line => errors.AppendLine(line),
+            cancellationToken: cancellationToken).ConfigureAwait(false);
+
+        if (result.IsFailure)
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(result.Failure);
+
+        var outputStr = output.ToString();
+        if (string.IsNullOrWhiteSpace(outputStr))
+            return Result.WithSuccess<IReadOnlyList<ContainerVolumeInfo>>([]);
+
+        try
+        {
+            var volumes = AppleVolumeJsonParser.ParseVolumes(outputStr);
+            return Result.WithSuccess<IReadOnlyList<ContainerVolumeInfo>>(volumes);
+        }
+        catch (InvalidOperationException ex)
+        {
+            return Result.WithFailure<IReadOnlyList<ContainerVolumeInfo>>(
+                DomainErrors.ParseError(ex.Message));
+        }
+    }
 }
