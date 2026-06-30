@@ -53,8 +53,6 @@ public partial class App : Application
             ViewLocator.Services = provider;
 
             _settingsService = provider.GetRequiredService<ISettingsService>();
-            if (OperatingSystem.IsMacOS())
-                Platform.MacDockHelper.SetShowInDock(_settingsService.Get().ShowInDock);
             _mainWindowVm = provider.GetRequiredService<MainWindowViewModel>();
             _mainWindow = new MainWindow { DataContext = _mainWindowVm };
             desktop.MainWindow = _mainWindow;
@@ -67,6 +65,8 @@ public partial class App : Application
                 {
                     e.Cancel = true;
                     _mainWindow.Hide();
+                    if (OperatingSystem.IsMacOS())
+                        Platform.MacDockHelper.SetShowInDock(_settingsService.Get().ShowInDock);
                 }
             };
 
@@ -79,6 +79,8 @@ public partial class App : Application
     private void ShowMainWindow()
     {
         if (_mainWindow is null) return;
+        if (OperatingSystem.IsMacOS())
+            Platform.MacDockHelper.SetShowInDock(true);
         _mainWindow.Show();
         _mainWindow.WindowState = WindowState.Normal;
         _mainWindow.Activate();

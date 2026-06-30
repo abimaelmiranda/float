@@ -1,9 +1,7 @@
-using System.Runtime.InteropServices;
 using CommunityToolkit.Mvvm.ComponentModel;
 using CommunityToolkit.Mvvm.Input;
 using Float.Core.Abstractions.Services;
 using Float.Core.Models;
-using Float.UI.Platform;
 using Float.UI.Resources;
 
 namespace Float.UI.ViewModels;
@@ -59,8 +57,6 @@ public partial class SettingsViewModel : ViewModelBase
             StopEngineOnQuit = StopEngineOnQuit,
             ShowInDock = ShowInDock,
         });
-        if (OperatingSystem.IsMacOS())
-            MacDockHelper.SetShowInDock(ShowInDock);
         CloseRequested?.Invoke(this, EventArgs.Empty);
     }
 
