@@ -11,30 +11,40 @@ public sealed class SettingsService : ISettingsService
         Environment.GetFolderPath(Environment.SpecialFolder.UserProfile),
         ".float", "settings.json");
 
-    private AppSettings _cached = Load();
+    private AppSettings _cached;
+
+    public SettingsService()
+    {
+        (_cached, LoadWarning) = Load();
+    }
+
+    public string? LoadWarning { get; private set; }
 
     public AppSettings Get() => _cached;
 
     public void Save(AppSettings settings)
     {
         _cached = settings;
+        LoadWarning = null;
         Directory.CreateDirectory(Path.GetDirectoryName(SettingsPath)!);
         var json = JsonSerializer.Serialize(settings, AppSettingsJsonContext.Default.AppSettings);
         File.WriteAllText(SettingsPath, json);
     }
 
-    private static AppSettings Load()
+    private static (AppSettings Settings, string? Warning) Load()
     {
         try
         {
-            if (!File.Exists(SettingsPath)) return new AppSettings();
+            if (!File.Exists(SettingsPath)) return (new AppSettings(), null);
             var json = File.ReadAllText(SettingsPath);
-            return JsonSerializer.Deserialize(json, AppSettingsJsonContext.Default.AppSettings)
-                ?? new AppSettings();
+            var settings = JsonSerializer.Deserialize(json, AppSettingsJsonContext.Default.AppSettings);
+            return settings is null
+                ? (new AppSettings(), "Settings file was empty.")
+                : (settings, null);
         }
-        catch
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or JsonException)
         {
-            return new AppSettings();
+            return (new AppSettings(), ex.Message);
         }
     }
 }

@@ -144,6 +144,8 @@ public static class UiStrings
     public static string SelectHostDirectory => Get(nameof(SelectHostDirectory));
     public static string SetAutomaticallyRosetta => Get(nameof(SetAutomaticallyRosetta));
     public static string Settings => Get(nameof(Settings));
+    public static string SettingsResetMessageFormat => Get(nameof(SettingsResetMessageFormat));
+    public static string SettingsResetTitle => Get(nameof(SettingsResetTitle));
     public static string SettingUpFloat => Get(nameof(SettingUpFloat));
     public static string ShowFloat => Get(nameof(ShowFloat));
     public static string ShowInDock => Get(nameof(ShowInDock));

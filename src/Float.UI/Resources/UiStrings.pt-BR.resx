@@ -84,6 +84,8 @@
   <data name="Scheme" xml:space="preserve"><value>ESQUEMA</value></data>
   <data name="Server" xml:space="preserve"><value>SERVIDOR</value></data>
   <data name="Settings" xml:space="preserve"><value>Ajustes</value></data>
+  <data name="SettingsResetMessageFormat" xml:space="preserve"><value>O Float não conseguiu ler seus ajustes e iniciou com os padrões. {0}</value></data>
+  <data name="SettingsResetTitle" xml:space="preserve"><value>Ajustes redefinidos</value></data>
   <data name="SettingUpFloat" xml:space="preserve"><value>Configurando o Float</value></data>
   <data name="ShowFloat" xml:space="preserve"><value>Mostrar Float</value></data>
   <data name="ShowInDock" xml:space="preserve"><value>Mostrar no Dock</value></data>

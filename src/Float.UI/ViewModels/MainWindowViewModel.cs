@@ -101,6 +101,7 @@ public partial class MainWindowViewModel : ViewModelBase
             IsSetupMode = true;
             engineSetupVm.SetupCompleted += OnSetupCompleted;
             CurrentPageViewModel = engineSetupVm;
+            ShowSettingsLoadWarning();
             return;
         }
 
@@ -108,6 +109,7 @@ public partial class MainWindowViewModel : ViewModelBase
         ShowingContainers = true;
         ShowingImages = false;
         ShowingVolumes = false;
+        ShowSettingsLoadWarning();
         _ = InitEngineAsync();
     }
 
@@ -219,26 +221,16 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ReturnToDashboard()
     {
         CancelMigrationLoad();
+        ShowPage(_dashboardVm);
         ShowingContainers = true;
-        ShowingImages = false;
-        ShowingVolumes = false;
-        ShowingMigration = false;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
     }
 
     private void ReturnToVolumes()
     {
         CancelMigrationLoad();
-        ShowingContainers = false;
-        ShowingImages = false;
+        ShowPage(_volumesVm);
         ShowingVolumes = true;
-        ShowingMigration = false;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _volumesVm;
         _ = _volumesVm.RefreshAsync();
     }
 
@@ -291,13 +283,8 @@ public partial class MainWindowViewModel : ViewModelBase
     private void ShowContainers()
     {
         CancelMigrationLoad();
+        ShowPage(_dashboardVm);
         ShowingContainers = true;
-        ShowingImages = false;
-        ShowingVolumes = false;
-        ShowingMigration = false;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _dashboardVm;
         _ = _dashboardVm.RefreshAsync();
     }
 
@@ -306,13 +293,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         HideNotification();
         CancelMigrationLoad();
-        ShowingContainers = false;
+        ShowPage(_imagesVm);
         ShowingImages = true;
-        ShowingVolumes = false;
-        ShowingMigration = false;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _imagesVm;
         await _imagesVm.RefreshAsync().ConfigureAwait(false);
     }
 
@@ -321,13 +303,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         HideNotification();
         CancelMigrationLoad();
-        ShowingContainers = false;
-        ShowingImages = false;
+        ShowPage(_volumesVm);
         ShowingVolumes = true;
-        ShowingMigration = false;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _volumesVm;
         await _volumesVm.RefreshAsync().ConfigureAwait(false);
     }
 
@@ -336,13 +313,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         HideNotification();
         CancelMigrationLoad();
-        ShowingContainers = false;
-        ShowingImages = false;
-        ShowingVolumes = false;
+        ShowPage(_migrationVm);
         ShowingMigration = true;
-        ShowingSettings = false;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _migrationVm;
         await _migrationVm.StartNewRunAsync().ConfigureAwait(false);
     }
 
@@ -351,13 +323,8 @@ public partial class MainWindowViewModel : ViewModelBase
     {
         HideNotification();
         CancelMigrationLoad();
-        ShowingContainers = false;
-        ShowingImages = false;
-        ShowingVolumes = false;
-        ShowingMigration = false;
-        ShowingSettings = false;
+        ShowPage(_registriesVm);
         ShowingRegistries = true;
-        CurrentPageViewModel = _registriesVm;
         await _registriesVm.RefreshAsync().ConfigureAwait(false);
     }
 
@@ -367,13 +334,8 @@ public partial class MainWindowViewModel : ViewModelBase
         HideNotification();
         CancelMigrationLoad();
         _settingsVm.Load();
-        ShowingContainers = false;
-        ShowingImages = false;
-        ShowingVolumes = false;
-        ShowingMigration = false;
+        ShowPage(_settingsVm);
         ShowingSettings = true;
-        ShowingRegistries = false;
-        CurrentPageViewModel = _settingsVm;
     }
 
     [RelayCommand]
@@ -399,5 +361,22 @@ public partial class MainWindowViewModel : ViewModelBase
         OnPropertyChanged(nameof(ThemeToggleLabel));
 
     private void CancelMigrationLoad() => _migrationVm.CancelLoad();
+
+    private void ShowPage(ViewModelBase page)
+    {
+        ShowingContainers = false;
+        ShowingImages = false;
+        ShowingVolumes = false;
+        ShowingMigration = false;
+        ShowingSettings = false;
+        ShowingRegistries = false;
+        CurrentPageViewModel = page;
+    }
+
+    private void ShowSettingsLoadWarning()
+    {
+        if (_settingsService.LoadWarning is { Length: > 0 } warning)
+            ShowNotification(UiStrings.SettingsResetTitle, string.Format(UiStrings.SettingsResetMessageFormat, warning));
+    }
 
 }

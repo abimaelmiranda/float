@@ -84,6 +84,8 @@
   <data name="Scheme" xml:space="preserve"><value>SCHEME</value></data>
   <data name="Server" xml:space="preserve"><value>SERVER</value></data>
   <data name="Settings" xml:space="preserve"><value>Settings</value></data>
+  <data name="SettingsResetMessageFormat" xml:space="preserve"><value>Float could not read your settings and started with defaults. {0}</value></data>
+  <data name="SettingsResetTitle" xml:space="preserve"><value>Settings reset</value></data>
   <data name="SettingUpFloat" xml:space="preserve"><value>Setting Up Float</value></data>
   <data name="ShowFloat" xml:space="preserve"><value>Show Float</value></data>
   <data name="ShowInDock" xml:space="preserve"><value>Show in Dock</value></data>
