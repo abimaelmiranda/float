@@ -59,8 +59,6 @@ public class Result<TValue> : Result
     public TValue GetValueOrThrow()
         => IsSuccess ? Value! : throw new InvalidOperationException(Failure.Message ?? "Operation failed");
 
-    public TValue? GetValueOrDefault() => Value;
-
     public static Result<TValue> WithSuccess(TValue value) => new(value);
     public static new Result<TValue> WithFailure(Error error) => new(error);
 

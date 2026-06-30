@@ -5,15 +5,4 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
   </PropertyGroup>
-
-  <ItemGroup>
-    <Folder Include="Abstractions/Services/" />
-    <Folder Include="Enums/" />
-    <Folder Include="Models/" />
-    <Folder Include="Models/Builders/" />
-    <Folder Include="Models/Results/" />
-    <Folder Include="Models/Results/Errors/" />
-    <Folder Include="Utils/" />
-  </ItemGroup>
-
 </Project>
