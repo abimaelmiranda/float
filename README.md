@@ -1,4 +1,4 @@
-# Float
+<h1 align="center">Float</h1>
 
 <p align="center">
   <img src="docs/float_readme_logo.png" alt="Float logo" width="160">
