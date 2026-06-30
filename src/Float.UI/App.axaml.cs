@@ -89,7 +89,15 @@ public partial class App : Application
     private void OnTrayIconClicked(object? sender, EventArgs e) => ShowMainWindow();
     private void OnShowFloatClick(object? sender, EventArgs e)  => ShowMainWindow();
 
-    private void OnAboutClick(object? sender, EventArgs e) { }
+    private void OnAboutClick(object? sender, EventArgs e)
+    {
+        ShowMainWindow();
+        var window = new Views.Shared.AboutWindow();
+        if (_mainWindow is not null)
+            window.ShowDialog(_mainWindow);
+        else
+            window.Show();
+    }
 
     private void OnSettingsClick(object? sender, EventArgs e)
     {
